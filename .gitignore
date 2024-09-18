@@ -1,2 +1,6 @@
 /venv
 .env
+/log
+/__pycache__
+/app/test.py
+/downloads/
