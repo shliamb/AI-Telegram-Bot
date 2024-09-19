@@ -9,8 +9,7 @@ from general_functions import random_name_2X
 
 async def get_voice_openai(data):
 
-    # model = data.get("model", AI_DEFAULT_MODEL_GET_AUDIO)
-    model = AI_DEFAULT_MODEL_GET_AUDIO
+    model = data.get("model", AI_DEFAULT_MODEL_GET_AUDIO)
     user_content = data.get("user_content") # 4096 characters max
     response_format = data.get("response_format", "opus") # mp3, opus, aac, flac, wav, and pcm in Telegram best - opus
     voice = data.get("voice", "nova") # alloy, echo, fable, onyx, nova, and shimmer

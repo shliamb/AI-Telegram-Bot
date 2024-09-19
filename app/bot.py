@@ -272,6 +272,7 @@ async def second_function(message: types.Message, state: FSMContext):
     # ai
     # model
     # system_content
+    model_voice = None
 
 
     data = {
@@ -330,38 +331,41 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # if VOICE:
     elif received_object == "voice":
-        if ai == "gemini":
-            answer = await get_text_openai(data) # Поменять когда будет и Гугль, но пока он тильки на енглишь
-        elif ai == "openai":
-            answer = await get_text_openai(data)
-        #return answer
+
+        data_voice = {
+            "model": model_voice,
+            # "prompt": prompt,
+            # "response_format": response_format,
+            # "language": language,
+        }
+
+        if file_path:
+            data_voice["file_path"] = file_path
+        if voice_file_name:
+            data_voice["name_file"] = voice_file_name
+
+        # Convert Voice to Text
+        convert_answer = await get_text_openai(data_voice)
+        if convert_answer is None:
+            return
+
+        data = {
+            "user_content": convert_answer,
+        }
+
+        answer = await mod_tex(ai, data)
+
+        if answer is None:
+            return
+        
+        # Attempts to give a response to the user:
+        await try_answer_bot(message, answer, voice_answer) 
 
 
 
 
 
 
-
-
-# # PHOTO + DOC + Text
-# async def mod_photo_text(ai, data):
-#     if ai == "gemini":
-#         answer = await mod_gemini_chat(data)
-#     elif ai == "openai":
-#         answer = await mod_openai_chat(data)
-#     return answer
-
-
-# # TEXT
-# async def mod_tex(ai, data):
-#     if ai == "gemini":
-#         answer = await mod_gemini_chat(data)
-#     elif ai == "openai":
-#         answer = await mod_openai_chat(data)
-#     return answer
-
-
-# AUDIO
 
 
 
