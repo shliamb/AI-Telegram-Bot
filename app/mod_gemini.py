@@ -1,34 +1,47 @@
-from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASWORD_DB, ADMIN_ID
+from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
 import requests
 import re
 import asyncio
-
+from config import AI_DEFAULT_MODEL_GEMINI, URL
 
 
 
 async def mod_gemini_chat(data):
 
-    #file_path = None
-
-    model = data.get("model", "gemini-1.5-flash-latest")
+    model = data.get("model", AI_DEFAULT_MODEL_GEMINI)
     user_content = data.get("user_content")
     system_content = data.get("system_content")
-    #file_path = data.get("file_path")
+    file_path = data.get("file_path")
+    name_file = data.get("name_file")
 
-    url = "http://137.184.87.156:8000/api/gemini/"
+
+    url = f"{URL}/api/gemini/"
 
     data_ai = {
             "username": USERNAME_API_AI,
             "user_content": user_content,
-            "system_content": system_content,
             "model": model,
     }
+
+    if system_content:
+        data_ai["system_content"] = system_content
+
 
     headers = {
         KEY_API_AI : VALUE_KEY_API_AI,
     }
 
-    response = requests.post(url, headers=headers, data=data_ai)#, files=files)
+    if file_path:
+        with open(file_path, 'rb') as file:
+            files = {
+                'file': (name_file, file),
+            }
+
+
+            response = requests.post(url, headers=headers, data=data_ai, files=files)
+
+    elif file_path is None:
+        response = requests.post(url, headers=headers, data=data_ai)
 
     if response.status_code == 200:
         answer_json = response.json()
