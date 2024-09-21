@@ -36,6 +36,10 @@ def random_name_2X() -> str:
 
 # Combined escaping of special characters:
 def escape_special_chars(text):
+    if not text:
+       print("Error: There is no content in the model's response.")
+       return
+
     special_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
     for char in special_chars:
         text = text.replace(char, f'\\{char}')

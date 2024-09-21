@@ -82,13 +82,8 @@ async def command_start_handler(message: Message) -> None:
 
 
 
-
-
-
-
-
 # TEXT
-async def mod_tex(ai, data):
+async def mod_tex(ai, data, message):
     if ai == "gemini":
         answer = await mod_gemini_chat(data)
     elif ai == "openai":
@@ -98,6 +93,8 @@ async def mod_tex(ai, data):
 
 # Attempts to give a response to the user:
 async def try_answer_bot(message, answer, voice_answer):
+
+    
     try:
         await message.reply(answer, parse_mode="MarkdownV2")
     except:
@@ -125,40 +122,30 @@ async def try_answer_bot(message, answer, voice_answer):
         await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(voice_answer_file_path))
     else:
         print(f"The file is empty or missing - {voice_answer_file_path}")
-
-
-# Set State
-class Form_img_text(StatesGroup):
-    first_stage = State()
-    #second_stage = State()
+        logging.error(f"The file is empty or missing - {voice_answer_file_path}")
 
 
 
-# PHOTO + DOC + Text
-@dp.message(Form_img_text.first_stage, F.content_type.in_({'text'}))
-async def mod_photo_text(message: Message, state: FSMContext):
-    # Из прошлого State
-    data = await state.get_data()
-    ai = data.get('ai')
-    voice_answer = data.get('voice_answer')
 
-    if message.text:
-        data["user_content"] = message.text
+# PHOTO input:
+async def mod_photo(ai, data, message):
 
-    if ai == "gemini":
-        answer = await mod_gemini_chat(data)
-    elif ai == "openai":
-        answer = await mod_openai_chat(data)
-    if answer:
-        # Attempts to give a response to the user:
-        await try_answer_bot(message, answer, voice_answer) 
+    # Telegram always saves in jpg in compress
+    photo = message.photo[-1]  # Используем самый большой размер фотографии
+    file_id = photo.file_id
+    file = await bot.get_file(file_id)
+    little = random_name_2X()
+    photo_file_name = f"photo-{little}-{message.photo[-1].file_id}.jpg"
+    file_path = f'{DOWNLOADS_FOLDER}{photo_file_name}'
+    await bot.download_file(file.file_path, file_path)
 
-    await state.clear()
+    data["file_path"] = file_path
+    data["name_file"] = photo_file_name
 
+    if data.get("user_content") is None:
+        await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="markdown")
+        return
 
-
-# PHOTO + DOC + Caption
-async def mod_photo_caption(ai, data):
     if ai == "gemini":
         answer = await mod_gemini_chat(data)
     elif ai == "openai":
@@ -167,199 +154,207 @@ async def mod_photo_caption(ai, data):
 
 
 
-#### Addressing AI:
-@dp.message(F.content_type.in_({'text', 'document', 'photo', 'audio', 'voice', })) # 'location' 'contact' 'video_note'  'video'  'sticker'
-async def second_function(message: types.Message, state: FSMContext):
+# DOCUMENTS input:
+async def mod_documents(ai, data, message):
 
-    ai = AI_DEFAULT
-    if ai == "openai":
-        model = AI_DEFAULT_MODEL_OPENAI
-    elif ai == "gemini":
-        model = AI_DEFAULT_MODEL_GEMINI
-    
-    voice_answer = VOICE_THE_ANSWER
+    # Get id and name file:
+    file_id = message.document.file_id
+    little = random_name_2X()
+    name_file = little + "-" + message.document.file_name
 
+    # Get extension:
+    match = re.search(r'\.([^.]+)$', name_file)
+    if not match:
+        logging.error(f"File dont have extension - {name_file}")
+    extension = match.group(1)  # Получаем расширение без точки
 
-    file_path, question, received_object, user_content, photo_file_name, name_file, caption, system_content = (None,) * 8
-
-    await typing(message)
-    id = user_id(message)
-    caption = message.caption  # Получаем caption изображения
-
-    #### TEXT:
-    if message.content_type == 'text':
-        received_object = "text"
-        question = message.text
-
-    #### DOCUMENTS:
-    elif message.content_type == 'document': # Любые форматы, а потому внутри нужна логика проверки
-        received_object = "document"
-        file_id = message.document.file_id
-        little = random_name_2X()
-        name_file = little + "-" + message.document.file_name
-
-        # Get extension:
-        match = re.search(r'\.([^.]+)$', name_file)
-
-        if match:
-            extension = match.group(1)  # Получаем расширение без точки
-        else:
-            logging.error(f"Dont support file - {name_file}")
-            return
-        
-        # Installation is not supported temporarily:
-        set_extension = {"doc", "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json"}
-
-        if extension in set_extension:
-            await message.answer(f"The bot does not support this file - {name_file}", parse_mode="markdown")
-            logging.error(f"Dont support file - {name_file}")
-            return
+    #### IMAGE ####
+    if extension.lower() == "jpg" or extension.lower() == "png":
 
         file_path = f'{DOWNLOADS_FOLDER}{name_file}'
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, file_path)
-        # await message.reply("Документ сохранен!")
 
+        data["file_path"] = file_path
+        data["name_file"] = name_file
 
-    #### PHOTO:
-    elif message.content_type == 'photo': # Telegram always saves in jpg in compress
-        received_object = "photo"
-        photo = message.photo[-1]  # Используем самый большой размер фотографии
-        file_id = photo.file_id
-        file = await bot.get_file(file_id)
-        little = random_name_2X()
-        photo_file_name = f"photo-{little}-{message.photo[-1].file_id}.jpg"
-        file_path = f'{DOWNLOADS_FOLDER}{photo_file_name}'
-        await bot.download_file(file.file_path, file_path)
-        # await message.reply("Фотография сохранена!")
+        if data.get("user_content") is None:
+            await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="markdown")
+            return
 
-
-    #### AUDIO:
-    elif message.content_type == 'audio':
-        received_object = "audio"
-        audio = message.audio
-        file_id = audio.file_id
-        little = random_name_2X()
-        audio_file_name = f"audio-{little}-{audio.file_id}.mp3"
-        file = await bot.get_file(file_id)
-        file_path = f'{AUDIO_FOLDER}{audio_file_name}'
-        await bot.download_file(file.file_path, file_path)
-        # await message.reply("Аудиофайл сохранен!")
-
-
-    #### VOICE:
-    elif message.content_type == 'voice':
-        received_object = "voice"
-        voice = message.voice
-        file_id = voice.file_id
-        little = random_name_2X()
-        voice_file_name = f"voice-{little}-{voice.file_id}.ogg"
-        file = await bot.get_file(file_id)
-        file_path = f'{VOICE_FOLDER}{voice_file_name}'
-        await bot.download_file(file.file_path, file_path)
-        # await message.reply("Голосовое сообщение сохранено!")
-
-    #### None, why not?)
-    if received_object is None:
-        await message.reply("Dont support file")
-        logging.error(f"Dont support file")
+    #### DOC ####
+    elif extension.lower() == "doc":
+        await message.reply("Серьезно...?", parse_mode="markdown")
         return
+
+    else:
+        await message.answer(f"The bot does not support this file yet, sorry - {name_file}", parse_mode="markdown")
+        logging.error(f"The bot does not support this file yet, sorry - {name_file}")
+        return
+
+    if ai == "gemini":
+        answer = await mod_gemini_chat(data)
+    elif ai == "openai":
+        answer = await mod_openai_chat(data)
+    return answer
+
+# "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json", "doc"
+
+
+
+
+
+#### AUDIO input:
+
+# Две кнопки, одна - перевод на анг, другая - транскрипция!!!
+async def mod_text_to_audio(ai, data, message):
+
+    audio = message.audio
+    file_id = audio.file_id
+    little = random_name_2X()
+    audio_file_name = f"audio-{little}-{audio.file_id}.mp3"
+    file = await bot.get_file(file_id)
+    file_path = f'{AUDIO_FOLDER}{audio_file_name}'
+    await bot.download_file(file.file_path, file_path)
+    # await message.reply("Аудиофайл сохранен!")
+
+
+#### VOICE input:
+async def mod_voice_to_text(ai, data, message):
+
+    voice = message.voice
+    file_id = voice.file_id
+    little = random_name_2X()
+    voice_file_name = f"voice-{little}-{voice.file_id}.ogg"
+    file = await bot.get_file(file_id)
+    file_path = f'{VOICE_FOLDER}{voice_file_name}'
+    await bot.download_file(file.file_path, file_path)
+
+    if file_path:
+        data["file_path"] = file_path
+    if voice_file_name:
+        data["name_file"] = voice_file_name
+
+    # Convert Voice to Text
+    convert_answer = await get_text_openai(data)
+    if convert_answer is None:
+        return
+
+    data = {"user_content": convert_answer,}
+    answer = await mod_tex(ai, data, message)
+    return answer
+
+
+
+
+# Drawing Dall-e 3:
+async def mod_gen_img(ai, data, message):
+    print("рисую")
+    return
+
+
+
+# Checking the text for a drawing request:
+async def check_request_drawing(question):
+    typecontent = None
+    draw_words = {
+        "draw", "sketch", "illustrate", "depict", "paint", "render", "нарисуй", "рисунок", "изобрази", "схема", \
+        "иллюстрация", "набросок", "макет", "дизайн", "черчеж",
+    }
+    question_words = set(question.lower().split())
+    if draw_words & question_words:
+        pass
+
+        # Кнопка с вопросом - нарисовать?
+        # Одна кнопка - нарисовать и нет, это вопрос
+        # детально настроить можно будет в настройках а так по умолчанию
+        #typecontent = "draw"
+
+        return typecontent or None
+
+
+
+
+#### MAIN HENDLER INCOMING
+@dp.message(F.content_type.in_({'text', 'document', 'photo', 'audio', 'voice', })) # 'location' 'contact' 'video_note'  'video'  'sticker'
+async def second_function(message: types.Message):
+
+    # SYS
+    file_path, question, received_object, photo_file_name, name_file, caption, system_content, model_voice = (None,) * 8
+    caption, question, typecontent = message.caption, message.text, message.content_type
+    ai, voice_answer = AI_DEFAULT, VOICE_THE_ANSWER
+    await typing(message)
+    id = user_id(message)
+    
+    # Getting a model depending on the selected AI:
+    default_model_ai = {
+        "openai": AI_DEFAULT_MODEL_OPENAI,
+        "gemini": AI_DEFAULT_MODEL_GEMINI, # ...
+    }
+
+    model = default_model_ai[ai]
+
+
+    # Getting the user's system data from the database:
 
     # Проверка в базе данных выбор пользователя - выбрана openai или Gemini или др., \
     # затем конкретно какая из версий, если нет этого то по умолчанию.
-    #system_content = "отвечай по русски" # Удалить нахер когда апи поправлю... твою мать...
-    # voice_answer ?
+    # system_content = "отвечай по русски" или еще чего
+    # voice_answer !
+    # model_voice
     # ai
     # model
-    # system_content
-    model_voice = None
+
+    # Checking the text for a drawing request:
+    if typecontent == "text":
+        drawing_request = await check_request_drawing(question)
+        typecontent = drawing_request or typecontent
+
+    # Data collection to API:
+    data = {"ai": ai,}
+    data["model"] = model
+    data["system_content"] = system_content
+    data["user_content"] = caption or question
+    data["voice_answer"] = voice_answer
+    data["model_voice"] = model_voice
+    # data["response_format"] = response_format
+    # data["language"] = language
+    # data["prompt"] = prompt
 
 
-    data = {
-        "ai": ai,
+    # Each type does its job
+    input_content_type = {
+        "text": mod_tex,
+        "draw": mod_gen_img,
+        "document": mod_documents,
+        "photo": mod_photo,
+        "audio": mod_text_to_audio,
+        "voice": mod_voice_to_text,
     }
 
-    if model:
-        data["model"] = model
-    if system_content:
-        data["system_content"] = system_content
+    if typecontent not in input_content_type:
+        await message.reply("Not support type file, sorry.")
+        logging.error(f"Not support type file, sorry.")
+        return
+    
+    answer = await input_content_type[typecontent](ai, data, message)
+
+    if not answer:
+        return
+    
+    # Attempts to give a response to the user:
+    await try_answer_bot(message, answer, voice_answer)
+####
 
 
-    # if PHOTO and some DOCUMENTS like a image:
-    if received_object == "document" or received_object == "photo":
-
-        if file_path:
-            data["file_path"] = file_path
-        if name_file:
-            data["name_file"] = name_file
-        elif photo_file_name:
-            data["name_file"] = photo_file_name
-        if voice_answer:
-            data["voice_answer"] = voice_answer
-        if caption:
-            data["user_content"] = caption
-            answer = await mod_photo_caption(ai, data)
-            if answer is None:
-                return
-            # Attempts to give a response to the user:
-            await try_answer_bot(message, answer, voice_answer) 
-            return
-        
-        await state.update_data(data=data) # Прикрепление в state данных
-        await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="markdown")
-        await state.set_state(Form_img_text.first_stage) # Ожидание следующего шага
+  
 
 
 
-    # if only TEXT:
-    elif received_object == "text":
-
-        if question:
-            data["user_content"] = question
-
-        answer = await mod_tex(ai, data)
-
-        if answer is None:
-            return
-        
-        # Attempts to give a response to the user:
-        await try_answer_bot(message, answer, voice_answer) 
-
-        await state.clear()
 
 
 
-    # if VOICE:
-    elif received_object == "voice":
 
-        data_voice = {
-            "model": model_voice,
-            # "prompt": prompt,
-            # "response_format": response_format,
-            # "language": language,
-        }
-
-        if file_path:
-            data_voice["file_path"] = file_path
-        if voice_file_name:
-            data_voice["name_file"] = voice_file_name
-
-        # Convert Voice to Text
-        convert_answer = await get_text_openai(data_voice)
-        if convert_answer is None:
-            return
-
-        data = {
-            "user_content": convert_answer,
-        }
-
-        answer = await mod_tex(ai, data)
-
-        if answer is None:
-            return
-        
-        # Attempts to give a response to the user:
-        await try_answer_bot(message, answer, voice_answer) 
 
 
 
@@ -396,3 +391,172 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"An error occurred: {e}.")
         print(f"An error occurred: {e}.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#     await state.update_data(data=data) # Прикрепление в state данных
+#     await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="markdown")
+#     await state.set_state(Form_img_text.first_stage) # Ожидание следующего шага
+
+
+
+# # Set State
+# class Form_img_text(StatesGroup):
+#     first_stage = State()
+#     #second_stage = State()
+
+
+
+# # PHOTO + DOC + Text
+# @dp.message(Form_img_text.first_stage, F.content_type.in_({'text'}))
+# async def mod_photo_text(message: Message, state: FSMContext):
+#     # Из прошлого State
+#     data = await state.get_data()
+#     ai = data.get('ai')
+#     voice_answer = data.get('voice_answer')
+
+#     if message.text:
+#         data["user_content"] = message.text
+
+#     if ai == "gemini":
+#         answer = await mod_gemini_chat(data)
+#     elif ai == "openai":
+#         answer = await mod_openai_chat(data)
+#     if answer:
+#         # Attempts to give a response to the user:
+#         await try_answer_bot(message, answer, voice_answer) 
+
+#     await state.clear()
+
+
+
+
+
+    # # if PHOTO and some DOCUMENTS like a image:
+    # if received_object == "document" or received_object == "photo":
+
+    #     if file_path:
+    #         data["file_path"] = file_path
+    #     if name_file:
+    #         data["name_file"] = name_file
+    #     elif photo_file_name:
+    #         data["name_file"] = photo_file_name
+    #     if voice_answer:
+    #         data["voice_answer"] = voice_answer
+    #     if caption:
+    #         data["user_content"] = caption
+    #         answer = await mod_photo_caption(ai, data)
+    #         if answer is None:
+    #             return
+    #         # Attempts to give a response to the user:
+    #         await try_answer_bot(message, answer, voice_answer) 
+    #         return
+        
+    #     await state.update_data(data=data) # Прикрепление в state данных
+    #     await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="markdown")
+    #     await state.set_state(Form_img_text.first_stage) # Ожидание следующего шага
+
+
+
+    # # if only TEXT:
+    # elif received_object == "text":
+
+    #     if question:
+    #         data["user_content"] = question
+
+    #     answer = await mod_tex(ai, data)
+
+    #     if answer is None:
+    #         return
+        
+    #     # Attempts to give a response to the user:
+    #     await try_answer_bot(message, answer, voice_answer) 
+
+    #await state.clear()
+
+
+
+      # #### PHOTO:
+    # elif message.content_type == 'photo': # Telegram always saves in jpg in compress
+    #     received_object = "photo"
+    #     photo = message.photo[-1]  # Используем самый большой размер фотографии
+    #     file_id = photo.file_id
+    #     file = await bot.get_file(file_id)
+    #     little = random_name_2X()
+    #     photo_file_name = f"photo-{little}-{message.photo[-1].file_id}.jpg"
+    #     file_path = f'{DOWNLOADS_FOLDER}{photo_file_name}'
+    #     await bot.download_file(file.file_path, file_path)
+    #     # await message.reply("Фотография сохранена!")
+
+
+
+    # # Set State
+# class Form_img_text(StatesGroup):
+#     first_stage = State()
+#     #second_stage = State()
+
+
+
+# # PHOTO + DOC + Text
+# @dp.message(Form_img_text.first_stage, F.content_type.in_({'text'}))
+# async def mod_photo_text(message: Message, state: FSMContext):
+#     # Из прошлого State
+#     data = await state.get_data()
+#     ai = data.get('ai')
+#     voice_answer = data.get('voice_answer')
+
+#     if message.text:
+#         data["user_content"] = message.text
+
+#     if ai == "gemini":
+#         answer = await mod_gemini_chat(data)
+#     elif ai == "openai":
+#         answer = await mod_openai_chat(data)
+#     if answer:
+#         # Attempts to give a response to the user:
+#         await try_answer_bot(message, answer, voice_answer) 
+
+#     await state.clear()
+
+
+
+    # #### DOCUMENTS:
+    # if message.content_type == 'document': # Любые форматы, а потому внутри нужна логика проверки
+    #     received_object = "document"
+    #     file_id = message.document.file_id
+    #     little = random_name_2X()
+    #     name_file = little + "-" + message.document.file_name
+
+    #     # Get extension:
+    #     match = re.search(r'\.([^.]+)$', name_file)
+
+    #     if match:
+    #         extension = match.group(1)  # Получаем расширение без точки
+    #     else:
+    #         logging.error(f"Dont support file - {name_file}")
+    #         return
+        
+    #     # Installation is not supported temporarily:
+    #     set_extension = {"doc", "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json"}
+
+    #     if extension in set_extension:
+    #         await message.answer(f"The bot does not support this file - {name_file}", parse_mode="markdown")
+    #         logging.error(f"Dont support file - {name_file}")
+    #         return
+
+    #     file_path = f'{DOWNLOADS_FOLDER}{name_file}'
+    #     file = await bot.get_file(file_id)
+    #     await bot.download_file(file.file_path, file_path)
+    #     # await message.reply("Документ сохранен!")

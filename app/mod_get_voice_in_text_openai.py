@@ -46,7 +46,7 @@ async def get_voice_openai(data):
             with open(file_path, "wb") as audio_file:
                 audio_file.write(audio_data)
 
-            print(f"The audio file is saved as output_audio.{format_audio}")
+            #print(f"The audio file is saved as output_audio.{format_audio}")
             return file_path
     else:
         print(f"Error: {response.status_code} - {response.text}")

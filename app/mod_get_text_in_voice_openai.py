@@ -3,7 +3,7 @@ import requests
 import requests
 
 from config import URL, AI_DEFAULT_MODEL_GET_AUDIO, AUDIO_FOLDER, AI_DEFAULT_MODEL_GET_TRANSCRIPTION
-from general_functions import random_name_2X
+#from general_functions import random_name_2X
 
 
 
@@ -11,17 +11,13 @@ from general_functions import random_name_2X
 
 async def get_text_openai(data):
 
-    model = data.get("model", AI_DEFAULT_MODEL_GET_TRANSCRIPTION) # whisper-1
+    model = data.get("model_voice", AI_DEFAULT_MODEL_GET_TRANSCRIPTION) # whisper-1
     prompt = data.get("user_content") # The prompt should match the audio language.
     response_format = data.get("response_format", "text") # json, text, srt, verbose_json, or vtt
     language = data.get("language") # input language in ISO-639-1, will improve accuracy and latency - ru or en
     file_path = data.get("file_path")
     name_file = data.get("name_file")
 
-
-    # print(file_path)
-    # print()
-    # print(name_file)
 
     url = f"{URL}/api/transcription-openai/"
 
@@ -32,12 +28,9 @@ async def get_text_openai(data):
             # timestamp_granularities=["segment"]                                                           # Not suport
     }
 
-    if language:
-        data["language"] = language
-    if prompt:
-        data["prompt"] = prompt
-    if response_format:
-        data["response_format"] = response_format
+    data["language"] = language
+    data["prompt"] = prompt
+    data["response_format"] = response_format
 
     headers = {
         KEY_API_AI: VALUE_KEY_API_AI,
