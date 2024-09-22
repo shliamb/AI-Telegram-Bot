@@ -1,6 +1,5 @@
 from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
 import requests
-import requests
 
 from config import URL, AI_DEFAULT_MODEL_GET_AUDIO, AUDIO_FOLDER, AI_DEFAULT_MODEL_GET_TRANSCRIPTION
 #from general_functions import random_name_2X

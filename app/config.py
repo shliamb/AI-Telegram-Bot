@@ -4,12 +4,13 @@
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # Minimum pay
-VOICE_THE_ANSWER = False # False or True
+VOICE_THE_ANSWER = True # False or True
 AI_DEFAULT = "gemini" # gemini or openai
 AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest" #  gemini-1.5-flash-latest or gpt-4o-mini-2024-07-18
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini-2024-07-18"
 AI_DEFAULT_MODEL_GET_AUDIO = "tts-1"
 AI_DEFAULT_MODEL_GET_TRANSCRIPTION = "whisper-1"
+DEFAULT_DALL_E = "dall-e-3"
 
 
 # Folders:

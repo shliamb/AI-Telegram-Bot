@@ -27,8 +27,8 @@ from aiogram import Bot, Dispatcher, types, F, Router
 from aiogram.enums import ParseMode
 from aiogram.utils.markdown import hbold
 from aiogram.filters import CommandStart, Command, Filter
-from aiogram.types import (Message, BotCommand, LabeledPrice, ContentType,
-                            InputFile, Document, PhotoSize, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton)
+from aiogram.types import (Message, BotCommand, LabeledPrice, ContentType, InputFile, Document, PhotoSize, \
+        ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton)
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.state import State, StatesGroup
@@ -41,8 +41,8 @@ from mod_gemini import mod_gemini_chat
 from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
+from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X
-
 
 
 
@@ -61,7 +61,8 @@ def user_id(action) -> int:
 # Show Typing bot
 async def typing(action) -> None:
     await bot.send_chat_action(action.chat.id, action='typing')
-    # await asyncio.sleep(5)
+
+
 
 
 #### Push /start ####
@@ -82,19 +83,27 @@ async def command_start_handler(message: Message) -> None:
 
 
 
-# TEXT
-async def mod_tex(ai, data, message):
+#### GET CHAT to AI:
+async def mod_tex(ai, data, message, voice_answer):
+
+    await typing(message)
+
     if ai == "gemini":
         answer = await mod_gemini_chat(data)
     elif ai == "openai":
         answer = await mod_openai_chat(data)
-    return answer
+
+    if not answer:
+        return
+    
+    # Attempts to give a response to the user:
+    await try_answer_bot(message, answer, voice_answer)
 
 
 # Attempts to give a response to the user:
 async def try_answer_bot(message, answer, voice_answer):
+    await typing(message)
 
-    
     try:
         await message.reply(answer, parse_mode="MarkdownV2")
     except:
@@ -125,10 +134,14 @@ async def try_answer_bot(message, answer, voice_answer):
         logging.error(f"The file is empty or missing - {voice_answer_file_path}")
 
 
-
+#### IMG + TEXT ####
+class Form_text_img(StatesGroup):
+    no_caption = State()
 
 # PHOTO input:
-async def mod_photo(ai, data, message):
+async def mod_photo(ai, data, message, voice_answer, state: FSMContext):
+
+    await typing(message)
 
     # Telegram always saves in jpg in compress
     photo = message.photo[-1]  # Используем самый большой размер фотографии
@@ -143,19 +156,30 @@ async def mod_photo(ai, data, message):
     data["name_file"] = photo_file_name
 
     if data.get("user_content") is None:
-        await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="markdown")
+        await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="Markdown")
         return
 
     if ai == "gemini":
         answer = await mod_gemini_chat(data)
     elif ai == "openai":
         answer = await mod_openai_chat(data)
-    return answer
+
+    if not answer:
+        return
+    
+    # Attempts to give a response to the user:
+    await try_answer_bot(message, answer, voice_answer)
+
+
+    # class Form_text_img(StatesGroup):
+    # no_caption = State()
 
 
 
 # DOCUMENTS input:
-async def mod_documents(ai, data, message):
+async def mod_documents(ai, data, message, voice_answer, state: FSMContext):
+
+    await typing(message)
 
     # Get id and name file:
     file_id = message.document.file_id
@@ -179,7 +203,7 @@ async def mod_documents(ai, data, message):
         data["name_file"] = name_file
 
         if data.get("user_content") is None:
-            await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="markdown")
+            await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="Markdown")
             return
 
     #### DOC ####
@@ -188,7 +212,7 @@ async def mod_documents(ai, data, message):
         return
 
     else:
-        await message.answer(f"The bot does not support this file yet, sorry - {name_file}", parse_mode="markdown")
+        await message.answer(f"The bot does not support this file yet, sorry - {name_file}", parse_mode="Markdown")
         logging.error(f"The bot does not support this file yet, sorry - {name_file}")
         return
 
@@ -196,7 +220,12 @@ async def mod_documents(ai, data, message):
         answer = await mod_gemini_chat(data)
     elif ai == "openai":
         answer = await mod_openai_chat(data)
-    return answer
+
+    if not answer:
+        return
+    
+    # Attempts to give a response to the user:
+    await try_answer_bot(message, answer, voice_answer)
 
 # "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json", "doc"
 
@@ -217,10 +246,17 @@ async def mod_text_to_audio(ai, data, message):
     file_path = f'{AUDIO_FOLDER}{audio_file_name}'
     await bot.download_file(file.file_path, file_path)
     # await message.reply("Аудиофайл сохранен!")
+    # if not answer:
+    #     return
+    
+    # # Attempts to give a response to the user:
+    # await try_answer_bot(message, answer, voice_answer)
+
+
 
 
 #### VOICE input:
-async def mod_voice_to_text(ai, data, message):
+async def mod_voice_to_text(ai, data, message, voice_answer):
 
     voice = message.voice
     file_id = voice.file_id
@@ -241,43 +277,116 @@ async def mod_voice_to_text(ai, data, message):
         return
 
     data = {"user_content": convert_answer,}
-    answer = await mod_tex(ai, data, message)
-    return answer
+    answer = await mod_tex(ai, data, message, voice_answer)
+
+    if not answer:
+        return
+    
+    # Attempts to give a response to the user:
+    await try_answer_bot(message, answer, voice_answer)
+ 
+
+
+
+#### DRAW ####
+# Set State
+class Form_draw(StatesGroup):
+    draw = State()
+
+# Confirmations to draw:
+@dp.callback_query(Form_draw.draw, lambda c: c.data in ["draw", "not_draw"])
+async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMContext):
+
+    chat_id = callback_query.message.chat.id
+    await bot.send_chat_action(chat_id, action='typing')
+
+    # Deleted keyboard and message:
+    await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)     # await bot.edit_message_reply_markup(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id, reply_markup=None)
+
+    data_state = await state.get_data()
+    ai = data_state.get("ai")
+    all_data = data_state.get("all_data")
+    voice_answer = data_state.get("voice_answer")
+    message = data_state.get("message")
+
+
+    if callback_query.data == 'draw':
+        await bot.send_message(callback_query.from_user.id, "🇺🇸 *EN:* The image is already being generated, expect it.\n🇷🇺 *RU:* Изображение уже генерируется, ожидайте.")
+
+        # Generation image:
+        if ai == "openai":
+            answer = await mod_openai_dall_e(all_data)
+        elif ai == "gemini":
+            answer = await mod_openai_dall_e(all_data) # Sorry)))
+
+        # Response to the user:
+        await bot.send_message(callback_query.from_user.id, answer)
+
+
+    elif callback_query.data == 'not_draw':
+
+        # await bot.send_message(callback_query.from_user.id, "🇺🇸 *EN:* Waiting for the response to be generated.\n🇷🇺 *RU:* Ожидание генерации ответа.")
+        sent_message = await bot.send_message(callback_query.from_user.id, "🇺🇸 *EN:* The response is already being generated, expect.\n🇷🇺 *RU:* Ответ уже генерируется, ожидайте.", parse_mode='Markdown')
+
+        answer = await mod_tex(ai, all_data, message, voice_answer)
+
+        if not answer:
+            return
+        
+        # Response to the user:
+        await try_answer_bot(message, answer, voice_answer)
+
+        await bot.delete_message(chat_id=callback_query.from_user.id, message_id=sent_message.message_id) # Должен удалять сообщение выше, но чет не пашет
+
+    await bot.answer_callback_query(callback_query.id)
+    await state.clear()
+
+
 
 
 
 
 # Drawing Dall-e 3:
-async def mod_gen_img(ai, data, message):
-    print("рисую")
-    return
+async def mod_gen_img(ai, data, message, voice_answer, state: FSMContext):
+
+    await state.update_data(ai=ai, all_data=data, message=message, voice_answer=voice_answer)
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="🖼 Yes / Да", callback_data="draw")],
+            [InlineKeyboardButton(text="❌ No / Нет", callback_data="not_draw")],
+        ]
+    )
+
+    await bot.send_message(message.chat.id, "🇺🇸 *EN:* Generate an image?\n🇷🇺 *RU:* Сгенерировать изображение?", parse_mode="Markdown", reply_markup=keyboard) 
+
+    await state.set_state(Form_draw.draw)
 
 
 
-# Checking the text for a drawing request:
+
+
+# Check request drawing:
 async def check_request_drawing(question):
     typecontent = None
-    draw_words = {
-        "draw", "sketch", "illustrate", "depict", "paint", "render", "нарисуй", "рисунок", "изобрази", "схема", \
-        "иллюстрация", "набросок", "макет", "дизайн", "черчеж",
+
+    draw_words = {  # добавить еще на каждое слово его слово-формы..
+        "draw", "sketch", "illustrate", "depict", "paint", "render", "нарисуй", "нарисуйте", "нарисовал", "нарисовала", "нарисовало", "нарисовать",  \
+        "рисунок", "изобрази", "схема", "нарисовали", "рисуешь", "иллюстрация", "набросок", "макет", "дизайн", "чертеж",
     }
     question_words = set(question.lower().split())
     if draw_words & question_words:
-        pass
+        typecontent = "draw"
+    
+    return typecontent
 
-        # Кнопка с вопросом - нарисовать?
-        # Одна кнопка - нарисовать и нет, это вопрос
-        # детально настроить можно будет в настройках а так по умолчанию
-        #typecontent = "draw"
-
-        return typecontent or None
 
 
 
 
 #### MAIN HENDLER INCOMING
 @dp.message(F.content_type.in_({'text', 'document', 'photo', 'audio', 'voice', })) # 'location' 'contact' 'video_note'  'video'  'sticker'
-async def second_function(message: types.Message):
+async def second_function(message: types.Message, state: FSMContext):
 
     # SYS
     file_path, question, received_object, photo_file_name, name_file, caption, system_content, model_voice = (None,) * 8
@@ -305,6 +414,8 @@ async def second_function(message: types.Message):
     # ai
     # model
 
+    #await state.update_data(ass="one") !!!!!!! delete
+
     # Checking the text for a drawing request:
     if typecontent == "text":
         drawing_request = await check_request_drawing(question)
@@ -312,10 +423,12 @@ async def second_function(message: types.Message):
 
     # Data collection to API:
     data = {"ai": ai,}
+    # All:
     data["model"] = model
     data["system_content"] = system_content
     data["user_content"] = caption or question
     data["voice_answer"] = voice_answer
+    # Voice:
     data["model_voice"] = model_voice
     # data["response_format"] = response_format
     # data["language"] = language
@@ -333,17 +446,21 @@ async def second_function(message: types.Message):
     }
 
     if typecontent not in input_content_type:
-        await message.reply("Not support type file, sorry.")
+        #await message.reply("Not support type file, sorry.")
         logging.error(f"Not support type file, sorry.")
         return
-    
-    answer = await input_content_type[typecontent](ai, data, message)
 
-    if not answer:
-        return
-    
-    # Attempts to give a response to the user:
-    await try_answer_bot(message, answer, voice_answer)
+    arguments = {
+        'ai': ai,
+        'data': data,
+        'message': message,
+        'voice_answer': voice_answer
+    }
+
+    if typecontent == "draw" or typecontent == "photo" or typecontent == "document":
+        arguments["state"] = state #state: FSMContext
+
+    await input_content_type[typecontent](**arguments)
 ####
 
 
@@ -560,3 +677,67 @@ if __name__ == "__main__":
     #     file = await bot.get_file(file_id)
     #     await bot.download_file(file.file_path, file_path)
     #     # await message.reply("Документ сохранен!")
+
+
+
+
+
+      # kb = [
+    #     [
+    #         types.KeyboardButton(text="Да"),
+    #         types.KeyboardButton(text="Нет")
+    #     ],
+    # ]
+    # keyboard = types.ReplyKeyboardMarkup(keyboard=kb)
+    
+    # await message.reply("🇺🇸 *EN:* Generate an image?\n🇷🇺 *RU:* Сгенерировать изображение?", reply_markup=keyboard)
+
+
+
+
+    # keyboard = ReplyKeyboardMarkup(
+    #     inline_keyboard=[
+    #         [KeyboardButton(text="🖼 Yes / Да")], 
+    #         [KeyboardButton(text="❌ No / Нет")], 
+    #     ]
+    # )
+
+    # await bot.send_message(message.chat.id, "🇺🇸 *EN:* Generate an image?\n🇷🇺 *RU:* Сгенерировать изображение?", parse_mode="MarkdownV2", reply_markup=keyboard)
+
+
+
+
+    #keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    # markup = ReplyKeyboardMarkup(
+    #     keyboard=[
+    #         ['Кнопка 1', 'Кнопка 2'],
+    #         ['Кнопка 3']
+    #     ],
+    #     resize_keyboard=True
+    # )
+
+
+    # button = KeyboardButton("Присвоить значение")
+    # markup.add(button)
+
+    # Пример правильного использования
+    # markup = ReplyKeyboardMarkup(
+    #     keyboard=[
+    #         [KeyboardButton(text='Кнопка 1'), KeyboardButton(text='Кнопка 2')],
+    #         [KeyboardButton(text='Кнопка 3')]
+    #     ],
+    #     resize_keyboard=True
+    # )
+
+    # button = KeyboardButton("Присвоить значение")
+    # markup.add(button)
+
+
+
+# Ждем ответа от пользователя в рамках этой же функции
+# @dp.message(lambda m: m.text in ["Да", "Нет"])
+# async def process_choice(message: types.Message):
+#     user_choice = message.text  # Присваиваем значение переменной
+#     await message.answer(f"Вы выбрали: {user_choice}")
+#     # Удаляем клавиатуру
+#     await message.reply("Клавиатура удалена.", reply_markup=types.ReplyKeyboardRemove())
