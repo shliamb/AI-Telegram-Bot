@@ -53,6 +53,26 @@ dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher
 
 
 
+# To Do:
+# Сделать в меню отдельный блок объявлений или новосте, так же кнопку отказа от уведомлений.
+#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #########
 # Get User_ID
 def user_id(action) -> int:
@@ -70,6 +90,16 @@ async def typing(action) -> None:
 async def command_start_handler(message: Message) -> None:
     await typing(message)
 
+
+    # MENU
+    bot_commands = [
+        BotCommand(command="/reset", description="RESET"),
+        BotCommand(command="/menu", description="MENU"),
+        BotCommand(command="/help", description="HELP"),
+    ]
+    await bot.set_my_commands(bot_commands)
+
+
     id = user_id(message)
     name = message.from_user.username
     full_name = message.from_user.full_name
@@ -80,6 +110,125 @@ async def command_start_handler(message: Message) -> None:
     about = name if name else (first_name if first_name else (last_name if last_name else "User"))
 
     await message.answer(f"hi <strong>{about}</strong>! Get high", parse_mode="HTML")
+
+
+
+
+
+
+
+menu = '''
+
+<b>⚙️ SETTINGS</b>
+
+Default language /en or /ru, now - en.
+Choose an AI /openai or /gemini, now - openai.
+Dialogue with AI with memory /yes or /no - YES.
+Return an audio response with a text response /yes or /no - YES.
+Summarize the story /yes or /no - YES.
+Notifications /yes or /no - Yes.
+You can fine-tune each position or just leave it as default.
+
+<b>📝 Text CHAT:</b>
+
+OpenAI:
+/4_o_mini - bot about info
+/4_turbo - bot about info
+
+Gemini:
+/4_o_mini - bot about info
+/4_turbo - bot about info
+
+<b>🌇 Creating an IMAGE:</b>
+
+Dall-e settings:
+/set_dall_3 - set Dall-e 3
+/set_dall_2 - set Dall-e 2
+/setabouttext - change bot about info
+/setuserpic - change bot profile photo
+/setcommands - change the list of commands
+/deletebot - delete a bot
+
+Midjourney:
+/my_vote_for_mid - vote for the implementation, already 45 ❤️
+
+<b>🗣 Voice calls to AI:</b>
+
+OpenAI:
+/setcommands - change the list of commands
+/deletebot - delete a bot
+
+<b>🎧 Audio from AI:</b>
+
+OpenAI:
+/setcommands - change the list of commands
+/deletebot - delete a bot
+
+<b>💳 Balance and payment:</b>
+/deletebot - delete a bot
+/deletebot - delete a bot
+
+<b>🗞 Reports and statistics:</b>
+/deletebot - delete a bot
+/deletebot - delete a bot
+
+
+
+
+'''
+
+help = '''
+help
+'''
+
+
+
+#### WORK MENU ####
+
+# RESET
+@dp.message(Command('reset'))
+async def start(message: types.Message):
+
+    await message.reply(f"I reset the history. You're clean)", parse_mode="Markdown")
+    #await bot.answer_callback_query(callback_query.id)
+
+# MENU
+@dp.message(Command('menu'))
+async def start(message: types.Message):
+
+    menu_message = await message.reply(f"{menu}", parse_mode="HTML")
+
+    # menu_message_id = menu_message.message_id
+    # menu_chat_id = message.chat.id
+
+    # link_to_menu_message = f"https://t.me/c/{menu_chat_id}/{menu_message_id}"
+
+    # print(link_to_menu_message)
+
+
+@dp.message(Command('help'))
+async def start(message: types.Message):
+
+    await message.reply(f"{help}", parse_mode="Markdown")
+
+    # Создаем ссылку на предыдущее сообщение с меню
+    #link_to_menu_message = f"Ссылка на меню: [Меню](https://t.me/c/{menu_chat_id}/{menu_message_id})"
+    
+    #await bot.send_message(message.from_user.id, f"{link_to_menu_message}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -122,7 +271,6 @@ async def try_answer_bot(message, answer, voice_answer):
     
     data_audio = {
         "user_content": answer,
-        #...
     }
 
     voice_answer_file_path = await get_voice_openai(data_audio)
@@ -137,6 +285,33 @@ async def try_answer_bot(message, answer, voice_answer):
 #### IMG + TEXT ####
 class Form_text_img(StatesGroup):
     no_caption = State()
+
+
+# Add a separate description of the image:
+@dp.message(Form_text_img.no_caption, F.content_type.in_({'text'}))
+async def add_text_to_photo(message: Message, state: FSMContext):
+    answer = None
+    # Из прошлого State
+    data_state = await state.get_data()
+    ai = data_state.get('ai')
+    all_data = data_state.get('all_data')
+    voice_answer = data_state.get('voice_answer')
+
+    all_data["user_content"] = message.text
+
+    if ai == "gemini":
+        answer = await mod_gemini_chat(all_data)
+    elif ai == "openai":
+        answer = await mod_openai_chat(all_data)
+
+    if not answer:
+        return
+    
+    # Attempts to give a response to the user:
+    await try_answer_bot(message, answer, voice_answer)
+    await state.clear()
+
+
 
 # PHOTO input:
 async def mod_photo(ai, data, message, voice_answer, state: FSMContext):
@@ -155,24 +330,27 @@ async def mod_photo(ai, data, message, voice_answer, state: FSMContext):
     data["file_path"] = file_path
     data["name_file"] = photo_file_name
 
-    if data.get("user_content") is None:
-        await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="Markdown")
-        return
+    if data.get("user_content"):
 
-    if ai == "gemini":
-        answer = await mod_gemini_chat(data)
-    elif ai == "openai":
-        answer = await mod_openai_chat(data)
+        if ai == "gemini":
+            answer = await mod_gemini_chat(data)
+        elif ai == "openai":
+            answer = await mod_openai_chat(data)
 
-    if not answer:
-        return
+        if not answer:
+            return
+        
+        # Attempts to give a response to the user:
+        await try_answer_bot(message, answer, voice_answer)
+        await state.clear()
     
-    # Attempts to give a response to the user:
-    await try_answer_bot(message, answer, voice_answer)
+
+    elif data.get("user_content") is None:
+        await state.update_data(ai=ai, all_data=data, voice_answer=voice_answer)
+        await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="Markdown")
+        await state.set_state(Form_text_img.no_caption)
 
 
-    # class Form_text_img(StatesGroup):
-    # no_caption = State()
 
 
 
@@ -192,6 +370,7 @@ async def mod_documents(ai, data, message, voice_answer, state: FSMContext):
         logging.error(f"File dont have extension - {name_file}")
     extension = match.group(1)  # Получаем расширение без точки
 
+
     #### IMAGE ####
     if extension.lower() == "jpg" or extension.lower() == "png":
 
@@ -202,9 +381,24 @@ async def mod_documents(ai, data, message, voice_answer, state: FSMContext):
         data["file_path"] = file_path
         data["name_file"] = name_file
 
-        if data.get("user_content") is None:
-            await message.reply("🇺🇸 *EN:* Ask a question in the caption of the picture.\n🇷🇺 *RU:* Задайте вопрос в подписи картинки.", parse_mode="Markdown")
-            return
+        if data.get("user_content"):
+
+            if ai == "gemini":
+                answer = await mod_gemini_chat(data)
+            elif ai == "openai":
+                answer = await mod_openai_chat(data)
+
+            if not answer:
+                return
+            
+            # Attempts to give a response to the user:
+            await try_answer_bot(message, answer, voice_answer)
+            await state.clear()
+
+        elif data.get("user_content") is None:
+            await state.update_data(ai=ai, all_data=data, voice_answer=voice_answer)
+            await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="Markdown")
+            await state.set_state(Form_text_img.no_caption)
 
     #### DOC ####
     elif extension.lower() == "doc":
@@ -216,35 +410,24 @@ async def mod_documents(ai, data, message, voice_answer, state: FSMContext):
         logging.error(f"The bot does not support this file yet, sorry - {name_file}")
         return
 
-    if ai == "gemini":
-        answer = await mod_gemini_chat(data)
-    elif ai == "openai":
-        answer = await mod_openai_chat(data)
-
-    if not answer:
-        return
-    
-    # Attempts to give a response to the user:
-    await try_answer_bot(message, answer, voice_answer)
-
 # "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json", "doc"
 
 
 
 
 
-#### AUDIO input:
+#### AUDIO input: Есть сомнения в востребованности данной функции, позже подумаю еще..
 
 # Две кнопки, одна - перевод на анг, другая - транскрипция!!!
-async def mod_text_to_audio(ai, data, message):
+# async def mod_text_to_audio(ai, data, message):
 
-    audio = message.audio
-    file_id = audio.file_id
-    little = random_name_2X()
-    audio_file_name = f"audio-{little}-{audio.file_id}.mp3"
-    file = await bot.get_file(file_id)
-    file_path = f'{AUDIO_FOLDER}{audio_file_name}'
-    await bot.download_file(file.file_path, file_path)
+    # audio = message.audio
+    # file_id = audio.file_id
+    # little = random_name_2X()
+    # audio_file_name = f"audio-{little}-{audio.file_id}.mp3"
+    # file = await bot.get_file(file_id)
+    # file_path = f'{AUDIO_FOLDER}{audio_file_name}'
+    # await bot.download_file(file.file_path, file_path)
     # await message.reply("Аудиофайл сохранен!")
     # if not answer:
     #     return
@@ -414,7 +597,6 @@ async def second_function(message: types.Message, state: FSMContext):
     # ai
     # model
 
-    #await state.update_data(ass="one") !!!!!!! delete
 
     # Checking the text for a drawing request:
     if typecontent == "text":
@@ -441,7 +623,7 @@ async def second_function(message: types.Message, state: FSMContext):
         "draw": mod_gen_img,
         "document": mod_documents,
         "photo": mod_photo,
-        "audio": mod_text_to_audio,
+        #"audio": mod_text_to_audio,
         "voice": mod_voice_to_text,
     }
 
@@ -513,231 +695,3 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-
-
-#     await state.update_data(data=data) # Прикрепление в state данных
-#     await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="markdown")
-#     await state.set_state(Form_img_text.first_stage) # Ожидание следующего шага
-
-
-
-# # Set State
-# class Form_img_text(StatesGroup):
-#     first_stage = State()
-#     #second_stage = State()
-
-
-
-# # PHOTO + DOC + Text
-# @dp.message(Form_img_text.first_stage, F.content_type.in_({'text'}))
-# async def mod_photo_text(message: Message, state: FSMContext):
-#     # Из прошлого State
-#     data = await state.get_data()
-#     ai = data.get('ai')
-#     voice_answer = data.get('voice_answer')
-
-#     if message.text:
-#         data["user_content"] = message.text
-
-#     if ai == "gemini":
-#         answer = await mod_gemini_chat(data)
-#     elif ai == "openai":
-#         answer = await mod_openai_chat(data)
-#     if answer:
-#         # Attempts to give a response to the user:
-#         await try_answer_bot(message, answer, voice_answer) 
-
-#     await state.clear()
-
-
-
-
-
-    # # if PHOTO and some DOCUMENTS like a image:
-    # if received_object == "document" or received_object == "photo":
-
-    #     if file_path:
-    #         data["file_path"] = file_path
-    #     if name_file:
-    #         data["name_file"] = name_file
-    #     elif photo_file_name:
-    #         data["name_file"] = photo_file_name
-    #     if voice_answer:
-    #         data["voice_answer"] = voice_answer
-    #     if caption:
-    #         data["user_content"] = caption
-    #         answer = await mod_photo_caption(ai, data)
-    #         if answer is None:
-    #             return
-    #         # Attempts to give a response to the user:
-    #         await try_answer_bot(message, answer, voice_answer) 
-    #         return
-        
-    #     await state.update_data(data=data) # Прикрепление в state данных
-    #     await message.reply("🇺🇸 *EN:* Question about the attached image:\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="markdown")
-    #     await state.set_state(Form_img_text.first_stage) # Ожидание следующего шага
-
-
-
-    # # if only TEXT:
-    # elif received_object == "text":
-
-    #     if question:
-    #         data["user_content"] = question
-
-    #     answer = await mod_tex(ai, data)
-
-    #     if answer is None:
-    #         return
-        
-    #     # Attempts to give a response to the user:
-    #     await try_answer_bot(message, answer, voice_answer) 
-
-    #await state.clear()
-
-
-
-      # #### PHOTO:
-    # elif message.content_type == 'photo': # Telegram always saves in jpg in compress
-    #     received_object = "photo"
-    #     photo = message.photo[-1]  # Используем самый большой размер фотографии
-    #     file_id = photo.file_id
-    #     file = await bot.get_file(file_id)
-    #     little = random_name_2X()
-    #     photo_file_name = f"photo-{little}-{message.photo[-1].file_id}.jpg"
-    #     file_path = f'{DOWNLOADS_FOLDER}{photo_file_name}'
-    #     await bot.download_file(file.file_path, file_path)
-    #     # await message.reply("Фотография сохранена!")
-
-
-
-    # # Set State
-# class Form_img_text(StatesGroup):
-#     first_stage = State()
-#     #second_stage = State()
-
-
-
-# # PHOTO + DOC + Text
-# @dp.message(Form_img_text.first_stage, F.content_type.in_({'text'}))
-# async def mod_photo_text(message: Message, state: FSMContext):
-#     # Из прошлого State
-#     data = await state.get_data()
-#     ai = data.get('ai')
-#     voice_answer = data.get('voice_answer')
-
-#     if message.text:
-#         data["user_content"] = message.text
-
-#     if ai == "gemini":
-#         answer = await mod_gemini_chat(data)
-#     elif ai == "openai":
-#         answer = await mod_openai_chat(data)
-#     if answer:
-#         # Attempts to give a response to the user:
-#         await try_answer_bot(message, answer, voice_answer) 
-
-#     await state.clear()
-
-
-
-    # #### DOCUMENTS:
-    # if message.content_type == 'document': # Любые форматы, а потому внутри нужна логика проверки
-    #     received_object = "document"
-    #     file_id = message.document.file_id
-    #     little = random_name_2X()
-    #     name_file = little + "-" + message.document.file_name
-
-    #     # Get extension:
-    #     match = re.search(r'\.([^.]+)$', name_file)
-
-    #     if match:
-    #         extension = match.group(1)  # Получаем расширение без точки
-    #     else:
-    #         logging.error(f"Dont support file - {name_file}")
-    #         return
-        
-    #     # Installation is not supported temporarily:
-    #     set_extension = {"doc", "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json"}
-
-    #     if extension in set_extension:
-    #         await message.answer(f"The bot does not support this file - {name_file}", parse_mode="markdown")
-    #         logging.error(f"Dont support file - {name_file}")
-    #         return
-
-    #     file_path = f'{DOWNLOADS_FOLDER}{name_file}'
-    #     file = await bot.get_file(file_id)
-    #     await bot.download_file(file.file_path, file_path)
-    #     # await message.reply("Документ сохранен!")
-
-
-
-
-
-      # kb = [
-    #     [
-    #         types.KeyboardButton(text="Да"),
-    #         types.KeyboardButton(text="Нет")
-    #     ],
-    # ]
-    # keyboard = types.ReplyKeyboardMarkup(keyboard=kb)
-    
-    # await message.reply("🇺🇸 *EN:* Generate an image?\n🇷🇺 *RU:* Сгенерировать изображение?", reply_markup=keyboard)
-
-
-
-
-    # keyboard = ReplyKeyboardMarkup(
-    #     inline_keyboard=[
-    #         [KeyboardButton(text="🖼 Yes / Да")], 
-    #         [KeyboardButton(text="❌ No / Нет")], 
-    #     ]
-    # )
-
-    # await bot.send_message(message.chat.id, "🇺🇸 *EN:* Generate an image?\n🇷🇺 *RU:* Сгенерировать изображение?", parse_mode="MarkdownV2", reply_markup=keyboard)
-
-
-
-
-    #keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    # markup = ReplyKeyboardMarkup(
-    #     keyboard=[
-    #         ['Кнопка 1', 'Кнопка 2'],
-    #         ['Кнопка 3']
-    #     ],
-    #     resize_keyboard=True
-    # )
-
-
-    # button = KeyboardButton("Присвоить значение")
-    # markup.add(button)
-
-    # Пример правильного использования
-    # markup = ReplyKeyboardMarkup(
-    #     keyboard=[
-    #         [KeyboardButton(text='Кнопка 1'), KeyboardButton(text='Кнопка 2')],
-    #         [KeyboardButton(text='Кнопка 3')]
-    #     ],
-    #     resize_keyboard=True
-    # )
-
-    # button = KeyboardButton("Присвоить значение")
-    # markup.add(button)
-
-
-
-# Ждем ответа от пользователя в рамках этой же функции
-# @dp.message(lambda m: m.text in ["Да", "Нет"])
-# async def process_choice(message: types.Message):
-#     user_choice = message.text  # Присваиваем значение переменной
-#     await message.answer(f"Вы выбрали: {user_choice}")
-#     # Удаляем клавиатуру
-#     await message.reply("Клавиатура удалена.", reply_markup=types.ReplyKeyboardRemove())

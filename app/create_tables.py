@@ -1,0 +1,128 @@
+from get_keys import USER_DB, PASWORD_DB
+import psycopg2
+
+
+'''
+
+Table users:
+user_id  name  full_name  first_name  last_name  block  last_visit  time_zone  language  system_content  money  
+notifications  dialog  dialog_sum  audio_response  ai  model_openai  model_google  model_anthropic  model_llamA  model_dall_e  
+model_midjourney  model_voice  model_speech  voice  voice_speed  img_quality  img_style  img_size  n_number
+
+Table statistics:
+id  date  model  tokens  min  img  price  user_id  name
+
+Table discussion:
+id  date  user_say  model_say  summarization  user_id 
+
+
+'''
+
+# Create TABLES:
+def create_tables_in_db():
+
+    try:
+        # Conect to db:                   имя контейнера
+        connection = psycopg2.connect(host="localhost", database="my_database", user=USER_DB, password=PASWORD_DB)
+        
+        cursor = connection.cursor()
+        
+        # Create table:
+        create_table_users = '''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id BIGINT PRIMARY KEY,
+            name VARCHAR(50),
+            full_name VARCHAR(50),
+            first_name VARCHAR(50),
+            last_name VARCHAR(50),
+            block BOOLEAN DEFAULT FALSE,
+            last_visit TIMESTAMP,
+            time_zone VARCHAR(10), 
+            language VARCHAR(10),
+            system_content TEXT,
+            money FLOAT,
+            notifications BOOLEAN DEFAULT TRUE,
+            dialog BOOLEAN DEFAULT TRUE,
+            dialog_sum BOOLEAN DEFAULT TRUE,
+            audio_response VARCHAR(50),
+            ai VARCHAR(50),
+            model_openai VARCHAR(50),
+            model_google VARCHAR(50),
+            model_anthropic VARCHAR(50),
+            model_llamA VARCHAR(50),
+            model_dall_e VARCHAR(50),
+            model_midjourney VARCHAR(50),
+            model_voice VARCHAR(50),
+            model_speech VARCHAR(50),
+            voice VARCHAR(50),
+            voice_speed FLOAT,
+            img_quality VARCHAR(50),
+            img_style VARCHAR(50),
+            img_size VARCHAR(50),
+            n_number INTEGER,
+
+            CONSTRAINT unique_system_content UNIQUE (system_content)
+        );
+        '''
+        # Executing an SQL query:
+        cursor.execute(create_table_users)
+
+
+        create_table_statistics = '''
+        CREATE TABLE IF NOT EXISTS statistics (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP,
+            model VARCHAR(50),
+            tokens INTEGER,
+            min FLOAT,
+            img INTEGER,
+            price FLOAT,
+            user_id BIGINT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        );
+        '''
+        cursor.execute(create_table_statistics)
+
+
+        create_table_discussion = '''
+        CREATE TABLE IF NOT EXISTS discussion (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP,
+            user_say TEXT,
+            model_say TEXT,
+            summarization BOOLEAN,
+            user_id BIGINT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        );
+        '''
+        cursor.execute(create_table_discussion)
+
+        # Saving changes:
+        connection.commit()
+        print("Adding tables is done!")
+
+    except Exception as error:
+        print("Error:", error)
+    finally:
+
+        # Closing the cursor and database connection
+        if cursor:
+            cursor.close()
+            
+        if connection:
+            connection.close()
+
+
+
+if __name__ == "__main__":
+    create_tables_in_db()
+
+
+
+
+
+# VARCHAR(n) - строковый тип данных ограничение n, TEXT - строковый тип данных ограничение в 1Гб.
+# iuser_id INTEGER SERIAL PRIMARY KEY , тут SERIAL - означает, что каждый последующее число в строке будет само увеличиваться..
+# Если ячейка является первичным ключем, то она автоматически добавленна в индекс, CONSTRAINT unique_user_id UNIQUE (user_id)  -- Создание уникального ограничения также создает индекс
+# INTEGER  BIGINT block BOOLEAN NOT NULL DEFAULT FALSE  INTEGER  VARCHAR(100) NOT NULL UNIQUE UNIQUE
+# time_zone TIMESTAMP DEFAULT CURRENT_TIMESTAMP

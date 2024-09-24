@@ -4,8 +4,8 @@
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # Minimum pay
-VOICE_THE_ANSWER = True # False or True
-AI_DEFAULT = "gemini" # gemini or openai
+VOICE_THE_ANSWER = False # False or True
+AI_DEFAULT = "openai" # gemini or openai
 AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest" #  gemini-1.5-flash-latest or gpt-4o-mini-2024-07-18
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini-2024-07-18"
 AI_DEFAULT_MODEL_GET_AUDIO = "tts-1"
@@ -23,6 +23,13 @@ VOICE_FOLDER = "./voice/"
 # Prices per 1M tokens:
 PRICE = {
     # OpenAI to 1M tokes:
+    # New:
+    'o1-preview': 150,
+    'o1-preview-2024-09-12': 150,
+
+    'o1-mini': 30,
+    'o1-mini-2024-09-12': 30,
+
     'chatgpt-4o-latest': 40,
     'gpt-4o': 40,
     'gpt-4o-2024-05-13': 40,
@@ -30,13 +37,6 @@ PRICE = {
     'gpt-4o-mini': 1.5, # no vision
     'gpt-4o-mini-2024-07-18': 1.5, # no vision
     'gpt-4-turbo-2024-04-09': 80,
-
-    # New:
-    'o1-preview': 150,
-    'o1-preview-2024-09-12': 150,
-
-    'o1-mini': 30,
-    'o1-mini-2024-09-12': 30,
 
     # Images to one img:
     'dall-e-3-1024': 0.08,
