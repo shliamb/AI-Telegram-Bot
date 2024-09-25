@@ -1,8 +1,10 @@
-from get_keys import USER_DB, PASWORD_DB
+from get_keys import USER_DB, PASSWORD_DB
 import psycopg2
 
 
 '''
+
+Architecture Data Base.
 
 Table users:
 user_id  name  full_name  first_name  last_name  block  last_visit  time_zone  language  system_content  money  
@@ -23,7 +25,7 @@ def create_tables_in_db():
 
     try:
         # Conect to db:                   имя контейнера
-        connection = psycopg2.connect(host="localhost", database="my_database", user=USER_DB, password=PASWORD_DB)
+        connection = psycopg2.connect(host="localhost", database="my_database", user=USER_DB, password=PASSWORD_DB)
         
         cursor = connection.cursor()
         
