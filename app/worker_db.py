@@ -19,27 +19,39 @@ async def get_connection():
 
 
 
-
-
-
-
 # Users Table:
 
 
 # Add user:
 async def add_user(user_data):
-    connection = None
+    keys_list, values_list, num_list, i, connection = [], [], [], 1, None
+
+    user_id = user_data.get("user_id")
+
+    if not user_id:
+        print("Error update_user: Where is user_id?") 
+        return False
+    
+    if len(user_data) < 1: # if there is at least a user_id, let's go
+        print("Error update_user: User_data is empty.")
+        return False
+
+    for key, value in user_data.items():
+        keys_list.append(key)
+        values_list.append(value)
+        num_list.append(f"${i}")
+        i += 1
+
+    keys = ", ".join(keys_list) # <-- в строку, а * распоковывает поотдельности
+    nums = ", ".join(num_list)
 
     try:
         connection = await get_connection()
         await connection.execute(
-            '''
-            INSERT INTO users (user_id, name, money)
-            VALUES ($1, $2, $3)
-            ''', 
-            user_data.get("user_id"), 
-            user_data.get("name"), 
-            user_data.get("money")
+            f'''
+            INSERT INTO users ({keys})
+            VALUES ({nums})
+            ''', *values_list # Оператор распоковки *
         )
         return True
     
@@ -53,9 +65,9 @@ async def add_user(user_data):
 
 # # Add user:
 # user_data = {
-#     "user_id": 185435943,
-#     "name": "Jonish",
-#     "money": 4.0,
+#     #"user_id": 485435943,
+#     "name": "Julia",
+#     "money": 5.0,
 # }
 
 # confirm = asyncio.run(add_user(user_data))
@@ -86,8 +98,8 @@ async def read_user(user_id):
         if connection is not None:
             await connection.close()
 
-# Read user:
-# data_user = asyncio.run(read_user(185435943))
+# # Read user:
+# data_user = asyncio.run(read_user(485435943))
 # print(data_user.get("user_id"), data_user.get("name"), data_user.get("money"))
 
 
@@ -98,35 +110,34 @@ async def read_user(user_id):
 
 # Update user:
 async def update_user(user_data):
-    updates, values, i, connection = [], [], 0, None
+    keys_list, values_list, i, connection = [], [], 1, None
 
     user_id = user_data.get("user_id")
+
     if not user_id:
-        print("Error update_user: Where is user_id?")
+        print("Error update_user: Where is user_id?") 
         return False
     
-    if not user_data:
-        print("Error update_user: User_data is empty.")
+    if len(user_data) <= 1: # At a minimum, we need user_id + at least one element of the change.
+        print("Error update_user: User_data is empty or contains a single entry.")
         return False
 
     for key, value in user_data.items():
         if key != "user_id":
+            keys_list.append(f"{key} = ${i}")
+            values_list.append(value) #user_data[key])
             i += 1
-            updates.append(f"{key} = ${i}")
-            values.append(user_data[key])
 
-    if updates:
-        update_string = ", ".join(updates)
-
-    values.append(user_id)
+    update_string = ", ".join(keys_list) # <-- в строку, а * распоковывает поотдельности
+    values_list.append(user_id)
 
     try:
         connection = await get_connection()
         await connection.execute(
             f'''
-            UPDATE users SET {update_string} WHERE user_id = ${i + 1};
+            UPDATE users SET {update_string} WHERE user_id = ${i};
             ''',
-            *values
+            *values_list
         )
         return True
     
@@ -140,18 +151,18 @@ async def update_user(user_data):
 
 
 
-# Update user:
-user_data = {
-    "user_id": 185435943,
-    "name": "Juna4",
-    #"money": 3.0,
-}
+# # Update user:
+# user_data = {
+#     "user_id": 485435943,
+#     "name": "Juna4",
+#     #"money": 5.0,
+# }
 
-confirm = asyncio.run(update_user(user_data))
-print(confirm)
+# confirm = asyncio.run(update_user(user_data))
+# print(confirm)
 
-data_user = asyncio.run(read_user(185435943))
-print(data_user.get("user_id"), data_user.get("name"), data_user.get("money"))
+# data_user = asyncio.run(read_user(485435943))
+# print(data_user.get("user_id"), data_user.get("name"), data_user.get("money"))
 
 
 
