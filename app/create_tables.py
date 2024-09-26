@@ -3,7 +3,6 @@ import psycopg2
 
 
 '''
-
 Architecture Data Base.
 
 Table users:
@@ -16,7 +15,6 @@ id  date  model  tokens  min  img  price  user_id  name
 
 Table discussion:
 id  date  user_say  model_say  summarization  user_id 
-
 
 '''
 
@@ -61,10 +59,10 @@ def create_tables_in_db():
             img_quality VARCHAR(50),
             img_style VARCHAR(50),
             img_size VARCHAR(50),
-            n_number INTEGER,
-
-            CONSTRAINT unique_system_content UNIQUE (system_content)
+            n_number INTEGER
         );
+        CREATE INDEX idx_ai ON users(ai);
+        CREATE INDEX idx_user_system_content ON users(system_content);
         '''
         # Executing an SQL query:
         cursor.execute(create_table_users)
@@ -128,3 +126,5 @@ if __name__ == "__main__":
 # Если ячейка является первичным ключем, то она автоматически добавленна в индекс, CONSTRAINT unique_user_id UNIQUE (user_id)  -- Создание уникального ограничения также создает индекс
 # INTEGER  BIGINT block BOOLEAN NOT NULL DEFAULT FALSE  INTEGER  VARCHAR(100) NOT NULL UNIQUE UNIQUE
 # time_zone TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+# UNIQUE - автоматом индексируются
+# INDEX idx_name (name)  -- Создание обычного индекса на колонке name
