@@ -8,12 +8,11 @@ from config import AI_DEFAULT_MODEL_GEMINI, URL
 
 async def mod_gemini_chat(data):
 
-    model = data.get("model", AI_DEFAULT_MODEL_GEMINI)
+    model = data.get("model_language")
     user_content = data.get("user_content")
     system_content = data.get("system_content")
     file_path = data.get("file_path")
     name_file = data.get("name_file")
-
 
     url = f"{URL}/api/gemini/"
 

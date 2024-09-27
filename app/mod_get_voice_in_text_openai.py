@@ -9,11 +9,11 @@ from general_functions import random_name_2X
 
 async def get_voice_openai(data):
 
-    model = data.get("model", AI_DEFAULT_MODEL_GET_AUDIO)
+    model = data.get("model_audio")
     user_content = data.get("user_content") # 4096 characters max
     response_format = data.get("response_format", "opus") # mp3, opus, aac, flac, wav, and pcm in Telegram best - opus
-    voice = data.get("voice", "nova") # alloy, echo, fable, onyx, nova, and shimmer
-    speed = data.get("speed", 1.0) # 0.25 to 4.0 
+    voice = data.get("voice") # alloy, echo, fable, onyx, nova, and shimmer
+    speed = data.get("voice_speed") # 0.25 to 4.0 
 
     url = f"{URL}/api/speech-to-audio-openai/"
 

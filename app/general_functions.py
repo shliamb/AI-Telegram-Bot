@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+from config import TIME_CORRECTION
 import logging
 import random
 import string
@@ -47,6 +48,23 @@ def escape_special_chars(text):
 
 
 
+# GET DAY AND TIME
+async def day_utcnow(time_zone=None):
+    if not time_zone:
+       time_zone = TIME_CORRECTION
+    utc_zone = timezone.utc
+    a = datetime.now(timezone.utc).replace(tzinfo=utc_zone)
+    a = a + timedelta(hours=time_zone)
+    day_str = a.strftime("%Y-%m-%d %H:%M:%S")
+    day = datetime.strptime(day_str, '%Y-%m-%d %H:%M:%S')
+    logging.info("info: Getting the day and time from the server")
+    return day or None
+
+# UNFORMAT TIME
+async def unformat_date(date):
+    day_now = str(date.strftime("%Y-%m-%d"))
+    time_now = float(date.strftime("%H.%M"))
+    return day_now, time_now
 
 
 
@@ -54,21 +72,16 @@ def escape_special_chars(text):
 
 
 
-# # GET DAY AND TIME
-# async def day_utcnow():
-#     utc_zone = timezone.utc
-#     a = datetime.now(timezone.utc).replace(tzinfo=utc_zone)
-#     a = a + timedelta(hours=time_correction)
-#     day_str = a.strftime("%Y-%m-%d %H:%M:%S")
-#     day = datetime.strptime(day_str, '%Y-%m-%d %H:%M:%S')
-#     logging.info("info: Getting the day and time from the server")
-#     return day or None
 
-# # UNFORMAT TIME
-# async def unformat_date(date):
-#     day_now = str(date.strftime("%Y-%m-%d"))
-#     time_now = float(date.strftime("%H.%M"))
-#     return day_now, time_now
+
+
+
+
+
+
+
+
+
 
 
 # # Calculation of the cost of used tokens

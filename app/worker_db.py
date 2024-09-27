@@ -46,9 +46,9 @@ async def add_user(user_data):
         connection = await get_connection()
         await connection.execute(
             f'''
-            INSERT INTO users ({keys})
-            VALUES ({nums})
-            ''', *values_list # Оператор распоковки *
+            INSERT INTO users ({keys}) VALUES ({nums})
+            ''', 
+            *values_list # Оператор распоковки *
         )
         return True
     
@@ -60,7 +60,7 @@ async def add_user(user_data):
         if connection is not None:
             await connection.close()
 
-# Add user:
+# #Add user:
 # user_data = {
 #     "user_id": 485435943,
 #     "name": "Julia",
@@ -82,6 +82,10 @@ async def read_user(user_id):
             ''',
             user_id,
         )
+
+        if not result:
+            return False
+        
         for record in result:
             data = dict(record)
         return data 
@@ -205,36 +209,40 @@ async def add_statistics(statistics_data):
 # # Add statistics:
 # statistics_data = {
 #     "user_id": 485435943,
-#     "model": "gpt-2",
-#     "tokens": 5,
+#     "model": "gpt-o",
+#     "tokens": 10,
 # }
 
 # confirm = asyncio.run(add_statistics(statistics_data))
 # print(confirm)
 
 
-# # Read statistics by user_id:
-# async def read_statistics(user_id):
-#     connection = None
-#     try:
-#         connection = await get_connection()
-#         result = await connection.fetch(
-#             '''
-#                 SELECT * FROM statistics WHERE user_id = $1;
-#             ''',
-#             user_id,
-#         )
 
-#         data = []
-#         for record in result:
-#             data.append(dict(record))
-#         return data
+# # Read statistics by user_id:
+async def read_statistics(user_id):
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM statistics WHERE user_id = $1 ORDER BY id DESC LIMIT 100;
+            ''',
+            user_id,
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
     
-#     except Exception as e:
-#         print(f"Error read_statistics: {e}")
-#     finally:
-#         if connection is not None:
-#             await connection.close()
+    except Exception as e:
+        print(f"Error read_statistics: {e}")
+    finally:
+        if connection is not None:
+            await connection.close()
 
 # # Read statistics by user_id:
 # data_user = asyncio.run(read_statistics(485435943))
@@ -242,8 +250,33 @@ async def add_statistics(statistics_data):
 #     print(one.get("user_id"), one.get("model"), one.get("tokens"))
 
 
+# Clear statistics:
+async def clear_statistics():
 
+    date_now = None
+    # date_now = функция получения даты + какое то условие, что бы давался лимит 3 месяца допустим
 
+    if not date_now:
+        print("Error date: Today's date has not been received")
+        return False
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            DELETE FROM statistics WHERE date < $1;
+            ''', 
+            (date_now,)
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error clear_statistics {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
 
 
 
@@ -258,50 +291,165 @@ async def add_statistics(statistics_data):
 #### DISCUSSION TABLE: ####
 ###########################
 
+# Add discussion:
+async def add_discussion(discussion_data):
+    keys_list, values_list, num_list, i, connection = [], [], [], 1, None
 
+    user_id = discussion_data.get("user_id")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# try:
-#     # Подключение к базе данных
-#     connection = psycopg2.connect(host="localhost", database="my_database", user=USER_DB, password=PASWORD_DB)
+    if not user_id:
+        print("Error add_discussion: Where is user_id?") 
+        return False
     
-#     cursor = connection.cursor()
+    if len(discussion_data) < 1: # if there is at least a user_id, let's go
+        print("Error add_discussion: Discussion_data is empty.")
+        return False
 
-#     # Проверка существования таблиц
-#     check_tables_query = '''
-#     SELECT table_name 
-#     FROM information_schema.tables 
-#     WHERE table_schema='public';
-#     '''
+    for key, value in discussion_data.items():
+        keys_list.append(key)
+        values_list.append(value)
+        num_list.append(f"${i}")
+        i += 1
 
-#     cursor.execute(check_tables_query)
-#     tables = cursor.fetchall()
+    keys = ", ".join(keys_list) # <-- в строку, а * распоковывает поотдельности
+    nums = ", ".join(num_list)
 
-#     print("Существующие таблицы:")
-#     for table in tables:
-#         print(table[0])
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            INSERT INTO discussion ({keys})
+            VALUES ({nums})
+            ''', *values_list # Оператор распоковки *
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error add_discussion: {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# # Add discussion:
+# discussion_data = {
+#     "user_id": 485435943,
+#     "user_say": "Ничего, тебе показалось..",
+#     "model_say": "Нет, ты явно что то хотел, повтори.",
+#     "summarization": True,
+# }
+
+# confirm = asyncio.run(add_discussion(discussion_data))
+# print(confirm)
 
 
 
-# except Exception as error:
-#     print("Ошибка при работе с PostgreSQL", error)
-# finally:
-#     # Закрытие курсора и соединения с базой данных
-#     if cursor:
-#         cursor.close()
-        
-#     if connection:
-#         connection.close()
+
+# # Read discussion by user_id:
+async def read_discussion(user_id):
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM discussion WHERE user_id = $1 ORDER BY id DESC LIMIT 10;
+            ''',
+            user_id,
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_discussion: {e}")
+    finally:
+        if connection is not None:
+            await connection.close()
+
+# # Read discussion by user_id:
+# data_user = asyncio.run(read_discussion(485435943))
+# for one in data_user:
+#     print(one.get("user_say"), one.get("model_say"), one.get("summarization"))
+
+
+# Clear discussion:
+async def clear_discussion():
+
+    date_now = None
+    # date_now = функция получения даты + ~ 2 дня, что бы дать время на использование..
+
+    if not date_now:
+        print("Error date: Today's date has not been received")
+        return False
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            DELETE FROM discussion WHERE date < $1;
+            ''', 
+            (date_now,)
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error clear_discussion {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### ADMIN PARSE TABLE: ####
+###########################
+
+# Read all users:
+async def read_all_users():
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM users;
+            '''
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_all_users: {e}")
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# data_all_users = asyncio.run(read_all_users())
+# for user in data_all_users:
+#     print(user.get("user_id"), user.get("name"), user.get("money"))
+

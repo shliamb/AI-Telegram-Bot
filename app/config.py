@@ -1,17 +1,43 @@
 
 
-#### CONFIG ####
+#### BASIC CONFIG ####
+
+# System:
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
-MIN_PAY = 1 # Minimum pay
-VOICE_THE_ANSWER = False # False or True
-AI_DEFAULT = "openai" # gemini or openai
+MIN_PAY = 1 # $ Minimum pay
+RUBTOUSD = 100 # The internal exchange rate
+GIFT = 0.1 # $ The amount on the account at the beginning
+VOICE_THE_ANSWER = True # False or True
+DIALOG = True # History dialog
+DIALOG_SUM = True # AI compress history dialog
+LANGUAGE = "en"
+
+# Language models:
+AI_DEFAULT = "gemini" # gemini or openai, anthropic in future
 AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest" #  gemini-1.5-flash-latest or gpt-4o-mini-2024-07-18
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini-2024-07-18"
-AI_DEFAULT_MODEL_GET_AUDIO = "tts-1"
-AI_DEFAULT_MODEL_GET_TRANSCRIPTION = "whisper-1"
-DEFAULT_DALL_E = "dall-e-3"
 
+# Gen Audio models:
+AI_AUDIO = "openai"
+AI_DEFAULT_MODEL_GET_AUDIO = "tts-1" # tts-1-hd
+VOICE = "nova" # alloy, echo, fable, onyx, nova, and shimmer
+VOICE_SPEED = 1.0 # 0.25 to 4.0
+
+# Transcription voice models:
+AI_VOICE = "openai"
+AI_DEFAULT_MODEL_GET_VOICE = "whisper-1" # no choes
+
+# Gen Img models:
+AI_DRAW = "openai" # or midjourney
+DEFAULT_DALL_E = "dall-e-3"
+IMG_SIZE = "1024x1024" # 
+N_NUMBER = 1
+IMG_QUALITY = "standard" # standard or hd
+IMG_STYLE = "vivid" # vivid ore natural
+
+# Gen Video models:
+AI_GEN_VIDEO = None
 
 # Folders:
 DOWNLOADS_FOLDER = "./downloads/"
@@ -20,7 +46,7 @@ AUDIO_FOLDER = "./audio/"
 VOICE_FOLDER = "./voice/"
 
 
-# Prices per 1M tokens:
+# Prices per 1M tokens models:
 PRICE = {
     # OpenAI to 1M tokes:
     # New:

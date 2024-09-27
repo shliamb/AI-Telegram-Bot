@@ -2,22 +2,6 @@ from get_keys import USER_DB, PASSWORD_DB
 import psycopg2
 
 
-'''
-Architecture Data Base.
-
-Table users:
-user_id  name  full_name  first_name  last_name  block  last_visit  time_zone  language  system_content  money  
-notifications  dialog  dialog_sum  audio_response  ai  model_openai  model_google  model_anthropic  model_llamA  model_dall_e  
-model_midjourney  model_voice  model_speech  voice  voice_speed  img_quality  img_style  img_size  n_number
-
-Table statistics:
-id  date  model  tokens  min  img  price  user_id  name
-
-Table discussion:
-id  date  user_say  model_say  summarization  user_id 
-
-'''
-
 # Create TABLES:
 def create_tables_in_db():
 
@@ -40,20 +24,25 @@ def create_tables_in_db():
             time_zone VARCHAR(10), 
             language VARCHAR(10),
             system_content TEXT,
+            paid BOOLEAN DEFAULT FALSE,
             money FLOAT,
-            notifications BOOLEAN DEFAULT TRUE,
-            dialog BOOLEAN DEFAULT TRUE,
-            dialog_sum BOOLEAN DEFAULT TRUE,
-            audio_response VARCHAR(50),
+            notifications BOOLEAN,
+            dialog BOOLEAN,
+            dialog_sum BOOLEAN,
+            voice_answer BOOLEAN,
+
             ai VARCHAR(50),
-            model_openai VARCHAR(50),
-            model_google VARCHAR(50),
-            model_anthropic VARCHAR(50),
-            model_llamA VARCHAR(50),
-            model_dall_e VARCHAR(50),
-            model_midjourney VARCHAR(50),
+            model_language VARCHAR(50),
+
+            ai_draw VARCHAR(50),
+            model_draw VARCHAR(50),
+
+            ai_voice VARCHAR(50),
             model_voice VARCHAR(50),
-            model_speech VARCHAR(50),
+
+            ai_audio VARCHAR(50),
+            model_audio VARCHAR(50),
+
             voice VARCHAR(50),
             voice_speed FLOAT,
             img_quality VARCHAR(50),
@@ -119,6 +108,25 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+'''
+Architecture Data Base.
+
+Table users:
+user_id  name  full_name  first_name  last_name  block  last_visit  time_zone  language  system_content  money  
+notifications  dialog  dialog_sum  audio_response  ai  model_openai  model_google  model_anthropic  model_llamA  model_dall_e  
+model_midjourney  model_voice  model_speech  voice  voice_speed  img_quality  img_style  img_size  n_number
+
+Table statistics:
+id  date  model  tokens  min  img  price  user_id  name
+
+Table discussion:
+id  date  user_say  model_say  summarization  user_id 
+
+'''
 
 
 # VARCHAR(n) - строковый тип данных ограничение n, TEXT - строковый тип данных ограничение в 1Гб.

@@ -9,7 +9,7 @@ from config import AI_DEFAULT_MODEL_OPENAI, URL
 
 async def mod_openai_chat(data):
 
-    model = data.get("model", AI_DEFAULT_MODEL_OPENAI)
+    model = data.get("model_language")
     user_content = data.get("user_content")
     system_content = data.get("system_content")
     file_path = data.get("file_path")
@@ -21,7 +21,6 @@ async def mod_openai_chat(data):
     data_ai = {
             "username": USERNAME_API_AI,
             "user_content": user_content,
-            # "system_content": system_content,
             "model": model,
     }
 
