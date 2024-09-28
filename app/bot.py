@@ -138,6 +138,21 @@ async def start(message: types.Message):
     await message.reply(f"I reset the history. You're clean)", parse_mode="Markdown")
     #await bot.answer_callback_query(callback_query.id)
 
+
+def bool_to_str(bools, lang):
+    if bools == True:
+        if lang == "ru":
+            text = "Да"
+        elif lang == "en":
+            text = "Yes"
+    elif bools == False:
+        if lang == "ru":
+            text = "Нет"
+        elif lang == "en":
+            text = "No"
+    return text
+
+
 # MENU
 @dp.message(Command('menu'))
 async def main_menu(message: types.Message):
@@ -148,16 +163,16 @@ async def main_menu(message: types.Message):
     data = await read_user(id)
 
     # print(data)
-    text = data["language"] if data.get("language") is not None else LANGUAGE
+    language = data["language"] if data.get("language") is not None else LANGUAGE
     ai = data["ai"] if data.get("ai") is not None else AI_DEFAULT
     dialog = data["dialog"] if data.get("dialog") is not None else DIALOG
-    dialog = str(dialog)
+    dialog = bool_to_str(dialog, language)
 
 
     menu_en = f'''
 
 <b>⚙️ SETTINGS:</b>
-<b>{text.upper()}</b> : language /en or /ru
+<b>{language.upper()}</b> : language /en or /ru
 <b>{ai.upper()}</b> : AI /openai or /gemini
 <b>{dialog.upper()}</b> : dialogue /di_on or /di_off
     Return an audio response with a text response /yes or /no - YES.
@@ -213,7 +228,7 @@ async def main_menu(message: types.Message):
     menu_ru = f'''
 
 <b>⚙️ Настройки:</b>
-<b>{text.upper()}</b> : язык /en или /ru
+<b>{language.upper()}</b> : язык /en или /ru
 <b>{ai.upper()}</b> : ИИ /openai или /gemini
 <b>{dialog.upper()}</b> : диалог /di_on или /di_off
     Dialogue with AI with memory /yes or /no - YES.
