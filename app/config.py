@@ -12,6 +12,8 @@ VOICE_THE_ANSWER = True # False or True
 DIALOG = True # History dialog
 DIALOG_SUM = True # AI compress history dialog
 LANGUAGE = "en"
+NOTIFICATIONS = True
+DIALOG_SUM = False
 
 # Language models:
 AI_DEFAULT = "gemini" # gemini or openai, anthropic in future

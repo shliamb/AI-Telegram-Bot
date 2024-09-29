@@ -22,8 +22,6 @@ async def encode_file(file_path):
     content = await file.read()
     return base64.b64encode(content).decode('utf-8')
 
-
-
 # Random name to file:
 def random_name() -> str:
     random_num = str(random.randint(11, 98))
@@ -46,9 +44,7 @@ def escape_special_chars(text):
         text = text.replace(char, f'\\{char}')
     return text
 
-
-
-# GET DAY AND TIME
+# GET DAY AND TIME:
 async def day_utcnow(time_zone=None):
     if not time_zone:
        time_zone = TIME_CORRECTION
@@ -60,14 +56,25 @@ async def day_utcnow(time_zone=None):
     logging.info("info: Getting the day and time from the server")
     return day or None
 
-# UNFORMAT TIME
+# UNFORMAT TIME:
 async def unformat_date(date):
     day_now = str(date.strftime("%Y-%m-%d"))
     time_now = float(date.strftime("%H.%M"))
     return day_now, time_now
 
-
-
+# in BOOL out STR TEXT UPPER:
+def bool_to_str(bools, lang):
+    if bools == True:
+        if lang == "ru":
+            text = "Включено"
+        elif lang == "en":
+            text = "On"
+    elif bools == False:
+        if lang == "ru":
+            text = "Выключено"
+        elif lang == "en":
+            text = "Off"
+    return text.upper()
 
 
 

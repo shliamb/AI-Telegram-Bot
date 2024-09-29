@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE, AI_AUDIO, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_GET_AUDIO, AI_DEFAULT_MODEL_GET_VOICE, LANGUAGE
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE, AI_AUDIO, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_GET_AUDIO, AI_DEFAULT_MODEL_GET_VOICE, LANGUAGE, NOTIFICATIONS
 
 
 import logging
@@ -42,7 +42,7 @@ from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
-from general_functions import escape_special_chars, random_name_2X, day_utcnow
+from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str
 from worker_db import add_user, read_user, update_user
 from texts import start_ru, start_en
 
@@ -86,6 +86,7 @@ async def command_start_handler(message: Message) -> None:
     bot_commands = [
         BotCommand(command="/reset", description="RESET"),
         BotCommand(command="/menu", description="MENU"),
+        BotCommand(command="/prices", description="PRICES"),
         BotCommand(command="/help", description="HELP"),
     ]
     await bot.set_my_commands(bot_commands)
@@ -139,19 +140,6 @@ async def start(message: types.Message):
     #await bot.answer_callback_query(callback_query.id)
 
 
-def bool_to_str(bools, lang):
-    if bools == True:
-        if lang == "ru":
-            text = "Да"
-        elif lang == "en":
-            text = "Yes"
-    elif bools == False:
-        if lang == "ru":
-            text = "Нет"
-        elif lang == "en":
-            text = "No"
-    return text
-
 
 # MENU
 @dp.message(Command('menu'))
@@ -162,76 +150,134 @@ async def main_menu(message: types.Message):
 
     data = await read_user(id)
 
+
     # print(data)
     language = data["language"] if data.get("language") is not None else LANGUAGE
     ai = data["ai"] if data.get("ai") is not None else AI_DEFAULT
     dialog = data["dialog"] if data.get("dialog") is not None else DIALOG
     dialog = bool_to_str(dialog, language)
+    notifications = data["notifications"] if data.get("notifications") is not None else NOTIFICATIONS
+    notifications = bool_to_str(notifications, language)
+    dialog_sum = data["dialog_sum"] if data.get("dialog_sum") is not None else DIALOG_SUM
+    dialog_sum = bool_to_str(dialog_sum, language)
+    voice_answer = data["voice_answer"] if data.get("voice_answer") is not None else VOICE_THE_ANSWER
+    voice_answer = bool_to_str(voice_answer, language)
+    if ai == "openai":
+        def_model_language = AI_DEFAULT_MODEL_OPENAI
+    elif ai == "gemini":
+        def_model_language = AI_DEFAULT_MODEL_GEMINI
+    model_language = data["model_language"] if data.get("model_language") is not None else def_model_language
+    ai_draw = data["ai_draw"] if data.get("ai_draw") is not None else AI_DRAW
+    model_draw = data["model_draw"] if data.get("model_draw") is not None else DEFAULT_DALL_E
+    img_size = data["img_size"] if data.get("img_size") is not None else IMG_SIZE
+    img_quality = data["img_quality"] if data.get("img_quality") is not None else IMG_QUALITY
+    img_style = data["img_style"] if data.get("img_style") is not None else IMG_STYLE
+    ai_voice = data["ai_voice"] if data.get("ai_voice") is not None else AI_VOICE
+    model_voice = data["model_voice"] if data.get("model_voice") is not None else AI_DEFAULT_MODEL_GET_VOICE
+    ai_audio = data["ai_audio"] if data.get("ai_audio") is not None else AI_AUDIO
+    model_audio = data["model_audio"] if data.get("model_audio") is not None else AI_DEFAULT_MODEL_GET_AUDIO
+    voice = data["voice"] if data.get("voice") is not None else VOICE
+    voice_speed = data["voice_speed"] if data.get("voice_speed") is not None else VOICE_SPEED
+    money = data.get("money")
+
+
+    menu_ru = f'''
+
+<b>⚙️ Настройки:</b>
+
+
+<b>Язык: {language.upper()}</b>
+   - /en — Английский
+   - /ru — Русский
+
+<b>Уведомления: {notifications}</b>
+   - /notif_on — Вкл уведомления
+   - /notif_off — Выкл уведомления
+
+<b>История диалога: {dialog}</b>
+   - /dialog_on — Вкл диалог
+   - /dialog_off — Выкл диалог
+
+<b>Сжатие истории: {dialog_sum}</b>
+   - /sum_on — Вкл сжатие диалога
+   - /sum_off — Вык сжатие диалога
+
+<b>Аудио ответ: {voice_answer}</b>
+   - /audio_on — Вкл аудио ответ
+   - /audio_off — Выкл аудио ответ
+
+<b>ИИ: {ai.upper()} - {model_language.upper()}</b>
+   <b>Выбрать модель от OpenAI:</b>
+      1. /gpt_4o_mini
+      2. /gpt_4o
+      3. /o1_mini
+   <b>Выбрать модель от Gemini:</b>
+      1. /gemini_1_5_flash
+      2. /gemini_1_5_pro
+   
+<b>Генерация изо.: {ai_draw.upper()} - {model_draw.upper()}</b>
+   <b>Выбрать модель от OpenAI:</b>
+      1. /dall_e_3
+      2. /dall_e_2
+   <b>Выбрать модель от Midjourney:</b>
+      1. /midjourney_2
+   <b>OpenAI размер изо: {img_size.upper()}</b>
+      1. /1024x1024
+      2. /520x520
+   <b>OpenAI качество изо: {img_quality.upper()}</b>
+      1. /standard
+      2. /hd
+   <b>OpenAI стиль изо: {img_style.upper()}</b>
+      1. /vivid
+      2. /natural
+
+<b>Распоз. голоса: {ai_voice.upper()} - {model_voice.upper()}</b>
+   <b>OpenAI выбрать модель:</b>
+      1. /whisper_1
+
+<b>Генерация голоса: {ai_audio.upper()} - {model_audio.upper()}</b>
+   <b>Выбрать модель от OpenAI:</b>
+      1. /tts_1
+      2. /tts_1_hd - hd и дороже
+   <b>Стиль голоса: {voice.upper()}</b>
+      1. /nova - женский голос
+      2. /alloy
+      3. /echo
+      4. /fable
+      5. /onyx
+      6. /shimmer
+   <b>Скорость голоса: {voice_speed}</b>
+      1. /speed_0_25 - 0.25
+      2. /speed_1 - 1.0
+      3. /speed_1_25 - 1.25
+
+<b>Баланс счета: {money} $</b>
+   - /add_money — пополнить
+
+<b>Скачать отчеты:</b>
+   - /get_stat — статистика 
+
+<b>Голосования:</b>
+   - /get_video — генерация видео <b>15 ❤️</b>
+   - /get_free — сделать бесплатным <b>33 ❤️</b>
+   - /dell_bot — удалить бота <b>2 ❤️</b>
+
+<b>😋 Новые возможности:</b>
+   - можно передать изображение и обсудить его с ИИ,
+   - можно передать голосовое сообщение, ИИ ответит,
+   - можно попросить нарисовать, ИИ нарисует.
+
+    '''
 
 
     menu_en = f'''
 
 <b>⚙️ SETTINGS:</b>
+
+
 <b>{language.upper()}</b> : language /en or /ru
 <b>{ai.upper()}</b> : AI /openai or /gemini
-<b>{dialog.upper()}</b> : dialogue /di_on or /di_off
-    Return an audio response with a text response /yes or /no - YES.
-    Summarize the story /yes or /no - YES.
-    Notifications /yes or /no - Yes.
-    You can fine-tune each position or just leave it as default.
-
-    <b>📝 Text CHAT:</b>
-
-    OpenAI:
-    /4_o_mini - bot about info
-    /4_turbo - bot about info
-
-    Gemini:
-    /4_o_mini - bot about info
-    /4_turbo - bot about info
-
-    <b>🌇 Creating an IMAGE:</b>
-
-    Dall-e settings:
-    /set_dall_3 - set Dall-e 3
-    /set_dall_2 - set Dall-e 2
-    /setabouttext - change bot about info
-    /setuserpic - change bot profile photo
-    /setcommands - change the list of commands
-    /deletebot - delete a bot
-
-    Midjourney:
-    /my_vote_for_mid - vote for the implementation, already 45 ❤️
-
-    <b>🗣 Voice calls to AI:</b>
-
-    OpenAI:
-    /setcommands - change the list of commands
-    /deletebot - delete a bot
-
-    <b>🎧 Audio from AI:</b>
-
-    OpenAI:
-    /setcommands - change the list of commands
-    /deletebot - delete a bot
-
-    <b>💳 Balance and payment:</b>
-    /deletebot - delete a bot
-    /deletebot - delete a bot
-
-    <b>🗞 Reports and statistics:</b>
-    /deletebot - delete a bot
-    /deletebot - delete a bot
-
-    '''
-
-    menu_ru = f'''
-
-<b>⚙️ Настройки:</b>
-<b>{language.upper()}</b> : язык /en или /ru
-<b>{ai.upper()}</b> : ИИ /openai или /gemini
-<b>{dialog.upper()}</b> : диалог /di_on или /di_off
-    Dialogue with AI with memory /yes or /no - YES.
+<b>{dialog}</b> : dialogue /di_on or /di_off
     Return an audio response with a text response /yes or /no - YES.
     Summarize the story /yes or /no - YES.
     Notifications /yes or /no - Yes.
@@ -283,9 +329,10 @@ async def main_menu(message: types.Message):
     '''
 
 
-    if data.get("language") == "ru":
+
+    if language == "ru":
         await message.answer(f"{menu_ru}", parse_mode="HTML")
-    elif data.get("language") == "en":
+    elif language == "en":
         await message.answer(f"{menu_en}", parse_mode="HTML")
 
     # menu_message_id = menu_message.message_id
