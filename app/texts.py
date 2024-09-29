@@ -16,3 +16,10 @@ Welcome to Telegram bot, created to work with advanced artificial intelligences 
 We are happy to help you!
 
 '''
+
+
+system_content = '''
+
+System content в OpenAI ChatGPT — это предварительно заданные инструкции или контекст, которые помогают модели понять, как она должна взаимодействовать с пользователем. Это может включать указания о тоне общения, стиле ответов и других аспектах, чтобы обеспечить более целенаправленный и релевантный опыт для пользователя.
+
+'''

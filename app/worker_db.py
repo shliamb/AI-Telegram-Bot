@@ -97,8 +97,12 @@ async def read_user(user_id):
             await connection.close()
 
 # # Read user:
-# data_user = asyncio.run(read_user(485435943))
+# data_user = asyncio.run(read_user(1666495))
+
+# print(data_user)
+
 # print(data_user.get("user_id"), data_user.get("name"), data_user.get("money"))
+
 
 
 # Update user:

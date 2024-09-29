@@ -179,6 +179,8 @@ async def main_menu(message: types.Message):
     voice = data["voice"] if data.get("voice") is not None else VOICE
     voice_speed = data["voice_speed"] if data.get("voice_speed") is not None else VOICE_SPEED
     money = data.get("money")
+    system_content = True if data.get("system_content") is not None else False
+    system_content = bool_to_str(system_content, language)
 
 
     menu_ru = f'''
@@ -208,22 +210,27 @@ async def main_menu(message: types.Message):
 
 <b>ИИ: {ai.upper()} - {model_language.upper()}</b>
    <b>Выбрать модель от OpenAI:</b>
-      1. /gpt_4o_mini
-      2. /gpt_4o
-      3. /o1_mini
-   <b>Выбрать модель от Gemini:</b>
-      1. /gemini_1_5_flash
-      2. /gemini_1_5_pro
+      1. /gpt_4o_mini - 1.5$ 1m ток
+      2. /gpt_4o - 40$ 1m ток
+      3. /gpt_4o_2024_05_13 - 40$ 1m ток
+      4. /gpt_4o_2024_08_06 - 25$ 1m ток
+      5. /gpt_4_turbo - 80$ 1m ток
+      6. /chatgpt_4o_latest - 40$ 1m ток
+   <b>Выбрать модель от Google:</b>
+      1. /gemini_1_5_flash - 1.125$ 1m ток
+      2. /gemini_1_0_pro - 4$ 1m ток
+      3. /gemini_1_5_pro - 93.75$ 1m ток
    
 <b>Генерация изо.: {ai_draw.upper()} - {model_draw.upper()}</b>
    <b>Выбрать модель от OpenAI:</b>
       1. /dall_e_3
       2. /dall_e_2
    <b>Выбрать модель от Midjourney:</b>
-      1. /midjourney_2
+      1. /midjourney
    <b>OpenAI размер изо: {img_size.upper()}</b>
-      1. /1024x1024
-      2. /520x520
+      1. /1792x1024
+      2. /1024x1792
+      3. /1024x1024
    <b>OpenAI качество изо: {img_quality.upper()}</b>
       1. /standard
       2. /hd
@@ -247,20 +254,19 @@ async def main_menu(message: types.Message):
       5. /onyx
       6. /shimmer
    <b>Скорость голоса: {voice_speed}</b>
-      1. /speed_0_25 - 0.25
+      1. /speed_0_75 - 0.75
       2. /speed_1 - 1.0
       3. /speed_1_25 - 1.25
+
+<b>Инструкции для ИИ: {system_content}</b>
+   - /system_content — добавить
+   - /get_sys_content - посмотреть
 
 <b>Баланс счета: {money} $</b>
    - /add_money — пополнить
 
 <b>Скачать отчеты:</b>
    - /get_stat — статистика 
-
-<b>Голосования:</b>
-   - /get_video — генерация видео <b>15 ❤️</b>
-   - /get_free — сделать бесплатным <b>33 ❤️</b>
-   - /dell_bot — удалить бота <b>2 ❤️</b>
 
 <b>😋 Новые возможности:</b>
    - можно передать изображение и обсудить его с ИИ,
@@ -270,91 +276,110 @@ async def main_menu(message: types.Message):
     '''
 
 
+
+
     menu_en = f'''
 
-<b>⚙️ SETTINGS:</b>
+<b>⚙️ Settings:</b>
 
 
-<b>{language.upper()}</b> : language /en or /ru
-<b>{ai.upper()}</b> : AI /openai or /gemini
-<b>{dialog}</b> : dialogue /di_on or /di_off
-    Return an audio response with a text response /yes or /no - YES.
-    Summarize the story /yes or /no - YES.
-    Notifications /yes or /no - Yes.
-    You can fine-tune each position or just leave it as default.
+<b>Language: {language.upper()}</b>
+   - /en — English
+   - /ru — Russian
 
-    <b>📝 Text CHAT:</b>
+<b>Notifications: {notifications}</b>
+   - /notif_on — On notifications
+   - /notif_off — Off notifications
 
-    OpenAI:
-    /4_o_mini - bot about info
-    /4_turbo - bot about info
+<b>History of dialogue: {dialog}</b>
+   - /dialog_on — On the dialog
+   - /dialog_off — Off the dialog
 
-    Gemini:
-    /4_o_mini - bot about info
-    /4_turbo - bot about info
+<b>History Compression: {dialog_sum}</b>
+   - /sum_on — On compression
+   - /sum_off — Off compression
 
-    <b>🌇 Creating an IMAGE:</b>
+<b>Audio response: {voice_answer}</b>
+   - /audio_on — On audio response
+   - /audio_off — Off audio response
 
-    Dall-e settings:
-    /set_dall_3 - set Dall-e 3
-    /set_dall_2 - set Dall-e 2
-    /setabouttext - change bot about info
-    /setuserpic - change bot profile photo
-    /setcommands - change the list of commands
-    /deletebot - delete a bot
+<b>AI: {ai.upper()} - {model_language.upper()}</b>
+   <b>Choose a model from OpenAI:</b>
+      1. /gpt_4o_mini - 1.5$ 1m tok
+      2. /gpt_4o - 40$ 1m tok
+      3. /gpt_4o_2024_05_13 - 40$ 1m tok
+      4. /gpt_4o_2024_08_06 - 25$ 1m tok
+      5. /gpt_4_turbo - 80$ 1m tok
+      6. /chatgpt_4o_latest - 40$ 1m tok
+   <b>Choose a model from Google:</b>
+      1. /gemini_1_5_flash - 1.125$ 1m tok
+      2. /gemini_1_0_pro - 4$ 1m tok
+      3. /gemini_1_5_pro - 93.75$ 1m tok
+   
+<b>Image generation: {ai_draw.upper()} - {model_draw.upper()}</b>
+   <b>Choose a model from OpenAI:</b>
+      1. /dall_e_3
+      2. /dall_e_2
+   <b>Choose a model from Midjourney:</b>
+      1. /midjourney
+   <b>OpenAI img size: {img_size.upper()}</b>
+      1. /1792x1024
+      2. /1024x1792
+      3. /1024x1024
+   <b>OpenAI img quality: {img_quality.upper()}</b>
+      1. /standard
+      2. /hd
+   <b>OpenAI img style: {img_style.upper()}</b>
+      1. /vivid
+      2. /natural
 
-    Midjourney:
-    /my_vote_for_mid - vote for the implementation, already 45 ❤️
+<b>Voice recognition: {ai_voice.upper()} - {model_voice.upper()}</b>
+   <b>OpenAI choose a model:</b>
+      1. /whisper_1
 
-    <b>🗣 Voice calls to AI:</b>
+<b>Voice generation: {ai_audio.upper()} - {model_audio.upper()}</b>
+   <b>Choose a model from OpenAI:</b>
+      1. /tts_1
+      2. /tts_1_hd 
+   <b>Voice style: {voice.upper()}</b>
+      1. /nova - a woman's voice
+      2. /alloy
+      3. /echo
+      4. /fable
+      5. /onyx
+      6. /shimmer
+   <b>The speed of the voice: {voice_speed}</b>
+      1. /speed_0_25 - 0.25
+      2. /speed_1 - 1.0
+      3. /speed_1_25 - 1.25
 
-    OpenAI:
-    /setcommands - change the list of commands
-    /deletebot - delete a bot
+<b>System content: {system_content}</b>
+   - /system_content — add text
+   - /get_sys_content - watch
 
-    <b>🎧 Audio from AI:</b>
+<b>Download reports:</b>
+   - /get_stat — statistics 
 
-    OpenAI:
-    /setcommands - change the list of commands
-    /deletebot - delete a bot
-
-    <b>💳 Balance and payment:</b>
-    /deletebot - delete a bot
-    /deletebot - delete a bot
-
-    <b>🗞 Reports and statistics:</b>
-    /deletebot - delete a bot
-    /deletebot - delete a bot
+<b>😋 New features:</b>
+   - you can transfer the image and discuss it with the AI,
+   - You can send a voice message And it will respond,
+   - You can ask him to draw, And he will draw.
 
     '''
-
-
 
     if language == "ru":
         await message.answer(f"{menu_ru}", parse_mode="HTML")
     elif language == "en":
         await message.answer(f"{menu_en}", parse_mode="HTML")
 
-    # menu_message_id = menu_message.message_id
-    # menu_chat_id = message.chat.id
-
-    # link_to_menu_message = f"https://t.me/c/{menu_chat_id}/{menu_message_id}"
-
-    # print(link_to_menu_message)
-
-
-@dp.message(Command('help'))
-async def start(message: types.Message):
-
-    help = '''
-    help
-    '''
-
-    await message.reply(f"{help}", parse_mode="Markdown")
 
 
 
 
+
+
+
+# Language:
 @dp.message(Command('en'))
 async def en(message: types.Message):
     id = user_id(message)
@@ -377,6 +402,566 @@ async def ru(message: types.Message):
     if confirm:
         await main_menu(message)
 
+# Notifications:
+@dp.message(Command('notif_on'))
+async def notif_on(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "notifications": True,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('notif_off'))
+async def notif_off(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "notifications": False,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+# History:
+@dp.message(Command('dialog_on'))
+async def dialog_on(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "dialog": True,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('dialog_off'))
+async def dialog_off(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "dialog": False,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+# History Compression:
+@dp.message(Command('sum_on'))
+async def sum_on(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "dialog_sum": True,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('sum_off'))
+async def sum_off(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "dialog_sum": False,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+# Audio response:
+@dp.message(Command('audio_on'))
+async def audio_on(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice_answer": True,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('audio_off'))
+async def audio_off(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice_answer": False,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+
+# OpenAI models:
+@dp.message(Command('gpt_4o_mini'))
+async def gpt_4o_mini(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4o-mini",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('gpt_4o'))
+async def gpt_4o(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4o",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('gpt_4o_2024_05_13'))
+async def gpt_4o_2024_05_13(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4o-2024-05-13",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('gpt_4o_2024_08_06'))
+async def gpt_4o_2024_08_06(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4o-2024-08-06",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('gpt_4_turbo'))
+async def gpt_4_turbo(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4-turbo-2024-04-09",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('chatgpt_4o_latest'))
+async def chatgpt_4o_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "chatgpt-4o-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+# Google models:
+@dp.message(Command('gemini_1_5_flash'))
+async def gemini_1_5_flash(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-1.5-flash-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('gemini_1_0_pro'))
+async def gemini_1_0_pro_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-1.0-pro-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('gemini_1_5_pro'))
+async def gemini_1_5_pro_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-1.5-pro-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+
+# Image generation:
+@dp.message(Command('dall_e_3'))
+async def dall_e_3(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('dall_e_2'))
+async def dall_e_2(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-2",
+        "img_size": "1024x1024",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('midjourney'))
+async def midjourney(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('1792x1024'))
+async def dall_e_3_1792x1024(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_size": "1792x1024",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('1024x1792'))
+async def dall_e_3_1024x1792(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_size": "1024x1792",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('1024x1024'))
+async def dall_e_3_1024x1024(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_size": "1024x1024",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('standard'))
+async def dall_e_3_standard(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_quality": "standard",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('hd'))
+async def dall_e_3_hd(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_quality": "hd",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('vivid'))
+async def dall_e_3_vivid(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_style": "vivid",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('natural'))
+async def dall_e_3_natural(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_draw": "openai",
+        "model_draw": "dall-e-3",
+        "img_style": "natural",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+# Voice recognition:
+@dp.message(Command('whisper_1'))
+async def whisper_1(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_audio": "openai",
+        "model_audio": "whisper-1",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+# Voice generation:
+@dp.message(Command('tts_1'))
+async def tts_1(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_voice": "openai",
+        "model_voice": "tts-1",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('tts_1_hd'))
+async def tts_1_hd(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_voice": "openai",
+        "model_voice": "tts-1-hd",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('nova'))
+async def nova(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice": "nova",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+@dp.message(Command('alloy'))
+async def alloy(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice": "alloy",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('echo'))
+async def echo(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice": "echo",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+@dp.message(Command('fable'))
+async def fable(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice": "fable",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+@dp.message(Command('onyx'))
+async def onyx(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice": "onyx",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('shimmer'))
+async def shimmer(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice": "shimmer",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+@dp.message(Command('speed_0_75'))
+async def speed_0_75(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice_speed": 0.75,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+@dp.message(Command('speed_1'))
+async def speed_1(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice_speed": 1.0,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+@dp.message(Command('speed_1_25'))
+async def speed_1_25(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "voice_speed": 1.25,
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message)
+
+
+
+# Set system content:
+class Form_system(StatesGroup):
+    content = State()
+
+@dp.message(Command('system_content'))
+async def system_content(message: types.Message, state: FSMContext):
+    id = user_id(message)
+    await message.reply("🇺🇸 *EN:* Set instructions that will help the AI understand how to interact with you.:\n\n🇷🇺 *RU:* Задайте инструкции которые помогут ИИ понять, как нужно взаимодействовать с вами:", parse_mode="Markdown")
+    await state.set_state(Form_system.content)
+
+@dp.message(Form_system.content)
+async def system_content_get_text(message: types.Message, state: FSMContext):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "system_content": message.text,
+    }
+    confirm = await update_user(data)
+
+    if confirm:
+        await message.reply("🇺🇸 *EN:* The system instruction has been saved.\n\n🇷🇺 *RU:* Системная инструкция сохранена.", parse_mode="Markdown")
+
+    await state.clear()
+
+
+
+
+
+
+
+@dp.message(Command('get_sys_content'))
+async def get_sys_content(message: types.Message):
+    id = user_id(message)
+    data = await read_user(id)
+    system_content = data["system_content"] if data.get("system_content") is not None else "is Empty"
+    await message.answer(system_content, parse_mode="HTML")
+
+
+
+@dp.message(Command('get_stat'))
+async def get_stat(message: types.Message):
+    id = user_id(message)
+    # data = {
+    #     "user_id": id,
+    #     "voice_speed": 1.25,
+    # }
+    # confirm = await update_user(data)
+    # if confirm:
+    #     await main_menu(message)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @dp.message(Command('openai'))
 async def openai(message: types.Message):
     id = user_id(message)
@@ -398,6 +983,34 @@ async def gemini(message: types.Message):
     confirm = await update_user(data)
     if confirm:
         await main_menu(message)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@dp.message(Command('help'))
+async def start(message: types.Message):
+    help = '''
+    help
+    '''
+    await message.reply(f"{help}", parse_mode="Markdown")
+
+
+
+
+
+
+
+
 
 
 
@@ -844,7 +1457,7 @@ async def second_function(message: types.Message, state: FSMContext):
         system_content = data_from_db.get("system_content")
 
     # Get voice_answer:
-    if data_from_db.get("voice_answer"):
+    if data_from_db.get("voice_answer") is not None:
         voice_answer = data_from_db.get("voice_answer")
 
     # Get voice style:
@@ -872,7 +1485,7 @@ async def second_function(message: types.Message, state: FSMContext):
         n_number = data_from_db.get("n_number")
 
     # Get dialog:
-    if data_from_db.get("dialog"):
+    if data_from_db.get("dialog") is not None:
         dialog = data_from_db.get("dialog")
 
     # Get language:
@@ -880,7 +1493,7 @@ async def second_function(message: types.Message, state: FSMContext):
         language = data_from_db.get("language")
 
     # Get dialog_sum:
-    if data_from_db.get("dialog_sum"):
+    if data_from_db.get("dialog_sum") is not None:
         dialog_sum = data_from_db.get("dialog_sum")
 
 
@@ -918,7 +1531,6 @@ async def second_function(message: types.Message, state: FSMContext):
     data["system_content"] = system_content
     data["user_content"] = caption or question
     data["language"] = language
-
 
     # Choosing a direction:
     input_content_type = {
