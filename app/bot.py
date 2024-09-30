@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE, AI_AUDIO, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_GET_AUDIO, AI_DEFAULT_MODEL_GET_VOICE, LANGUAGE, NOTIFICATIONS
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS
 
 
 import logging
@@ -42,8 +42,8 @@ from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
-from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str
-from worker_db import add_user, read_user, update_user
+from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users
 from texts import start_ru, start_en
 
 
@@ -172,10 +172,10 @@ async def main_menu(message: types.Message):
     img_size = data["img_size"] if data.get("img_size") is not None else IMG_SIZE
     img_quality = data["img_quality"] if data.get("img_quality") is not None else IMG_QUALITY
     img_style = data["img_style"] if data.get("img_style") is not None else IMG_STYLE
-    ai_voice = data["ai_voice"] if data.get("ai_voice") is not None else AI_VOICE
-    model_voice = data["model_voice"] if data.get("model_voice") is not None else AI_DEFAULT_MODEL_GET_VOICE
-    ai_audio = data["ai_audio"] if data.get("ai_audio") is not None else AI_AUDIO
-    model_audio = data["model_audio"] if data.get("model_audio") is not None else AI_DEFAULT_MODEL_GET_AUDIO
+    ai_voice_to_text = data["ai_voice_to_text"] if data.get("ai_voice_to_text") is not None else AI_VOICE_TO_TEXT
+    model_voice_to_text = data["model_voice_to_text"] if data.get("model_voice_to_text") is not None else AI_DEFAULT_MODEL_VOICE_TO_TEXT
+    ai_text_to_voice = data["ai_text_to_voice"] if data.get("ai_text_to_voice") is not None else AI_TEXT_TO_VOICE
+    model_text_to_voice = data["model_text_to_voice"] if data.get("model_text_to_voice") is not None else AI_DEFAULT_MODEL_TEXT_TO_VOICE
     voice = data["voice"] if data.get("voice") is not None else VOICE
     voice_speed = data["voice_speed"] if data.get("voice_speed") is not None else VOICE_SPEED
     money = data.get("money")
@@ -188,85 +188,107 @@ async def main_menu(message: types.Message):
 <b>⚙️ Настройки:</b>
 
 
-<b>Язык: {language.upper()}</b>
-   - /en — Английский
-   - /ru — Русский
+<b>ЯЗЫК: {language.upper()}</b>
+    /en — английский
+    /ru — русский
 
-<b>Уведомления: {notifications}</b>
-   - /notif_on — Вкл уведомления
-   - /notif_off — Выкл уведомления
+<b>УВЕДОМЛЕНИЯ: {notifications}</b>
+    /notif_on — вкл уведомления
+    /notif_off — выкл уведомления
 
-<b>История диалога: {dialog}</b>
-   - /dialog_on — Вкл диалог
-   - /dialog_off — Выкл диалог
+<b>ИСТОРИЯ ДИАЛОГА: {dialog}</b>
+    /dialog_on — вкл диалог
+    /dialog_off — выкл диалог
 
-<b>Сжатие истории: {dialog_sum}</b>
-   - /sum_on — Вкл сжатие диалога
-   - /sum_off — Вык сжатие диалога
+<b>СЖАТИЕ ИСТОРИИ: {dialog_sum}</b>
+    /sum_on — вкл сжатие диалога
+    /sum_off — вык сжатие диалога
 
-<b>Аудио ответ: {voice_answer}</b>
-   - /audio_on — Вкл аудио ответ
-   - /audio_off — Выкл аудио ответ
+<b>АУДИО ОТВЕТА: {voice_answer}</b>
+    /audio_on — вкл аудио ответ
+    /audio_off — выкл аудио ответ
 
-<b>ИИ: {ai.upper()} - {model_language.upper()}</b>
-   <b>Выбрать модель от OpenAI:</b>
-      1. /gpt_4o_mini - 1.5$ 1m ток
-      2. /gpt_4o - 40$ 1m ток
-      3. /gpt_4o_2024_05_13 - 40$ 1m ток
-      4. /gpt_4o_2024_08_06 - 25$ 1m ток
-      5. /gpt_4_turbo - 80$ 1m ток
-      6. /chatgpt_4o_latest - 40$ 1m ток
-   <b>Выбрать модель от Google:</b>
-      1. /gemini_1_5_flash - 1.125$ 1m ток
-      2. /gemini_1_0_pro - 4$ 1m ток
-      3. /gemini_1_5_pro - 93.75$ 1m ток
+    
+<b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
+<b>МОДЕЛЬ: {model_language.upper()}</b>
+
+<b>модели openai:</b>
+    /gpt_4o_mini - 1.5$ 1м ток
+    /gpt_4o - 40$ 1м ток
+    /gpt_4o_2024_05_13 - 40$ 1м ток
+    /gpt_4o_2024_08_06 - 25$ 1м ток
+    /gpt_4_turbo - 80$ 1м ток
+    /chatgpt_4o_latest - 40$ 1м ток
+
+<b>модели google:</b>
+    /gemini_1_5_flash - 1.125$ 1м ток
+    /gemini_1_0_pro - 4$ 1м ток
+    /gemini_1_5_pro - 93.75$ 1м ток
    
-<b>Генерация изо.: {ai_draw.upper()} - {model_draw.upper()}</b>
-   <b>Выбрать модель от OpenAI:</b>
-      1. /dall_e_3
-      2. /dall_e_2
-   <b>Выбрать модель от Midjourney:</b>
-      1. /midjourney
-   <b>OpenAI размер изо: {img_size.upper()}</b>
-      1. /1792x1024
-      2. /1024x1792
-      3. /1024x1024
-   <b>OpenAI качество изо: {img_quality.upper()}</b>
-      1. /standard
-      2. /hd
-   <b>OpenAI стиль изо: {img_style.upper()}</b>
-      1. /vivid
-      2. /natural
+        
+<b>ГЕНЕРАЦИЯ КАРТИНОК ИИ: {ai_draw.upper()}</b>
+<b>МОДЕЛЬ: {model_draw.upper()}</b>
 
-<b>Распоз. голоса: {ai_voice.upper()} - {model_voice.upper()}</b>
-   <b>OpenAI выбрать модель:</b>
-      1. /whisper_1
+<b>модели openai:</b>
+    /dall_e_3
+    /dall_e_2
 
-<b>Генерация голоса: {ai_audio.upper()} - {model_audio.upper()}</b>
-   <b>Выбрать модель от OpenAI:</b>
-      1. /tts_1
-      2. /tts_1_hd - hd и дороже
-   <b>Стиль голоса: {voice.upper()}</b>
-      1. /nova - женский голос
-      2. /alloy
-      3. /echo
-      4. /fable
-      5. /onyx
-      6. /shimmer
-   <b>Скорость голоса: {voice_speed}</b>
-      1. /speed_0_75 - 0.75
-      2. /speed_1 - 1.0
-      3. /speed_1_25 - 1.25
+<b>модели midjourney:</b>
+    /midjourney
 
-<b>Инструкции для ИИ: {system_content}</b>
-   - /system_content — добавить
-   - /get_sys_content - посмотреть
+<b>openai размер изо: {img_size.upper()}</b>
+    /1792x1024
+    /1024x1792
+    /1024x1024
 
-<b>Баланс счета: {money} $</b>
-   - /add_money — пополнить
+<b>openai качество изо: {img_quality.upper()}</b>
+    /standard
+    /hd
 
-<b>Скачать отчеты:</b>
-   - /get_stat — статистика 
+<b>openai стиль изо: {img_style.upper()}</b>
+    /vivid
+    /natural
+
+    
+<b>РАСПОЗ. ГОЛОСА ИИ: {ai_voice_to_text.upper()}</b>
+<b>МОДЕЛЬ: {model_voice_to_text.upper()}</b>
+
+<b>модели openai: {model_voice_to_text.upper()}</b>
+    /whisper_1
+
+        
+<b>ГЕНЕРАЦИЯ ГОЛОСА ИИ: {ai_text_to_voice.upper()}</b>
+<b>МОДЕЛЬ: {model_text_to_voice.upper()}:</b>
+
+<b>модель openai: {model_text_to_voice.upper()}</b>
+    /tts_1
+    /tts_1_hd - hd и дороже
+
+<b>стиль голоса: {voice.upper()}</b>
+    /nova - женский голос
+    /alloy
+    /echo
+    /fable
+    /onyx
+    /shimmer
+
+<b>скорость голоса: {voice_speed}</b>
+    /speed_0_75 - 0.75
+    /speed_1 - 1.0
+    /speed_1_25 - 1.25
+
+        
+<b>ИНСТРУКЦИИ ДЛЯ ИИ: {system_content}</b>
+    /system_content — добавить
+    /get_sys_content - посмотреть
+
+<b>БАЛАНС СЧЕТА: {money} $</b>
+    /add_money — пополнить
+
+<b>СКАЧАТЬ ОТЧЕТЫ:</b>
+    /get_stat — статистика 
+
+   
 
 <b>😋 Новые возможности:</b>
    - можно передать изображение и обсудить его с ИИ,
@@ -283,82 +305,107 @@ async def main_menu(message: types.Message):
 <b>⚙️ Settings:</b>
 
 
-<b>Language: {language.upper()}</b>
-   - /en — English
-   - /ru — Russian
+<b>LANGUAGE: {language.upper()}</b>
+    /en — English
+    /ru — Russian
 
-<b>Notifications: {notifications}</b>
-   - /notif_on — On notifications
-   - /notif_off — Off notifications
+<b>NOTIFICATIONS: {notifications}</b>
+    /notif_on — On notifications
+    /notif_off — Off notifications
 
-<b>History of dialogue: {dialog}</b>
-   - /dialog_on — On the dialog
-   - /dialog_off — Off the dialog
+<b>HISTORY OF DIALOGUE: {dialog}</b>
+    /dialog_on — On the dialog
+    /dialog_off — Off the dialog
 
-<b>History Compression: {dialog_sum}</b>
-   - /sum_on — On compression
-   - /sum_off — Off compression
+<b>HISTORY COMPRESSION: {dialog_sum}</b>
+    /sum_on — On compression
+    /sum_off — Off compression
 
-<b>Audio response: {voice_answer}</b>
-   - /audio_on — On audio response
-   - /audio_off — Off audio response
+<b>AUDIO RESPONSE: {voice_answer}</b>
+    /audio_on — On audio response
+    /audio_off — Off audio response
 
-<b>AI: {ai.upper()} - {model_language.upper()}</b>
-   <b>Choose a model from OpenAI:</b>
-      1. /gpt_4o_mini - 1.5$ 1m tok
-      2. /gpt_4o - 40$ 1m tok
-      3. /gpt_4o_2024_05_13 - 40$ 1m tok
-      4. /gpt_4o_2024_08_06 - 25$ 1m tok
-      5. /gpt_4_turbo - 80$ 1m tok
-      6. /chatgpt_4o_latest - 40$ 1m tok
-   <b>Choose a model from Google:</b>
-      1. /gemini_1_5_flash - 1.125$ 1m tok
-      2. /gemini_1_0_pro - 4$ 1m tok
-      3. /gemini_1_5_pro - 93.75$ 1m tok
    
-<b>Image generation: {ai_draw.upper()} - {model_draw.upper()}</b>
-   <b>Choose a model from OpenAI:</b>
-      1. /dall_e_3
-      2. /dall_e_2
-   <b>Choose a model from Midjourney:</b>
-      1. /midjourney
-   <b>OpenAI img size: {img_size.upper()}</b>
-      1. /1792x1024
-      2. /1024x1792
-      3. /1024x1024
-   <b>OpenAI img quality: {img_quality.upper()}</b>
-      1. /standard
-      2. /hd
-   <b>OpenAI img style: {img_style.upper()}</b>
-      1. /vivid
-      2. /natural
+<b>LANGUAGE AI: {ai.upper()}</b>
+<b>MODEL: {model_language.upper()}</b>
 
-<b>Voice recognition: {ai_voice.upper()} - {model_voice.upper()}</b>
-   <b>OpenAI choose a model:</b>
-      1. /whisper_1
+<b>models openai:</b>
+    /gpt_4o_mini - 1.5$ 1m tok
+    /gpt_4o - 40$ 1m tok
+    /gpt_4o_2024_05_13 - 40$ 1m tok
+    /gpt_4o_2024_08_06 - 25$ 1m tok
+    /gpt_4_turbo - 80$ 1m tok
+    /chatgpt_4o_latest - 40$ 1m tok
 
-<b>Voice generation: {ai_audio.upper()} - {model_audio.upper()}</b>
-   <b>Choose a model from OpenAI:</b>
-      1. /tts_1
-      2. /tts_1_hd 
-   <b>Voice style: {voice.upper()}</b>
-      1. /nova - a woman's voice
-      2. /alloy
-      3. /echo
-      4. /fable
-      5. /onyx
-      6. /shimmer
-   <b>The speed of the voice: {voice_speed}</b>
-      1. /speed_0_25 - 0.25
-      2. /speed_1 - 1.0
-      3. /speed_1_25 - 1.25
+<b>models google:</b>
+    /gemini_1_5_flash - 1.125$ 1m tok
+    /gemini_1_0_pro - 4$ 1m tok
+    /gemini_1_5_pro - 93.75$ 1m tok
+   
 
-<b>System content: {system_content}</b>
-   - /system_content — add text
-   - /get_sys_content - watch
+<b>IMAGE GENERATION AI: {ai_draw.upper()}</b>
+<b>MODEL: {model_draw.upper()}</b>
 
-<b>Download reports:</b>
-   - /get_stat — statistics 
+<b>models openai:</b>
+    /dall_e_3
+    /dall_e_2
+
+<b>models midjourney:</b>
+    /midjourney
+
+<b>openai img size: {img_size.upper()}</b>
+    /1792x1024
+    /1024x1792
+    /1024x1024
+
+<b>openai img quality: {img_quality.upper()}</b>
+    /standard
+    /hd
+
+<b>openai img style: {img_style.upper()}</b>
+    /vivid
+    /natural
+
+    
+<b>VOICE RECOGNITION AI: {ai_voice_to_text.upper()}</b>
+<b>MODEL: {model_voice_to_text.upper()}</b>
+
+<b>models openai: {model_voice_to_text.upper()}</b>
+    /whisper_1
+
+      
+<b>VOICE GENERATION AI: {ai_text_to_voice.upper()}</b>
+<b>MODEL: {model_text_to_voice.upper()}</b>
+
+<b>model from OpenAI: {model_text_to_voice.upper()}</b>
+    /tts_1
+    /tts_1_hd 
+
+<b>Voice style: {voice.upper()}</b>
+    /nova - a woman's voice
+    /alloy
+    /echo
+    /fable
+    /onyx
+    /shimmer
+    
+<b>The speed of the voice: {voice_speed}</b>
+    /speed_0_25 - 0.25
+    /speed_1 - 1.0
+    /speed_1_25 - 1.25
+
+    
+<b>SYSTEM CONTENT: {system_content}</b>
+    /system_content — add text
+    /get_sys_content - watch
+
+<b>ACCOUNT BALANS: {money} $</b>
+    /add_money — replenish
+
+<b>DOWNLOAD REPORTS:</b>
+    /get_stat — statistics 
+
+
 
 <b>😋 New features:</b>
    - you can transfer the image and discuss it with the AI,
@@ -747,8 +794,8 @@ async def whisper_1(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai_audio": "openai",
-        "model_audio": "whisper-1",
+        "ai_text_to_voice": "openai",
+        "model_text_to_voice": "whisper-1",
     }
     confirm = await update_user(data)
     if confirm:
@@ -761,8 +808,8 @@ async def tts_1(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai_voice": "openai",
-        "model_voice": "tts-1",
+        "ai_text_to_voice": "openai",
+        "model_text_to_voice": "tts-1",
     }
     confirm = await update_user(data)
     if confirm:
@@ -773,8 +820,8 @@ async def tts_1_hd(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai_voice": "openai",
-        "model_voice": "tts-1-hd",
+        "ai_text_to_voice": "openai",
+        "model_text_to_voice": "tts-1-hd",
     }
     confirm = await update_user(data)
     if confirm:
@@ -925,70 +972,106 @@ async def get_sys_content(message: types.Message):
 
 
 
+
+
+
 @dp.message(Command('get_stat'))
 async def get_stat(message: types.Message):
     id = user_id(message)
-    # data = {
-    #     "user_id": id,
-    #     "voice_speed": 1.25,
-    # }
-    # confirm = await update_user(data)
-    # if confirm:
-    #     await main_menu(message)
+    all_data = await read_statistics(id)
+    all_static = []
+
+    all_static.append(["№", "User id", "Date", "Use model AI", "Tokens", "Minutes Audio", "Image", "Price for one", "Full session consumption"])
+    
+    for data in all_data:
+        all_static.append([data.get("id"), data.get("user_id"), data.get("date"), data.get("model"), data.get("tokens"), data.get("min"), data.get("img"), data.get("price_1"), data.get("price")])
+
+    # Create csv file
+    output = StringIO()
+    writer = csv.writer(output)
+    for row in all_static:
+        writer.writerow(row)
+    csv_data = output.getvalue()
+    output.close()
+
+    # csv file to download
+    file_name = f"User-statistic-{random_name_2X()}.csv"
+    buffered_input_file = types.input_file.BufferedInputFile(file=csv_data.encode(), filename=file_name)
+    try:
+        await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
+    except:
+        print(f"Error sending documentb User stat")
 
 
 
 
+#### ADMIN MENU ####
+####################
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@dp.message(Command('openai'))
-async def openai(message: types.Message):
-    id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "openai"
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message)
-
-@dp.message(Command('gemini'))
+# ADMIN: Get menu:
+@dp.message(Command('admin'))
 async def gemini(message: types.Message):
     id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "gemini"
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message)
 
 
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
 
 
+    admin = '''
+<b>ADMIN PANEL:</b>
+    - /get_info_by_users
+    - /get_logs
+    - /clear_logs
+    - /clear_table_statistic
+    - /clear_table_dialog
+    - /get_backup
+    - /upload_and_restore_db
+<b>New:</b>
+    - /get_month_pay_stat
+    - /get_stat_pay_year
+    - /add_metod_pay
+    - /use_random_metod_pay 
+    - /select_one_metod_pay
+    '''
+
+    await message.answer(admin, parse_mode="HTML")
 
 
+# ADMIN: Get stat by users:
+@dp.message(Command('get_info_by_users'))
+async def get_info_by_users(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    all_data = await read_all_users()
+    all_static, i = [], 0
+
+    all_static.append(["№", "User id", "Name", "Full Name", "First Name", "Last Name", "Block", "Last Visit", "Time Zone", "Language", "Paid?", "Money $", "Notifications", "Dialog", "Dialog Summarization", "Voise answer", "Ai", "Model Language", "Ai draw", "Model Draw", "System Content"])
+    
+    for data in all_data:
+        i += 1
+        all_static.append([i, data.get("user_id"), data.get("name"), data.get("full_name"), data.get("first_name"), data.get("last_name"), data.get("block"), data.get("last_visit"), data.get("time_zone"), data.get("language"), data.get("paid"), data.get("money"), data.get("notifications"), data.get("dialog"), data.get("dialog_sum"), data.get("voice_answer"), data.get("system_content")])
+
+    # Create csv file
+    output = StringIO()
+    writer = csv.writer(output)
+    for row in all_static:
+        writer.writerow(row)
+    csv_data = output.getvalue()
+    output.close()
+
+    # csv file to download
+    file_name = f"Users-admin-{random_name_2X()}.csv"
+    buffered_input_file = types.input_file.BufferedInputFile(file=csv_data.encode(), filename=file_name)
+    try:
+        await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
+    except:
+        print(f"Error sending documentb User stat")
 
 
 
@@ -1034,7 +1117,7 @@ async def try_answer_bot(message, answer, data):
         except:
             escape_text = escape_special_chars(answer)
             await message.reply(escape_text)
-    
+
     if data.get("voice_answer") is False:
         return
     
@@ -1042,11 +1125,23 @@ async def try_answer_bot(message, answer, data):
         await message.reply("🇺🇸 *EN:* To translate text into audio, it must be less than 4096 characters.\n\n🇷🇺 *RU:* Для перевода текста в аудио, должно быть меньше 4096 символов.", parse_mode="markdown") # MarkdownV2
         return
     
-
+    # Convert Text to Audio:
     data["user_content"] = answer
-
     voice_answer_file_path = await get_voice_openai(data)
 
+    # Get tokens to Text input:
+    token_in_text = tiktroken(answer)
+
+    data["used_tokens"] = None
+    data["used_tokens"] = token_in_text
+    data["min"] = None
+    
+    # Calculation:
+    confirm = await calculation(data, "text_to_voice")
+    if not confirm:
+        print("Error: calculation.")
+
+    # Save file answer:
     if os.path.exists(voice_answer_file_path) and os.path.getsize(voice_answer_file_path) > 0:
         await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(voice_answer_file_path))
     else:
@@ -1054,6 +1149,7 @@ async def try_answer_bot(message, answer, data):
         logging.error(f"The file is empty or missing - {voice_answer_file_path}")
 
     data = {}
+    return
 
 
 #### GET CHAT to AI:
@@ -1069,8 +1165,17 @@ async def mod_tex(data, message):
     if not answer:
         return
     
+    text = answer.get("response")
+    used_tokens = answer.get("used_tokens")
+    data["used_tokens"] = None
+    data["used_tokens"] = used_tokens
+
+    confirm = await calculation(data, "text")
+    if not confirm:
+        print("Error: calculation.")
+
     # Attempts to give a response to the user:
-    await try_answer_bot(message, answer, data)
+    await try_answer_bot(message, text, data)
 
 
 
@@ -1100,8 +1205,18 @@ async def add_text_to_photo(message: Message, state: FSMContext):
     all_data["file_path"] = None
     all_data["name_file"] = None
 
+
+    text = answer.get("response")
+    used_tokens = answer.get("used_tokens")
+    all_data["used_tokens"] = None
+    all_data["used_tokens"] = used_tokens
+
+    confirm = await calculation(all_data, "text")
+    if not confirm:
+        print("Error: calculation.")
+
     # Attempts to give a response to the user:
-    await try_answer_bot(message, answer, all_data)
+    await try_answer_bot(message, text, all_data)
     await state.clear()
 
 
@@ -1132,9 +1247,19 @@ async def mod_photo(data, message, state: FSMContext):
 
         if not answer:
             return
-        
+
+        text = answer.get("response")
+        used_tokens = answer.get("used_tokens")
+        data["used_tokens"] = None
+        data["used_tokens"] = used_tokens
+
+        confirm = await calculation(data, "text")
+        if not confirm:
+            print("Error: calculation.")
+
+
         # Attempts to give a response to the user:
-        await try_answer_bot(message, answer, data)
+        await try_answer_bot(message, text, data)
         await state.clear()
     
 
@@ -1187,8 +1312,17 @@ async def mod_documents(data, message, state: FSMContext):
             data["file_path"] = None
             data["name_file"] = None
             
+            text = answer.get("response")
+            used_tokens = answer.get("used_tokens")
+            data["used_tokens"] = None
+            data["used_tokens"] = used_tokens
+
+            confirm = await calculation(data, "text")
+            if not confirm:
+                print("Error: calculation.")
+
             # Attempts to give a response to the user:
-            await try_answer_bot(message, answer, data)
+            await try_answer_bot(message, text, data)
             await state.clear()
 
         elif data.get("user_content") is None:
@@ -1234,7 +1368,7 @@ async def mod_documents(data, message, state: FSMContext):
 
 
 
-#### VOICE input:
+#### VOICE input to TEXT and send AI:
 async def mod_voice_to_text(data, message):
 
     voice = message.voice
@@ -1248,25 +1382,31 @@ async def mod_voice_to_text(data, message):
     data["file_path"] = file_path
     data["name_file"] = voice_file_name
 
-    if data.get("ai_voice") == "openai":
+    if data.get("ai_voice_to_text") == "openai":
         convert_answer = await get_text_openai(data)
-    # elif data.get("ai_voice") == "gemini":
+    # elif data.get("ai_voice_to_text") == "gemini":
     #     convert_answer = await get_text_openai(data)
-
-    if convert_answer is None:
+    
+    if not convert_answer:
+        print("Error: Convet voice to text.")
         return
 
-    data["user_content"] = convert_answer
+    data["user_content"] = convert_answer.get("response")
     data["file_path"] = None
     data["name_file"] = None
+    data["used_tokens"] = None
+    data["min"] = convert_answer.get("minutes")
 
-    answer = await mod_tex(data, message)
+    confirm = await calculation(data, "voice_to_text")
 
-    if not answer:
+    if not confirm:
+        print("Error: calculation tokens voice to text.")
         return
-    
-    # Attempts to give a response to the user:
-    await try_answer_bot(message, answer, data)
+
+    data["min"] = None
+
+    await mod_tex(data, message) # there is also a calculation of statistics
+    return
  
 
 
@@ -1298,6 +1438,25 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
             answer = await mod_openai_dall_e(all_data)
         # elif all_data.get("ai_draw") == "gemini":
         #     answer = await mod_openai_dall_e(all_data) # Sorry)))
+
+        if not answer:
+            print("Error: Convet voice to text.")
+
+        # get model dall-e
+        peps_model = set_model_dalle(all_data)
+
+        # Statistic:
+        all_data["file_path"] = None
+        all_data["name_file"] = None
+        all_data["used_tokens"] = None
+        all_data["min"] = None
+        all_data["model_draw"] = peps_model
+
+        confirm = await calculation(all_data, "gen_img")
+
+        if not confirm:
+            print("Error: calculation tokens draw.")
+            return
 
         # Response to the user:
         await bot.send_message(callback_query.from_user.id, answer)
@@ -1350,6 +1509,10 @@ async def mod_gen_img(data, message, state: FSMContext):
 async def check_request_drawing(question):
     typecontent = None
 
+
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     draw_words = {  # добавить еще на каждое слово его слово-формы.. так лень, капец.. позже..)
         "draw", "sketch", "illustrate", "depict", "paint", "render", "нарисуй", "нарисуйте", "нарисовал", "нарисовала", "нарисовало", "нарисовать",  \
         "рисунок", "изобрази", "схема", "нарисовали", "рисуешь", "иллюстрация", "набросок", "макет", "дизайн", "чертеж",
@@ -1382,17 +1545,17 @@ async def second_function(message: types.Message, state: FSMContext):
     }
     # Gen Audio models:
     default_model_audio = {
-        "openai": AI_DEFAULT_MODEL_GET_AUDIO,
+        "openai": AI_DEFAULT_MODEL_TEXT_TO_VOICE,
     }
     # Transcription voice models:
     default_model_voice = {
-        "openai": AI_DEFAULT_MODEL_GET_VOICE,
+        "openai": AI_DEFAULT_MODEL_VOICE_TO_TEXT,
     }
 
     # SYS
-    file_path, question, received_object, photo_file_name, name_file, caption, system_content, model_voice, voice, language = (None,) * 10
+    file_path, question, received_object, photo_file_name, name_file, caption, system_content, model_voice_to_text, voice, language = (None,) * 10
     caption, question, typecontent = message.caption, message.text, message.content_type
-    ai, ai_draw, ai_voice, ai_audio, voice_answer, dialog, img_size, n_number, dialog_sum, voice, voice_speed, img_quality, img_style = AI_DEFAULT, AI_DRAW, AI_VOICE, AI_AUDIO, VOICE_THE_ANSWER, DIALOG, IMG_SIZE, N_NUMBER, DIALOG_SUM, VOICE, VOICE_SPEED, IMG_QUALITY, IMG_STYLE
+    ai, ai_draw, ai_voice_to_text, ai_text_to_voice, voice_answer, dialog, img_size, n_number, dialog_sum, voice, voice_speed, img_quality, img_style = AI_DEFAULT, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, VOICE_THE_ANSWER, DIALOG, IMG_SIZE, N_NUMBER, DIALOG_SUM, VOICE, VOICE_SPEED, IMG_QUALITY, IMG_STYLE
 
     await typing(message)
     id = user_id(message)
@@ -1432,25 +1595,25 @@ async def second_function(message: types.Message, state: FSMContext):
     else:
         model_draw = default_model_draw[ai_draw]
 
-    # Get ai_voice:
-    if data_from_db.get("ai_voice"):
-        ai_voice = data_from_db.get("ai_voice")
+    # Get ai_voice_to_text:
+    if data_from_db.get("ai_voice_to_text"):
+        ai_voice_to_text = data_from_db.get("ai_voice_to_text")
 
     # Get model draw ai:
-    if data_from_db.get("model_voice"):
-        model_voice = data_from_db.get("model_voice")
+    if data_from_db.get("model_voice_to_text"):
+        model_voice_to_text = data_from_db.get("model_voice_to_text")
     else:
-        model_voice = default_model_voice[ai_voice]
+        model_voice_to_text = default_model_voice[ai_voice_to_text]
 
-    # Get ai_audio:
-    if data_from_db.get("ai_audio"):
-        ai_audio = data_from_db.get("ai_audio")
+    # Get ai_text_to_voice:
+    if data_from_db.get("ai_text_to_voice"):
+        ai_text_to_voice = data_from_db.get("ai_text_to_voice")
 
-    # Get model_audio:
-    if data_from_db.get("model_audio"):
-        model_audio = data_from_db.get("model_audio")
+    # Get model_text_to_voice:
+    if data_from_db.get("model_text_to_voice"):
+        model_text_to_voice = data_from_db.get("model_text_to_voice")
     else:
-        model_audio = default_model_audio[ai_audio]
+        model_text_to_voice = default_model_audio[ai_text_to_voice]
 
     # Get system_content:
     if data_from_db.get("system_content"):
@@ -1504,17 +1667,18 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Data collection to API:
     data = {
+        "user_id": id,
         "ai": ai,
         "model_language": model_language,
 
         "ai_draw": ai_draw,
         "model_draw": model_draw,
 
-        "ai_voice": ai_voice,
-        "model_voice": model_voice,
+        "ai_voice_to_text": ai_voice_to_text,
+        "model_voice_to_text": model_voice_to_text,
 
-        "ai_audio": ai_audio,
-        "model_audio": model_audio,
+        "ai_text_to_voice": ai_text_to_voice,
+        "model_text_to_voice": model_text_to_voice,
 
         "voice_answer": voice_answer,
         "img_size": img_size,

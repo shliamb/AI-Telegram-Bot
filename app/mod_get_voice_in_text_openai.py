@@ -2,14 +2,14 @@ from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
 import requests
 import base64
 
-from config import URL, AI_DEFAULT_MODEL_GET_AUDIO, AUDIO_FOLDER
+from config import URL, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AUDIO_FOLDER
 from general_functions import random_name_2X
 
 
 
 async def get_voice_openai(data):
 
-    model = data.get("model_audio")
+    model = data.get("model_text_to_voice")
     user_content = data.get("user_content") # 4096 characters max
     response_format = data.get("response_format", "opus") # mp3, opus, aac, flac, wav, and pcm in Telegram best - opus
     voice = data.get("voice") # alloy, echo, fable, onyx, nova, and shimmer

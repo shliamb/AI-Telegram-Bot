@@ -44,7 +44,8 @@ async def mod_gemini_chat(data):
 
     if response.status_code == 200:
         answer_json = response.json()
-        answer = answer_json.get("response")
+        #answer = answer_json.get("response")
+        answer = answer_json
     else:
         print(response.status_code, response.text)
         answer = str(response.text) + str(response.status_code)

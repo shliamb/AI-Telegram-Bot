@@ -20,14 +20,16 @@ async def mod_openai_dall_e(data):
 
     data = {
             "username": USERNAME_API_AI,
+            "model": model,
             "user_content": prompt,
-            "quality": quality,
-            "style": style,
             "size": size,
             "response_format": response_format,
             "n": n,
-            "model": model,
     }
+
+    if model == "dall-e-3":
+        data["quality"] = quality
+        data["style"] = style
 
     headers = {
         KEY_API_AI: VALUE_KEY_API_AI,

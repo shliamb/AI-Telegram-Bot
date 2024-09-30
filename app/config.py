@@ -21,14 +21,14 @@ AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest" #  gemini-1.5-flash-latest o
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini-2024-07-18"
 
 # Gen Audio models:
-AI_AUDIO = "openai"
-AI_DEFAULT_MODEL_GET_AUDIO = "tts-1" # tts-1-hd
+AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
+AI_DEFAULT_MODEL_TEXT_TO_VOICE = "tts-1" # tts-1-hd           AI_DEFAULT_MODEL_GET_AUDIO
 VOICE = "nova" # alloy, echo, fable, onyx, nova, and shimmer
 VOICE_SPEED = 1.0 # 0.25 to 4.0
 
 # Transcription voice models:
-AI_VOICE = "openai"
-AI_DEFAULT_MODEL_GET_VOICE = "whisper-1" # no choes
+AI_VOICE_TO_TEXT = "openai"  # in - voice, out - text   
+AI_DEFAULT_MODEL_VOICE_TO_TEXT = "whisper-1" # no choes  model_voice_to_text
 
 # Gen Img models:
 AI_DRAW = "openai" # or midjourney
@@ -46,6 +46,13 @@ DOWNLOADS_FOLDER = "./downloads/"
 UPLOADS_FOLDER = "./uploads/"
 AUDIO_FOLDER = "./audio/"
 VOICE_FOLDER = "./voice/"
+
+# Delete files:
+DEL_DOWNLOADS = True
+DEL_UPLOADS = True
+DEL_AUDIO = True
+DEL_VOICE = True
+
 
 
 # Prices per 1M tokens models:

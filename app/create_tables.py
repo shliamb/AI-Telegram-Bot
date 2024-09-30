@@ -24,7 +24,7 @@ def create_tables_in_db():
             time_zone VARCHAR(10), 
             language VARCHAR(10),
             system_content TEXT,
-            paid BOOLEAN DEFAULT FALSE,
+            paid INT DEFAULT 0,
             money FLOAT,
             notifications BOOLEAN,
             dialog BOOLEAN,
@@ -37,11 +37,11 @@ def create_tables_in_db():
             ai_draw VARCHAR(50),
             model_draw VARCHAR(50),
 
-            ai_voice VARCHAR(50),
-            model_voice VARCHAR(50),
+            ai_voice_to_text VARCHAR(50),
+            model_voice_to_text VARCHAR(50),
 
-            ai_audio VARCHAR(50),
-            model_audio VARCHAR(50),
+            ai_text_to_voice VARCHAR(50),
+            model_text_to_voice VARCHAR(50),
 
             voice VARCHAR(50),
             voice_speed FLOAT,
@@ -65,6 +65,7 @@ def create_tables_in_db():
             tokens INTEGER,
             min FLOAT,
             img INTEGER,
+            price_1 FLOAT,
             price FLOAT,
             user_id BIGINT,
             FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -86,6 +87,30 @@ def create_tables_in_db():
         '''
         cursor.execute(create_table_discussion)
 
+        create_table_metod_pay = '''
+        CREATE TABLE IF NOT EXISTS pays (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP,
+            title_metod_pay VARCHAR(50),
+            counts INT,
+            metod_pay TEXT
+        );
+        '''
+        cursor.execute(create_table_metod_pay)
+
+        create_table_pays = '''
+        CREATE TABLE IF NOT EXISTS pays (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP,
+            title_metod_pay VARCHAR(50),
+            sum FLOAT,
+            user_id BIGINT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        );
+        '''
+        cursor.execute(create_table_pays)
+
+
         # Saving changes:
         connection.commit()
         print("Adding tables is done!")
@@ -103,8 +128,8 @@ def create_tables_in_db():
 
 
 
-if __name__ == "__main__":
-    create_tables_in_db()
+
+create_tables_in_db()
 
 
 

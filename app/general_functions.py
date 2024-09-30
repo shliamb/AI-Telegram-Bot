@@ -1,8 +1,11 @@
+from worker_db import add_statistics, read_user, update_user
+from config import PRICE
 from datetime import datetime, timezone, timedelta
 from config import TIME_CORRECTION
 import logging
 import random
 import string
+import tiktoken
 import os
 import re
 import base64
@@ -77,65 +80,148 @@ def bool_to_str(bools, lang):
     return text.upper()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # Calculation of the cost of used tokens
-# async def calculation(username, model_version, used_tokens, input_data):
-#     one_tok_price = None
+# Calculation of the cost of used tokens
+async def calculation(data, input_data):
+    one_price, use_model, data_stat = None, None, {}
     
-#     for key, value in price.items():
-#         if key == model_version:
-#             if input_data == "text":
-#                 one_tok_price = value / 1000000 # Price 1 token to USD
-#                 break
-#             elif input_data == "img":
-#                 one_tok_price = value
-#                 break
-#             elif input_data == "audio":
-#                 one_tok_price = value # Price 1 min
-#                 break
+    try:
+        for key, value in PRICE.items():
+            if input_data == "text" and key == data.get("model_language"):
+                one_price = value / 1000000 # Price 1 token to USD
+                use_model = data.get("model_language")
+                total_price = one_price * data.get("used_tokens")
+                data_stat["tokens"] = data.get("used_tokens")
+                break
+            elif input_data == "gen_img" and key == data.get("model_draw"):
+                one_price = value
+                use_model = data.get("model_draw")
+                total_price = one_price * data.get("n_number")
+                data_stat["img"] = data.get("n_number")
+                break
+            elif input_data == "voice_to_text" and key == data.get("model_voice_to_text"):
+                one_price = value # Price 1 min
+                use_model = data.get("model_voice_to_text")
+                total_price = one_price * data.get("min")
+                data_stat["min"] = data.get("min")
+                break
+            elif input_data == "text_to_voice" and key == data.get("model_text_to_voice"):
+                one_price = value / 1000000 # Price 1 charaster to USD
+                use_model = data.get("model_text_to_voice")
+                total_price = one_price * data.get("used_tokens")
+                data_stat["tokens"] = data.get("used_tokens")
+                break
+
+        # Collecting data
+        data_stat["user_id"] = data.get("user_id")
+        data_stat["date"] = await day_utcnow()
+        data_stat["model"] = use_model
+        data_stat["price_1"] = one_price
+        data_stat["price"] = total_price
+
+
+        # Save statistic data to DB:
+        confirm = await add_statistics(data_stat)
+        if not confirm:
+            print("Error: add_statistics")
+
+        # Getting user data
+        user_data = await read_user(data.get("user_id"))
+        new_money = user_data.get("money") - total_price
+        data_money = {"money": new_money, "user_id": data.get("user_id"),}
+
+        # The balance was changed taking into account the expense
+        confirm = await update_user(data_money)
+        if not confirm:
+            print("Error: update_user")
+
+        return True
+    
+    except Exception as error:
+        print("Error:", error)
+        return False
+
+
+
+# We consider tokens from the text to be average and I'm not sure what is correct
+def tiktroken(user_content):
+    # Statistic *** Ебанный костыль, пока что не знаю как подругому сделать ****   Available encodings: ['gpt2', 'r50k_base', 'p50k_base', 'p50k_edit', 'cl100k_base', 'o200k_base']
+    enc = tiktoken.get_encoding("gpt2")
+    tokens = enc.encode(user_content)
+    used_tokens = len(tokens)
+    return used_tokens
+
+
+
+# Set model OpenAI Dall-e
+def set_model_dalle(data):
+
+    quality = data.get("quality")
+    size = data.get("size")
+    model = data.get("model_draw")
+
+    if data.get("ai_draw") == "openai":
+        # Choosing a price list
+        if model and model == "dall-e-3":
+            if quality and quality == "hd":
+                if size and size == "1024x1024":
+                    model = "dall-e-3-hd-1024"
+                elif size and size == "1792x1024" or size and size == "1024x1792":
+                    model = "dall-e-3-hd-1792"
+                else:
+                    model = "dall-e-3-hd-1024"
+            elif quality and quality == "standard":
+                if size and size == "1024x1024":
+                    model = "dall-e-3-1024"
+                elif size and size == "1792x1024" or size and size == "1024x1792":
+                    model = "dall-e-3-1792"
+                else:
+                    model = "dall-e-3-1024"
+            else:
+                model = "dall-e-3-1024"
+
+        elif model and model == "dall-e-2":
+            if size and size == "1024x1024":
+                model = "dall-e-2-1024"
+            elif size and size == "512x512":
+                model = "dall-e-2-512"
+            elif size and size == "256x256":
+                model = "dall-e-2-256"
+            else:
+                model = "dall-e-2-1024"
+        else:
+            model = "dall-e-3-1024"
+        return model
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # Async calculating the length of an audio file:
+# async def read_audio_file(file_path: str) -> float: # mp3 (ID3v1 и ID3v2), flac, ogg Vorbis, acc (and M4A), wav, wma (limited support), aiff
+#     async with aiofiles.open(file_path, 'rb') as f:
+#         content = await f.read()
+#         audio_file = BytesIO(content)
         
-#     if one_tok_price == None:
-#         print(f"The model {model_version} was not found in the price list")
-#         logging.error(f"The model {model_version} was not found in the price list")
-#         one_tok_price = 0.000095 # Sorry..
-
-#     total_price = one_tok_price * used_tokens
-
-#     # Collecting data
-#     data_stat = {
-#         "username_table_stat": username,
-#         "time": await day_utcnow(),
-#         "use_model": model_version,
-#         "sesion_token": used_tokens,
-#         "price_1_tok": one_tok_price,
-#         "total_price": total_price,
-#     }
-
-#     # Save statistic data to DB:
-#     await add_statistic(data_stat)
-
-#     # Getting user data
-#     user_data = await get_user_by_username(username)
-#     new_money = user_data.money - total_price
-#     data_money = {"money": new_money}
-
-#     # The balance was changed taking into account the expense
-#     await update_user_by_username(username, data_money)
-
-#     return total_price
+#         # Загружаем аудиофайл с помощью mutagen
+#         audio = File(audio_file)
+        
+#         if audio is None or audio.info is None:
+#             print("The audio file could not be uploaded.")
+#             logging.error("The audio file could not be uploaded.")
+#         else:
+#             # print(audio.pprint())
+#             duration = audio.info.length  # Получаем длину в секундах
+#             if duration:
+#                 length_sound = float(f"{duration:.2f}")
+#                 return length_sound
 
 
 # Remove File OS
@@ -183,23 +269,5 @@ def bool_to_str(bools, lang):
 #             return
 
 
-# # Async calculating the length of an audio file:
-# async def read_audio_file(file_path: str) -> float: # mp3 (ID3v1 и ID3v2), flac, ogg Vorbis, acc (and M4A), wav, wma (limited support), aiff
-#     async with aiofiles.open(file_path, 'rb') as f:
-#         content = await f.read()
-#         audio_file = BytesIO(content)
-        
-#         # Загружаем аудиофайл с помощью mutagen
-#         audio = File(audio_file)
-        
-#         if audio is None or audio.info is None:
-#             print("The audio file could not be uploaded.")
-#             logging.error("The audio file could not be uploaded.")
-#         else:
-#             # print(audio.pprint())
-#             duration = audio.info.length  # Получаем длину в секундах
-#             if duration:
-#                 length_sound = float(f"{duration:.2f}")
-#                 return length_sound
 
 
