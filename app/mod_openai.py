@@ -45,9 +45,9 @@ async def mod_openai_chat(data):
 
     if response.status_code == 200:
         answer_json = response.json()
-        #answer = answer_json.get("response")
+        # answer = answer_json.get("response")
         answer = response.json()
-        print(answer)
+        # print(answer)
     else:
         print(response.status_code, response.text)
         answer = str(response.text) + str(response.status_code)

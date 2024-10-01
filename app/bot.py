@@ -43,7 +43,7 @@ from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use
 from texts import start_ru, start_en
 
 
@@ -1018,22 +1018,38 @@ async def gemini(message: types.Message):
         print(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
+    # Get method default:
+    data_pay = await read_one_methods_pay_by_use()
+    use_pay = data_pay[0].get("title_method_pay")
 
-    admin = '''
+    admin = f'''
 <b>ADMIN PANEL:</b>
-    - /get_info_by_users
-    - /get_logs
-    - /clear_logs
-    - /clear_table_statistic
-    - /clear_table_dialog
-    - /get_backup
-    - /upload_and_restore_db
-<b>New:</b>
-    - /get_month_pay_stat
-    - /get_stat_pay_year
-    - /add_metod_pay
-    - /use_random_metod_pay 
-    - /select_one_metod_pay
+
+<b>INFO: (11)</b>
+    /get_info_by_users
+
+<b>LOGS:</b>
+    /get_logs
+
+<b>CLEAR:</b>
+    /clear_logs
+    /clear_table_statistic
+    /clear_table_dialog
+
+<b>BACKUP & RESTORE:</b>  
+    /get_backup
+    /upload_and_restore_db
+
+<b>STATISTICS:</b>
+    /get_month_pay_stat
+    /get_stat_pay_year
+
+<b>METHODS PAY: {use_pay}</b>
+    /add_metod_pay - add method
+    /select_one_metod_pay - select method
+    /use_random_metod_pay  - use random
+    /delete_metod 
+
     '''
 
     await message.answer(admin, parse_mode="HTML")
@@ -1072,6 +1088,143 @@ async def get_info_by_users(message: types.Message):
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
         print(f"Error sending documentb User stat")
+
+
+
+
+
+# ADMIN: Add method pay:
+class Form_method_pay(StatesGroup):
+    title_pay = State()
+    text_pay = State()
+
+@dp.message(Command('add_metod_pay'))
+async def add_metod_pay(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    await message.reply("The name of the payment method is short (title method):", parse_mode="Markdown") 
+    await state.set_state(Form_method_pay.title_pay)
+
+@dp.message(Form_method_pay.title_pay)
+async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    await state.update_data(title=message.text)
+    await message.reply("The terms of the payment method are detailed for users:", parse_mode="Markdown") 
+    await state.set_state(Form_method_pay.text_pay)
+
+@dp.message(Form_method_pay.text_pay)
+async def add_metod_pay_input_text(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    title = await state.get_data()
+    text = message.text
+
+    pay_data = {
+        "date": await day_utcnow(),
+        "title_method_pay": title.get("title"),
+        "method_pay": text,
+    }
+
+    confirm = await add_methods_pay(pay_data)
+
+    if confirm:
+        await message.reply("The payment method has been successfully added.", parse_mode="Markdown") 
+    await state.clear()
+####
+
+
+# ADMIN: SELECT method pay:
+class Form_change_method(StatesGroup):
+    num = State()
+
+@dp.message(Command('select_one_metod_pay'))
+async def select_one_metod_pay(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    # Get metods pay data:
+    all_metods = await read_all_methods_pay()
+
+    if not all_metods:
+        print("Error: Dont have metods pay.")
+        await message.reply("*Error*: Dont have metods pay.", parse_mode="Markdown") 
+        return
+
+    # Show metods:
+    methods = ""
+    for n in all_metods:
+        id = str(n.get("id"))
+        title = n.get("title_method_pay")
+        methods = methods + "\n" + id + " - " + title
+
+    await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method that should be the default:", parse_mode="Markdown") 
+    await state.set_state(Form_change_method.num)
+
+@dp.message(Form_change_method.num)
+async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
+    id_man = user_id(message)
+
+    if id_man != ADMIN_ID:
+        print(f"This {id_man} shit made an attempt to enter to Admin Panel.")
+        return
+    
+    try:
+        int_value = int(message.text)
+    except:
+        print(f"This not integer id method pay.")
+        return
+
+    # Unset default method pay:
+    data = await read_one_methods_pay_by_use()
+
+    pay_data = {
+        "id": data[0].get("id"),
+        "use": False,
+    }
+    confirm = await update_methods_pay(pay_data)
+    if not confirm:
+        print("Error: Not update_methods_pay.")
+        return
+
+    # Set default method pay:
+    pay_data = {
+        "id": int_value,
+        "use": True,
+    }
+    confirm = await update_methods_pay(pay_data)
+    if not confirm:
+        print("Error: Not update_methods_pay.")
+        return
+
+    await message.reply(f"The default payment method has been successfully installed - {int_value}", parse_mode="Markdown")
+    await state.clear()
+# ####
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1515,7 +1668,8 @@ async def check_request_drawing(question):
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     draw_words = {  # добавить еще на каждое слово его слово-формы.. так лень, капец.. позже..)
         "draw", "sketch", "illustrate", "depict", "paint", "render", "нарисуй", "нарисуйте", "нарисовал", "нарисовала", "нарисовало", "нарисовать",  \
-        "рисунок", "изобрази", "схема", "нарисовали", "рисуешь", "иллюстрация", "набросок", "макет", "дизайн", "чертеж",
+        "рисунок", "изобрази", "схема", "нарисовали", "рисуешь", "иллюстрация", "набросок", "макет", "дизайн", "чертеж", "сгенерируй рисунок", "generate a drawing", \
+        "сгенерируй изображение", "generate an image", "сгенерируй фотографию", "generate a photo", "сгенерируй картинку", "generate a picture"
     }
     question_words = set(question.lower().split())
     if draw_words & question_words:

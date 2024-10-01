@@ -87,28 +87,29 @@ def create_tables_in_db():
         '''
         cursor.execute(create_table_discussion)
 
-        create_table_metod_pay = '''
-        CREATE TABLE IF NOT EXISTS pays (
+        create_table_methods_pay = '''
+        CREATE TABLE IF NOT EXISTS methods_pay (
             id SERIAL PRIMARY KEY,
             date TIMESTAMP,
-            title_metod_pay VARCHAR(50),
             counts INT,
-            metod_pay TEXT
+            use BOOLEAN,
+            title_method_pay VARCHAR(50) UNIQUE,
+            method_pay TEXT
         );
         '''
-        cursor.execute(create_table_metod_pay)
+        cursor.execute(create_table_methods_pay)
 
-        create_table_pays = '''
-        CREATE TABLE IF NOT EXISTS pays (
+        create_table_payments = '''
+        CREATE TABLE IF NOT EXISTS payments (
             id SERIAL PRIMARY KEY,
-            date TIMESTAMP,
-            title_metod_pay VARCHAR(50),
+            date TIMESTAMP UNIQUE,
+            title_method_pay VARCHAR(50),
             sum FLOAT,
             user_id BIGINT,
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         );
         '''
-        cursor.execute(create_table_pays)
+        cursor.execute(create_table_payments)
 
 
         # Saving changes:

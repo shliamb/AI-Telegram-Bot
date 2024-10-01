@@ -414,13 +414,433 @@ async def clear_discussion():
 
 
 
+#### METHOD_PAY TABLE: ####
+###########################
+
+# Read all methods_pay:
+async def read_all_methods_pay():
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM methods_pay;
+            '''
+        )
+
+        if not result:
+            print("The methodt pay is empty, sorry.")
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_all_methods_pay: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+
+# Read one methods_pay by title:
+async def read_one_methods_pay(title: str):
+    connection = None
+    try:
+        if type(title) != str:
+            print("Error: input data is not str (title method pay.)")
+            return False
+
+        if not title:
+            print("Error: Title method pay is Empty or None.")
+            return False
+
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM methods_pay WHERE title_method_pay = $1;
+            ''',
+            title,
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_one_methods_pay: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Read one methods_pay by id:
+async def read_one_methods_pay_by_id(id: int):
+    connection = None
+    try:
+        if type(id) != int:
+            print("Error: input data is not int (id method pay.)")
+            return False
+
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM methods_pay WHERE id = $1;
+            ''',
+            id,
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_one_methods_pay_by_id: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Read one methods_pay by use == True:
+async def read_one_methods_pay_by_use():
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM methods_pay WHERE use = $1;
+            ''',
+            True,
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_one_methods_pay_by_use: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Deleted one methods_pay:
+async def deleted_one_methods_pay(title: str):
+    connection = None
+    try:
+        if type(title) != str:
+            print("Error: input data is not str (title method pay.)")
+            return False
+
+        if not title:
+            print("Error: Title method pay is Empty or None.")
+            return False
+
+        connection = await get_connection()
+        await connection.execute(
+            '''
+                DELETE FROM methods_pay WHERE title_method_pay = $1;
+            ''',
+            title,
+        )
+
+        return True
+    
+    except Exception as e:
+        print(f"Error deleted_one_methods_pay: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Add methods_pay:
+async def add_methods_pay(pay_data):
+    keys_list, values_list, num_list, i, connection = [], [], [], 1, None
+
+    if len(pay_data) <= 1: 
+        print("Error: User_data is empty.")
+        return False
+
+    for key, value in pay_data.items():
+        keys_list.append(key)
+        values_list.append(value)
+        num_list.append(f"${i}")
+        i += 1
+
+    keys = ", ".join(keys_list) # <-- в строку, а * распоковывает поотдельности
+    nums = ", ".join(num_list)
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            INSERT INTO methods_pay ({keys}) VALUES ({nums})
+            ''', 
+            *values_list # Оператор распоковки *
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error add_methods_pay: {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+
+# Update methods_pay by id:
+async def update_methods_pay(pay_data):
+    keys_list, values_list, i, connection = [], [], 1, None
+
+    id = pay_data.get("id")
+
+    if not id:
+        print("Error update_methods_pay: Where is id?") 
+        return False
+    
+    if len(pay_data) <= 1: # At a minimum, we need id + at least one element of the change.
+        print("Error update_methods_pay: pay_data is empty or contains a single entry.")
+        return False
+
+    for key, value in pay_data.items():
+        if key != "id":
+            keys_list.append(f"{key} = ${i}")
+            values_list.append(value) #user_data[key])
+            i += 1
+
+    update_string = ", ".join(keys_list) # <-- в строку, а * распоковывает поотдельности
+    values_list.append(id)
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            UPDATE methods_pay SET {update_string} WHERE id = ${i};
+            ''', 
+            *values_list
+        )
+        return True
+    
+    
+    except Exception as e:
+        print(f"Error update_methods_pay: {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+
+# # Add methods_pay:
+# pay_data = {
+#     # "date": ,
+#     "title_method_pay": "White",
+#     "counts": 1,
+#     "method_pay": "С вас 3 пирожка и это официально, я нарисую чек!",
+# }
+
+# Deleted:
+# confirm = asyncio.run(deleted_one_methods_pay("White"))
+# print(confirm)
+
+# # Add:
+# confirm = asyncio.run(add_methods_pay(pay_data))
+# print(confirm)
+
+# # Read all:
+# data = asyncio.run(read_all_methods_pay())
+# print(data)
+
+# # Read one method pay by USE:
+# data = asyncio.run(read_one_methods_pay_by_use())
+# print(data)
+
+# # Update row use to id:
+# pay_data = {
+#     "id": 1,
+#     "use": True,
+# }
+# data1 = asyncio.run(update_methods_pay(pay_data))
+# print(data1)
+
+# # Read by id:
+# data = asyncio.run(read_one_methods_pay_by_id(1))
+# print(data)
+
+# # Read for title record:
+# data = asyncio.run(read_one_methods_pay("White"))
+# print(data)
 
 
 
 
 
+#### PAYMENTS TABLE: ####
+#########################
 
 
+# Read all payments for one user_id:
+async def read_all_payments_for_user_id(user_id):
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM payments WHERE user_id = $1;
+            ''',
+            user_id
+        )
+
+        if not result:
+            print(f"User {user_id} not pay.")
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_all_payments_for_user_id: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Read all payments:
+async def read_all_payments():
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM payments;
+            '''
+        )
+
+        if not result:
+            print("Users not pay.")
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+        return data
+    
+    except Exception as e:
+        print(f"Error read_all_payments: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Add payments:
+async def add_payments(payments):
+    keys_list, values_list, num_list, i, connection = [], [], [], 1, None
+
+    if len(payments) <= 1: 
+        print("Error: User_data is empty.")
+        return False
+    
+    if payments.get("user_id") is None: 
+        print("Error: User_id is empty.")
+        return False
+
+    for key, value in payments.items():
+        keys_list.append(key)
+        values_list.append(value)
+        num_list.append(f"${i}")
+        i += 1
+
+    keys = ", ".join(keys_list) # <-- в строку, а * распоковывает поотдельности
+    nums = ", ".join(num_list)
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            INSERT INTO payments ({keys}) VALUES ({nums})
+            ''', 
+            *values_list # Оператор распоковки *
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error add_payments: {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# Deleted all payments:
+async def deleted_all_payments():
+    connection = None
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            '''
+                DELETE FROM payments;
+            '''
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error deleted_all_payments: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# # Add payments:
+# payments = {
+#     "user_id": 1666495,
+#     # "date": ,
+#     "title_method_pay": "White",
+#     "sum": 126,
+# }
+
+# # Add payments:
+# data = asyncio.run(add_payments(payments))
+# print(data)
+
+# # Resd one payments for her user_id:
+# data = asyncio.run(read_all_payments_for_user_id(1666495))
+# print(data)
+
+# # Deleted all records payments:
+# data = asyncio.run(deleted_all_payments())
+# print(data)
+
+# # Read all payments:
+# data = asyncio.run(read_all_payments())
+# print(data)
 
 
 
