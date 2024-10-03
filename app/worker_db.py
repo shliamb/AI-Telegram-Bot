@@ -85,10 +85,8 @@ async def read_user(user_id):
 
         if not result:
             return False
-        
-        for record in result:
-            data = dict(record)
-        return data 
+
+        return dict(*result)
     
     except Exception as e:
         print(f"Error read_user: {e}")
@@ -96,10 +94,10 @@ async def read_user(user_id):
         if connection is not None:
             await connection.close()
 
-# # Read user:
+# # # Read user:
 # data_user = asyncio.run(read_user(1666495))
 
-# print(data_user)
+# #print(data_user)
 
 # print(data_user.get("user_id"), data_user.get("name"), data_user.get("money"))
 
@@ -240,6 +238,10 @@ async def read_statistics(user_id):
         data = []
         for record in result:
             data.append(dict(record))
+
+        if len(data) == 1:
+            data = dict(*result)
+
         return data
     
     except Exception as e:
@@ -249,7 +251,8 @@ async def read_statistics(user_id):
             await connection.close()
 
 # # Read statistics by user_id:
-# data_user = asyncio.run(read_statistics(485435943))
+# data_user = asyncio.run(read_statistics(1666495))
+# #print(data_user)
 # for one in data_user:
 #     print(one.get("user_id"), one.get("model"), one.get("tokens"))
 
@@ -369,6 +372,10 @@ async def read_discussion(user_id):
         data = []
         for record in result:
             data.append(dict(record))
+
+        if len(data) == 1:
+            data = dict(*result)
+
         return data
     
     except Exception as e:
@@ -435,6 +442,10 @@ async def read_all_methods_pay():
         data = []
         for record in result:
             data.append(dict(record))
+
+        if len(data) == 1:
+            data = dict(*result)
+            
         return data
     
     except Exception as e:
@@ -469,11 +480,8 @@ async def read_one_methods_pay(title: str):
         if not result:
             return False
 
-        data = []
-        for record in result:
-            data.append(dict(record))
-        return data
-    
+        return dict(*result)
+
     except Exception as e:
         print(f"Error read_one_methods_pay: {e}")
         return False
@@ -501,10 +509,7 @@ async def read_one_methods_pay_by_id(id: int):
         if not result:
             return False
 
-        data = []
-        for record in result:
-            data.append(dict(record))
-        return data
+        return dict(*result)
     
     except Exception as e:
         print(f"Error read_one_methods_pay_by_id: {e}")
@@ -515,13 +520,13 @@ async def read_one_methods_pay_by_id(id: int):
 
 
 # Read one methods_pay by use == True:
-async def read_one_methods_pay_by_use():
+async def read_one_methods_pay_by_use(i):
     connection = None
     try:
         connection = await get_connection()
         result = await connection.fetch(
-            '''
-                SELECT * FROM methods_pay WHERE use = $1;
+            f'''
+                SELECT * FROM methods_pay WHERE use_{i} = $1;
             ''',
             True,
         )
@@ -529,10 +534,7 @@ async def read_one_methods_pay_by_use():
         if not result:
             return False
 
-        data = []
-        for record in result:
-            data.append(dict(record))
-        return data
+        return dict(*result)
     
     except Exception as e:
         print(f"Error read_one_methods_pay_by_use: {e}")
@@ -540,6 +542,13 @@ async def read_one_methods_pay_by_use():
     finally:
         if connection is not None:
             await connection.close()
+
+
+# # Read one method pay by USE:
+# i = 2
+# data = asyncio.run(read_one_methods_pay_by_use(i))
+# print(data)
+# print(data.get(f"use_{i}"))
 
 
 # Deleted one methods_pay:
@@ -720,6 +729,10 @@ async def read_all_payments_for_user_id(user_id):
         data = []
         for record in result:
             data.append(dict(record))
+
+        if len(data) == 1:
+            data = dict(*result)
+
         return data
     
     except Exception as e:
@@ -748,6 +761,10 @@ async def read_all_payments():
         data = []
         for record in result:
             data.append(dict(record))
+
+        if len(data) == 1:
+            data = dict(*result)
+
         return data
     
     except Exception as e:
@@ -864,6 +881,10 @@ async def read_all_users():
         data = []
         for record in result:
             data.append(dict(record))
+
+        if len(data) == 1:
+            data = dict(*result)
+
         return data
     
     except Exception as e:

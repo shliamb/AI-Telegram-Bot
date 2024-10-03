@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 # logging.basicConfig(level=logging.INFO, filename='./log/bot.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
 import re
-import random
+# import random
 import os
 import asyncio
-import requests
+#import requests
 from io import StringIO, BytesIO
-import uuid
-from pathlib import Path # Работа с файловыми путями 
+#import uuid
+#from pathlib import Path # Работа с файловыми путями 
 # from datetime import datetime, timezone, timedelta
 # import time
 # import sys
@@ -43,7 +43,7 @@ from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, read_one_methods_pay_by_use
 from texts import start_ru, start_en
 
 
@@ -957,12 +957,6 @@ async def system_content_get_text(message: types.Message, state: FSMContext):
 
     await state.clear()
 
-
-
-
-
-
-
 @dp.message(Command('get_sys_content'))
 async def get_sys_content(message: types.Message):
     id = user_id(message)
@@ -974,7 +968,7 @@ async def get_sys_content(message: types.Message):
 
 
 
-
+# User statistic:
 @dp.message(Command('get_stat'))
 async def get_stat(message: types.Message):
     id = user_id(message)
@@ -1005,6 +999,181 @@ async def get_stat(message: types.Message):
 
 
 
+
+
+
+
+#### Transfer money: ####
+####################
+
+class Form_my_pay(StatesGroup):
+    add_summ = State()
+    #confirm_summt = State()
+
+# Select method pay:
+@dp.message(Command("add_money"))
+async def add_money(message: types.Message, state: FSMContext):
+
+    id = user_id(message)
+    answer = await read_user(id)
+    language = answer.get("language")
+    await state.update_data(language=language)
+
+
+    if language == "ru":
+        await message.reply("На данный момент, оплатить можно только переводом на карту.\n\n Выберите способ перевода:\n1. /card_ru - на карту РФ\n2. /mastercard - на карту 'MasterCard'", parse_mode="HTML")
+    else:
+        await message.reply("At the moment, you can only pay by transfer to a card.\n\n Select the transfer method:\n1. /card_ru - to the Russian card\n2. /mastercard - to the 'MasterCard' card", parse_mode="HTML")
+
+    await state.set_state(Form_my_pay.add_summ)
+
+
+
+
+# To Russian card:
+@dp.message(Form_my_pay.add_summ, Command("card_ru"))
+async def card_ru(message: types.Message, state: FSMContext):
+
+    data = await read_one_methods_pay_by_use()
+    data_state = await state.get_data()
+    language = data_state.get("language")
+
+    if data and data.get("use") == True:
+        method_pay_ru = data.get("method_pay")
+        method_pay_en = data.get("method_pay")
+    
+    if language == "ru":
+        await message.reply(f"{method_pay_ru}\nВведите сумму:", parse_mode="HTML")
+    else:
+        await message.reply(f"{method_pay_en}\nEnter the amount:", parse_mode="HTML")
+    
+    await state.clear()
+
+
+
+
+
+# # To mastercard card:
+# @dp.message(Command("mastercard"))
+# async def mastercard(message: types.Message):
+
+
+
+# # await state.set_state(Form_my_pay.add_summ)
+# @dp.message(Form_my_pay.add_summ)
+# async def invoice_user(message: Message, state: FSMContext):
+
+#     mes_id = message.chat.id
+#     summ = message.text
+#     id = user_id(message)
+#     admin_id = ADMIN_ID
+#     url = f"tg://user?id={id}"
+
+#     # is Float or Int?
+#     try:
+#         summ = float(summ)
+#     except:
+#         print("Error: Not float.")
+#         await message.reply("🇺🇸 *EN:* Enter the amount again, in numbers.\n\n🇷🇺 *RU:* Введите сумму еще раз, цифрами.", parse_mode="Markdown")
+#         return
+
+#     # is Zerro?
+#     if summ <= 0:
+#         print("Error: You entered 0.")
+#         await message.reply("🇺🇸 *EN:* You entered 0. Enter the amount again.\n\n🇷🇺 *RU:* Введите сумму еще раз, больше нуля.", parse_mode="Markdown")
+#         return
+
+#     # Send message to ADMIN:
+#     await confirm_my(id, summ, admin_id, mes_id, url)
+
+#     await state.clear()
+
+
+
+# # Вызов у админа кнопки подтверждения
+# async def confirm_my(id, summ, admin_id, mes_id, url):
+#     # Кнопка подтверждения
+#     keyboard = InlineKeyboardMarkup(
+#         inline_keyboard=[
+#             [InlineKeyboardButton(text="👛 Подтвердить", callback_data=f"confirm_summ_user_d:{id}:{summ}:{admin_id}:{mes_id}")], 
+#         ]
+#     )
+#     await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {summ} РУБ", parse_mode="HTML", reply_markup=keyboard)
+#     await bot.send_message(mes_id, f"Запрос принят, ожидайте.\nThe request has been accepted, wait.")
+#     return
+
+
+
+
+# # Обработчик подтверждения
+# @dp.callback_query(lambda c: c.data and c.data.startswith('confirm_summ_user_d'))
+# async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
+#     data = callback_query.data.split(':')
+#     if len(data) == 5:
+#         id = int(data[1])
+#         summ = float(data[2])
+#         admin_id = int(data[3])
+#         mes_id = int(data[4])
+#     else:
+#         await bot.answer_callback_query(callback_query.id, text="Ошибка в данных запроса.", show_alert=True)
+#         return
+
+#     data_set = await get_settings(id)
+#     new_money = data_set.money + float(summ)
+
+#     updated_data = {"money": new_money}
+#     conf = await update_settings(id, updated_data)
+
+#     if conf is True:
+#         await bot.send_message(admin_id, f"Счет клиента {id} пополнен, общий:  {new_money} RUB.")
+#         await bot.send_message(mes_id, f"Ваш счет пополнен на {summ} RUB\nYour account has been topped up with {summ} RUB.")
+#         await bot.answer_callback_query(callback_query.id)
+#         return
+#     else:
+#         await bot.send_message(admin_id, f"Ошибка пополнения счета.")
+#         await bot.answer_callback_query(callback_query.id)
+#         return
+####
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@dp.message(Command('help'))
+async def start(message: types.Message):
+    help = '''
+    help
+    '''
+    await message.reply(f"{help}", parse_mode="Markdown")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### ADMIN MENU ####
 ####################
 
@@ -1019,8 +1188,8 @@ async def gemini(message: types.Message):
         return
 
     # Get method default:
-    data_pay = await read_one_methods_pay_by_use()
-    use_pay = data_pay[0].get("title_method_pay")
+    #data_pay = await read_one_methods_pay_by_use(i)
+    #use_pay = data_pay.get("title_method_pay")
 
     admin = f'''
 <b>ADMIN PANEL:</b>
@@ -1044,9 +1213,9 @@ async def gemini(message: types.Message):
     /get_month_pay_stat
     /get_stat_pay_year
 
-<b>METHODS PAY: {use_pay}</b>
+<b>METHODS PAY: </b>
     /add_metod_pay - add method
-    /select_one_metod_pay - select method
+    /select_metod_pay - select method
     /use_random_metod_pay  - use random
     /delete_metod 
 
@@ -1096,7 +1265,8 @@ async def get_info_by_users(message: types.Message):
 # ADMIN: Add method pay:
 class Form_method_pay(StatesGroup):
     title_pay = State()
-    text_pay = State()
+    text_pay_ru = State()
+    text_pay_en = State()
 
 @dp.message(Command('add_metod_pay'))
 async def add_metod_pay(message: types.Message, state: FSMContext):
@@ -1118,24 +1288,39 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
         return
 
     await state.update_data(title=message.text)
-    await message.reply("The terms of the payment method are detailed for users:", parse_mode="Markdown") 
-    await state.set_state(Form_method_pay.text_pay)
+    await message.reply("The terms of the payment method are detailed for users RU version:", parse_mode="Markdown") 
+    await state.set_state(Form_method_pay.text_pay_ru)
 
-@dp.message(Form_method_pay.text_pay)
-async def add_metod_pay_input_text(message: types.Message, state: FSMContext):
+@dp.message(Form_method_pay.text_pay_ru)
+async def add_metod_pay_input_text_ru(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
         print(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
-    title = await state.get_data()
-    text = message.text
+    await state.update_data(text_ru=message.text)
+
+    await message.reply("The terms of the payment method are detailed for users EN version:", parse_mode="Markdown") 
+    await state.set_state(Form_method_pay.text_pay_en)
+
+@dp.message(Form_method_pay.text_pay_en)
+async def add_metod_pay_input_text_en(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    st_data = await state.get_data()
+    text_ru = st_data.get("text_ru")
+    text_en = message.text
 
     pay_data = {
         "date": await day_utcnow(),
-        "title_method_pay": title.get("title"),
-        "method_pay": text,
+        "title_method_pay": st_data.get("title"),
+        "method_pay_ru": text_ru,
+        "method_pay_en": text_en,
     }
 
     confirm = await add_methods_pay(pay_data)
@@ -1146,13 +1331,33 @@ async def add_metod_pay_input_text(message: types.Message, state: FSMContext):
 ####
 
 
+
+
+
 # ADMIN: SELECT method pay:
 class Form_change_method(StatesGroup):
+    start = State()
     num = State()
 
-@dp.message(Command('select_one_metod_pay'))
-async def select_one_metod_pay(message: types.Message, state: FSMContext):
+
+@dp.message(Command('select_metod_pay'))
+async def start_metod_pay(message: types.Message, state: FSMContext):
+    await state.set_state(Form_change_method.start)
+    await select_metod_pay(message, state) # Автоматически вызываем следующий обработчик
+
+
+@dp.message(Form_change_method.start)
+async def select_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
+
+    try:
+        st_data = await state.get_data()
+        i = st_data.get("exi")
+    except:
+        print("Info: First change method pay.")
+
+    if not i:
+        i = 1
 
     if id != ADMIN_ID:
         print(f"This {id} shit made an attempt to enter to Admin Panel.")
@@ -1173,7 +1378,8 @@ async def select_one_metod_pay(message: types.Message, state: FSMContext):
         title = n.get("title_method_pay")
         methods = methods + "\n" + id + " - " + title
 
-    await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method that should be the default:", parse_mode="Markdown") 
+    await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method that should be used by default in position number {i}:", parse_mode="Markdown") 
+    await state.update_data(exi=i)
     await state.set_state(Form_change_method.num)
 
 @dp.message(Form_change_method.num)
@@ -1183,62 +1389,57 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     if id_man != ADMIN_ID:
         print(f"This {id_man} shit made an attempt to enter to Admin Panel.")
         return
-    
+
+    st_data = await state.get_data()
+    i = st_data.get("exi")
+
     try:
         int_value = int(message.text)
     except:
         print(f"This not integer id method pay.")
+        await message.reply("This not integer id method pay.", parse_mode="Markdown") 
+        return
+    
+    if int_value > 4:
+        print(f"There is no such position.")
+        await message.reply("There are 4 positions in total.", parse_mode="Markdown") 
         return
 
     # Unset default method pay:
-    data = await read_one_methods_pay_by_use()
+    data = await read_one_methods_pay_by_use(i)
 
-    pay_data = {
-        "id": data[0].get("id"),
-        "use": False,
-    }
-    confirm = await update_methods_pay(pay_data)
-    if not confirm:
-        print("Error: Not update_methods_pay.")
-        return
+    if data:
+        pay_data = {
+            "id": data.get("id"),
+            f"use_{i}": False,
+        }
+        confirm = await update_methods_pay(pay_data)
+        if not confirm:
+            print("Error: Not update_methods_pay.")
+            return
 
     # Set default method pay:
     pay_data = {
         "id": int_value,
-        "use": True,
+        f"use_{i}": True,
     }
     confirm = await update_methods_pay(pay_data)
     if not confirm:
         print("Error: Not update_methods_pay.")
         return
 
-    await message.reply(f"The default payment method has been successfully installed - {int_value}", parse_mode="Markdown")
-    await state.clear()
-# ####
+    await message.reply(f"The default payment method in position number {i} has been successfully installed - {int_value}", parse_mode="Markdown")
+    i += 1
+    if i >= 5:
+        i = 0
+        await message.reply("*The process is completed.*", parse_mode="Markdown")
+        await state.clear()
+    else:
+        await state.update_data(exi=i)
+        await state.set_state(Form_change_method.start)
+        await select_metod_pay(message, state)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@dp.message(Command('help'))
-async def start(message: types.Message):
-    help = '''
-    help
-    '''
-    await message.reply(f"{help}", parse_mode="Markdown")
+####
 
 
 

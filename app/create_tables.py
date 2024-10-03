@@ -92,9 +92,13 @@ def create_tables_in_db():
             id SERIAL PRIMARY KEY,
             date TIMESTAMP,
             counts INT,
-            use BOOLEAN,
+            use_1 BOOLEAN,
+            use_2 BOOLEAN,
+            use_3 BOOLEAN,
+            use_4 BOOLEAN,
             title_method_pay VARCHAR(50) UNIQUE,
-            method_pay TEXT
+            method_pay_ru TEXT,
+            method_pay_en TEXT
         );
         '''
         cursor.execute(create_table_methods_pay)
