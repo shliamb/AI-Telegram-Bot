@@ -193,8 +193,32 @@ def set_model_dalle(data):
         return model
 
 
+# Get activ use pay method:
+def get_use_met_all(n):
 
-
+    id = str(n.get("id"))
+    title = n.get("title_method_pay")
+    if n.get("use_sbp_transfer") is True:
+        use = "use_sbp_transfer"
+    elif n.get("use_mastercard") is True:
+        use = "use_mastercard"
+    elif n.get("use_visa") is True:
+        use = "use_visa"
+    elif n.get("use_mircard") is True:
+        use = "use_mircard"
+    elif n.get("use_cripto") is True:
+        use = "use_cripto"
+    elif n.get("use_sms") is True:
+        use = "use_sms"
+    elif n.get("use_stars") is True:
+        use = "use_stars"
+    elif n.get("use_telegram") is True:
+        use = "use_telegram"
+    elif n.get("use_digital") is True:
+        use = "use_digital"
+    else:
+        use = "not use"
+    return {"id": id, "use": use, "title_method_pay": title}
 
 
 

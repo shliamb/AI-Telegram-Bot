@@ -520,13 +520,13 @@ async def read_one_methods_pay_by_id(id: int):
 
 
 # Read one methods_pay by use == True:
-async def read_one_methods_pay_by_use(i):
+async def read_one_methods_pay_by_use(place_of_use):
     connection = None
     try:
         connection = await get_connection()
         result = await connection.fetch(
             f'''
-                SELECT * FROM methods_pay WHERE use_{i} = $1;
+                SELECT * FROM methods_pay WHERE {place_of_use} = $1;
             ''',
             True,
         )
@@ -552,23 +552,23 @@ async def read_one_methods_pay_by_use(i):
 
 
 # Deleted one methods_pay:
-async def deleted_one_methods_pay(title: str):
+async def deleted_one_methods_pay(id):
     connection = None
     try:
-        if type(title) != str:
-            print("Error: input data is not str (title method pay.)")
+        if type(id) != int:
+            print("Error: input data is not int (id method pay.)")
             return False
 
-        if not title:
+        if not id:
             print("Error: Title method pay is Empty or None.")
             return False
 
         connection = await get_connection()
         await connection.execute(
             '''
-                DELETE FROM methods_pay WHERE title_method_pay = $1;
+                DELETE FROM methods_pay WHERE id = $1;
             ''',
-            title,
+            id,
         )
 
         return True
@@ -678,7 +678,7 @@ async def update_methods_pay(pay_data):
 # confirm = asyncio.run(add_methods_pay(pay_data))
 # print(confirm)
 
-# # Read all:
+# Read all:
 # data = asyncio.run(read_all_methods_pay())
 # print(data)
 

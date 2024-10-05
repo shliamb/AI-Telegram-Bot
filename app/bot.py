@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD
 
 
 import logging
@@ -42,8 +42,8 @@ from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
-from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, read_one_methods_pay_by_use
+from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id
 from texts import start_ru, start_en
 
 
@@ -102,9 +102,14 @@ async def command_start_handler(message: Message) -> None:
     about = name if name else (first_name if first_name else (last_name if last_name else "User"))
 
     is_user_to_db = await read_user(id)
+    language = is_user_to_db.get("language")
 
     if is_user_to_db:
-        await message.answer(f"🇺🇸 *EN:* Hi {about}! You are already initiated into the bot. You can start using it.\n\n🇷🇺 *RU:* Привет {about}! Вы уже инициированы в боте. Можете приступить к пользованию.", parse_mode="Markdown")
+
+        if language == "ru":
+            await message.reply(f"Привет {about}! Вы уже инициированы в боте. Можете приступить к пользованию.", parse_mode="Markdown")
+        else:
+            await message.reply(f"Hi {about}! You are already initiated into the bot. You can start using it.", parse_mode="Markdown")
         return
     
     date = {
@@ -120,7 +125,10 @@ async def command_start_handler(message: Message) -> None:
     confirm = await add_user(date)
 
     if confirm:
-        await message.answer(f"🇺🇸 *EN:* Hello, {about}! {start_en}\n\n🇷🇺 *RU:* Здравствуйте, {about}! {start_ru}", parse_mode="Markdown")
+        if language == "ru":
+            await message.reply(f"Здравствуйте, {about}! {start_ru}", parse_mode="Markdown")
+        else:
+            await message.reply(f"Hello, {about}! {start_en}", parse_mode="Markdown")
         return confirm
     
     return
@@ -147,11 +155,8 @@ async def main_menu(message: types.Message):
 
     id = user_id(message)
 
-
     data = await read_user(id)
 
-
-    # print(data)
     language = data["language"] if data.get("language") is not None else LANGUAGE
     ai = data["ai"] if data.get("ai") is not None else AI_DEFAULT
     dialog = data["dialog"] if data.get("dialog") is not None else DIALOG
@@ -939,13 +944,25 @@ class Form_system(StatesGroup):
 
 @dp.message(Command('system_content'))
 async def system_content(message: types.Message, state: FSMContext):
-    id = user_id(message)
-    await message.reply("🇺🇸 *EN:* Set instructions that will help the AI understand how to interact with you.:\n\n🇷🇺 *RU:* Задайте инструкции которые помогут ИИ понять, как нужно взаимодействовать с вами:", parse_mode="Markdown")
+    id = user_id(message)    
+    is_user_to_db = await read_user(id)
+    language = is_user_to_db.get("language")
+    await state.update_data(language=language)
+
+    if is_user_to_db:
+        if language == "ru":
+            await message.reply(f"Задайте инструкции которые помогут ИИ понять, как нужно взаимодействовать с вами:", parse_mode="Markdown")
+        else:
+            await message.reply(f"Set instructions that will help the AI understand how to interact with you:", parse_mode="Markdown")
+    
     await state.set_state(Form_system.content)
 
 @dp.message(Form_system.content)
 async def system_content_get_text(message: types.Message, state: FSMContext):
     id = user_id(message)
+    state_data = await state.get_data()
+    language = state_data.get("language")
+
     data = {
         "user_id": id,
         "system_content": message.text,
@@ -953,7 +970,10 @@ async def system_content_get_text(message: types.Message, state: FSMContext):
     confirm = await update_user(data)
 
     if confirm:
-        await message.reply("🇺🇸 *EN:* The system instruction has been saved.\n\n🇷🇺 *RU:* Системная инструкция сохранена.", parse_mode="Markdown")
+        if language == "ru":
+            await message.reply(f"Системная инструкция сохранена.", parse_mode="Markdown")
+        else:
+            await message.reply(f"The system instruction has been saved.", parse_mode="Markdown")
 
     await state.clear()
 
@@ -1006,133 +1026,283 @@ async def get_stat(message: types.Message):
 #### Transfer money: ####
 ####################
 
+
 class Form_my_pay(StatesGroup):
+    text = State()
     add_summ = State()
-    #confirm_summt = State()
+    confirm_summ = State()
 
 # Select method pay:
 @dp.message(Command("add_money"))
 async def add_money(message: types.Message, state: FSMContext):
 
     id = user_id(message)
-    answer = await read_user(id)
-    language = answer.get("language")
-    await state.update_data(language=language)
+    data_user = await read_user(id)
+    language = data_user.get("language")
+    # paid = data_user.get("paid")
+    # money = data_user.get("money")
 
+    answer = ""
+
+    intro_ru = '''
+Выбор способа оплаты: 
+'''
+    intro_en = '''
+Choosing a payment method:
+'''
 
     if language == "ru":
-        await message.reply("На данный момент, оплатить можно только переводом на карту.\n\n Выберите способ перевода:\n1. /card_ru - на карту РФ\n2. /mastercard - на карту 'MasterCard'", parse_mode="HTML")
+        answer = answer + intro_ru
     else:
-        await message.reply("At the moment, you can only pay by transfer to a card.\n\n Select the transfer method:\n1. /card_ru - to the Russian card\n2. /mastercard - to the 'MasterCard' card", parse_mode="HTML")
+        answer = answer + intro_en
 
+    if USE_SBP_TRANSFER and await read_one_methods_pay_by_use("use_sbp_transfer"):
+        if language == "ru":
+            answer = answer + "\n/sbp_ru - перевод RUB по СБП"
+        else:
+            answer = answer + "\n/sbp_ru - transfer RUB by SBP"
+
+    if USE_MASTERCARD and await read_one_methods_pay_by_use("use_mastercard"):
+        if language == "ru":
+            answer = answer + "\n/mastercard - перевод USD Mastercard"
+        else:
+            answer = answer + "\n/mastercard - transfer USD Mastercard"
+
+    if USE_VISA and await read_one_methods_pay_by_use("use_visa"):
+        if language == "ru":
+            answer = answer + "\n/use_visa - перевод USD Visa"
+        else:
+            answer = answer + "\n/use_visa - transfer USD Visa card"
+
+    if USE_MIRCARD and await read_one_methods_pay_by_use("use_mircard"):
+        if language == "ru":
+            answer = answer + "\n/mir_ru - перевод RUB на карту"
+        else:
+            answer = answer + "\n/mir_ru - transfer RUB to a card"
+
+    if USE_CRIPTO and await read_one_methods_pay_by_use("use_cripto"):
+        if language == "ru":
+            answer = answer + "/use_cripto"
+        else:
+            answer = answer + "/use_cripto"
+
+    if USE_SMS and await read_one_methods_pay_by_use("use_sms"):
+        if language == "ru":
+            answer = answer + "/use_sms"
+        else:
+            answer = answer + "/use_sms"
+
+    if USE_STARS and await read_one_methods_pay_by_use("use_stars"):
+        if language == "ru":
+            answer = answer + "/use_stars"
+        else:
+            answer = answer + "/use_stars"
+
+    if USE_TELEGRAM and await read_one_methods_pay_by_use("use_telegram"):
+        if language == "ru":
+            answer = answer + "/use_telegram"
+        else:
+            answer = answer + "/use_telegram"
+
+    if USE_DIGITAL and await read_one_methods_pay_by_use("use_digital"):
+        if language == "ru":
+            answer = answer + "/use_digital"
+        else:
+            answer = answer + "/use_digital"
+
+    await message.reply(answer, parse_mode="HTML")
+    await state.update_data(language=language)
+    await state.set_state(Form_my_pay.text)
+
+
+
+# 
+@dp.message(Form_my_pay.text)
+async def sbp_ru(message: types.Message, state: FSMContext):
+
+    state_data = await state.get_data()
+    language = state_data.get("language")
+
+    if message.text == "/sbp_ru":
+        use="use_sbp_transfer"
+    if message.text == "/mastercard":
+        use="use_mastercard"
+    if message.text == "/use_visa":
+        use="use_visa"
+    if message.text == "/mir_ru":
+        use="use_mircard"
+    if message.text == "/use_cripto":
+        use="use_cripto"
+    if message.text == "/use_sms":
+        use="use_sms"
+    if message.text == "/use_stars":
+        use="use_stars"
+    if message.text == "/use_telegram":
+        use="use_telegram"
+    if message.text == "/use_digital":
+        use="use_digital"
+
+    if use == "use_sbp_transfer" or use == "use_mircard":
+        if language == "ru":
+            await message.reply(f"Введите сумму в RUB:\nДля отмены введите 0.\n\n<b>Обратите внимание</b>, что на счет поступит сумма в USD по внутреннему курсу 1USD = {RUBTOUSD}RUB", parse_mode="HTML")
+        else:
+            await message.reply(f"Enter the amount in RUB:\nTo cancel, enter 0.\n\n<b>Please note</b> that the amount in USD will be credited to the account at the internal rate of 1USD = {RUBTOUSD}RUB", parse_mode="HTML")
+    else:
+        if language == "ru":
+            await message.reply(f"Введите сумму в USD:\nДля отмены введите 0.", parse_mode="HTML")
+        else:
+            await message.reply(f"Enter the amount in RUB:\nTo cancel, enter 0.", parse_mode="HTML")
+
+    await state.update_data(language=language, use=use)
     await state.set_state(Form_my_pay.add_summ)
 
+@dp.message(Form_my_pay.add_summ)
+async def sbp_ru_input(message: types.Message, state: FSMContext):
 
+    state_data = await state.get_data()
+    language = state_data.get("language")
+    use = state_data.get("use")
 
+    try:
+        amount = float(message.text)
+    except:
+        print(f"This not float input.")
+        await message.reply("This not float input.", parse_mode="Markdown") 
+        return
 
-# To Russian card:
-@dp.message(Form_my_pay.add_summ, Command("card_ru"))
-async def card_ru(message: types.Message, state: FSMContext):
+    if float(message.text) == 0.0:
+        if language == "ru":
+            await message.reply("Пополнение отменено.", parse_mode="HTML")
+        else:
+            await message.reply("The deposit has been canceled.", parse_mode="HTML")
+        await state.clear()
+        return
 
-    data = await read_one_methods_pay_by_use()
-    data_state = await state.get_data()
-    language = data_state.get("language")
+    if use == "use_sbp_transfer" and amount < 100 or use == "use_mircard" and amount < 100:
+        if language == "ru":
+            await message.reply("Минимальная сумма 100 RUB.", parse_mode="HTML")
+        else:
+            await message.reply("The minimum amount is 100 RUB.", parse_mode="HTML")
+        return
+    elif amount < 1:
+        if language == "ru":
+            await message.reply("Минимальная сумма 1 USD.", parse_mode="HTML")
+        else:
+            await message.reply("The minimum amount is 1 USD.", parse_mode="HTML")
+        return
 
-    if data and data.get("use") == True:
-        method_pay_ru = data.get("method_pay")
-        method_pay_en = data.get("method_pay")
-    
+    data = await read_one_methods_pay_by_use(use)
+
     if language == "ru":
-        await message.reply(f"{method_pay_ru}\nВведите сумму:", parse_mode="HTML")
+        answer = data.get("method_pay_ru")
     else:
-        await message.reply(f"{method_pay_en}\nEnter the amount:", parse_mode="HTML")
-    
-    await state.clear()
+        answer = data.get("method_pay_en")
+
+    await message.reply(answer, parse_mode="HTML")
+
+    if language == "ru":
+        await message.reply("После успешного перевода, введите 'Готово' или 'Отмена' - для отмены.", parse_mode="HTML")
+    else:
+        await message.reply("After successful transfer, enter 'Done' or 'Cancel' to cancel.", parse_mode="HTML")
+
+    await state.update_data(language=language, amount=amount, use=use)
+    await state.set_state(Form_my_pay.confirm_summ)
+
+@dp.message(Form_my_pay.confirm_summ)
+async def sbp_ru_confirm(message: types.Message, state: FSMContext):
+
+    state_data = await state.get_data()
+    language = state_data.get("language")
+    amount = state_data.get("amount")
+    text = message.text
+    use = state_data.get("use")
 
 
+    if text.lower() == "отмена" or text.lower() == "cancel":
+        if language == "ru":
+            await message.reply("Пополнение отменено.", parse_mode="HTML")
+        else:
+            await message.reply("The deposit has been canceled.", parse_mode="HTML")
+        await state.clear()
+        return
+
+    elif text.lower() == "готово" or text.lower() == "done":
+        if language == "ru":
+            await message.reply("После проверки платежа, ваш счет пополнится и придет уведомление.", parse_mode="HTML")
+        else:
+            await message.reply("After checking the payment, your account will be replenished and a notification will be sent.", parse_mode="HTML")
+
+        mes_id = message.chat.id
+        id = user_id(message)
+        admin_id = ADMIN_ID
+        url = f"tg://user?id={id}"
+
+        # Send message to ADMIN:
+        await confirm_my(id, amount, admin_id, mes_id, url, language, use)
+        await state.clear()
+
+    else:
+        if language == "ru":
+            await message.reply("После успешного перевода, введите 'Готово' или 'Отмена' - для отмены.", parse_mode="HTML")
+        else:
+            await message.reply("After successful transfer, enter 'Done' or 'Cancel' to cancel.", parse_mode="HTML")
 
 
+# Вызов у админа кнопки подтверждения
+async def confirm_my(id, amount, admin_id, mes_id, url, language, use):
 
-# # To mastercard card:
-# @dp.message(Command("mastercard"))
-# async def mastercard(message: types.Message):
+    if use == "use_sbp_transfer" or use == "use_mircard":
+        amount = float(amount) / float(RUBTOUSD)
+    else:
+        amount = float(amount)
 
-
-
-# # await state.set_state(Form_my_pay.add_summ)
-# @dp.message(Form_my_pay.add_summ)
-# async def invoice_user(message: Message, state: FSMContext):
-
-#     mes_id = message.chat.id
-#     summ = message.text
-#     id = user_id(message)
-#     admin_id = ADMIN_ID
-#     url = f"tg://user?id={id}"
-
-#     # is Float or Int?
-#     try:
-#         summ = float(summ)
-#     except:
-#         print("Error: Not float.")
-#         await message.reply("🇺🇸 *EN:* Enter the amount again, in numbers.\n\n🇷🇺 *RU:* Введите сумму еще раз, цифрами.", parse_mode="Markdown")
-#         return
-
-#     # is Zerro?
-#     if summ <= 0:
-#         print("Error: You entered 0.")
-#         await message.reply("🇺🇸 *EN:* You entered 0. Enter the amount again.\n\n🇷🇺 *RU:* Введите сумму еще раз, больше нуля.", parse_mode="Markdown")
-#         return
-
-#     # Send message to ADMIN:
-#     await confirm_my(id, summ, admin_id, mes_id, url)
-
-#     await state.clear()
+    # Кнопка подтверждения
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"confirm_summ_user_id:{id}:{amount}:{admin_id}:{mes_id}:{language}")], 
+        ]
+    )
+    await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
+    return
 
 
+# Обработчик подтверждения
+@dp.callback_query(lambda c: c.data and c.data.startswith('confirm_summ_user_id'))
+async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
+    data = callback_query.data.split(':')
+    if len(data) == 6:
+        id = int(data[1])
+        amount = float(data[2])
+        admin_id = int(data[3])
+        mes_id = int(data[4])
+        language = str(data[5])
+    else:
+        await bot.answer_callback_query(callback_query.id, text="Error: Error in the request data.", show_alert=True)
+        return
 
-# # Вызов у админа кнопки подтверждения
-# async def confirm_my(id, summ, admin_id, mes_id, url):
-#     # Кнопка подтверждения
-#     keyboard = InlineKeyboardMarkup(
-#         inline_keyboard=[
-#             [InlineKeyboardButton(text="👛 Подтвердить", callback_data=f"confirm_summ_user_d:{id}:{summ}:{admin_id}:{mes_id}")], 
-#         ]
-#     )
-#     await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {summ} РУБ", parse_mode="HTML", reply_markup=keyboard)
-#     await bot.send_message(mes_id, f"Запрос принят, ожидайте.\nThe request has been accepted, wait.")
-#     return
+    data_set = await read_user(id)
+    new_money = data_set.get("money") + (float(amount))
+    new_paid = data_set.get("paid") + 1
 
+    updated_data = {"user_id": id, "money": new_money, "paid": new_paid}
+    confirm = await update_user(updated_data)
 
+    if confirm is True:
+        # Admin:
+        await bot.send_message(admin_id, f"Счет клиента {id} пополнен, общий:  {new_money} $.")
+        
+        # User:
+        if language == "ru":
+            await bot.send_message(mes_id, f"Ваш счет пополнен. На балансе - {new_money}$. Поздравляем!")
+        else:
+            await bot.send_message(mes_id, f"Your account has been topped up. On the balance sheet - {new_money}$. Congratulations!")
 
-
-# # Обработчик подтверждения
-# @dp.callback_query(lambda c: c.data and c.data.startswith('confirm_summ_user_d'))
-# async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
-#     data = callback_query.data.split(':')
-#     if len(data) == 5:
-#         id = int(data[1])
-#         summ = float(data[2])
-#         admin_id = int(data[3])
-#         mes_id = int(data[4])
-#     else:
-#         await bot.answer_callback_query(callback_query.id, text="Ошибка в данных запроса.", show_alert=True)
-#         return
-
-#     data_set = await get_settings(id)
-#     new_money = data_set.money + float(summ)
-
-#     updated_data = {"money": new_money}
-#     conf = await update_settings(id, updated_data)
-
-#     if conf is True:
-#         await bot.send_message(admin_id, f"Счет клиента {id} пополнен, общий:  {new_money} RUB.")
-#         await bot.send_message(mes_id, f"Ваш счет пополнен на {summ} RUB\nYour account has been topped up with {summ} RUB.")
-#         await bot.answer_callback_query(callback_query.id)
-#         return
-#     else:
-#         await bot.send_message(admin_id, f"Ошибка пополнения счета.")
-#         await bot.answer_callback_query(callback_query.id)
-#         return
+        await bot.answer_callback_query(callback_query.id)
+        return
+    else:
+        await bot.send_message(admin_id, "Error: A replenishment error occurred.")
+        await bot.answer_callback_query(callback_query.id)
+        return
 ####
 
 
@@ -1333,31 +1503,14 @@ async def add_metod_pay_input_text_en(message: types.Message, state: FSMContext)
 
 
 
-
-# ADMIN: SELECT method pay:
-class Form_change_method(StatesGroup):
-    start = State()
+# ADMIN: DELETE method pay:
+class Form_delete_method(StatesGroup):
     num = State()
 
 
-@dp.message(Command('select_metod_pay'))
-async def start_metod_pay(message: types.Message, state: FSMContext):
-    await state.set_state(Form_change_method.start)
-    await select_metod_pay(message, state) # Автоматически вызываем следующий обработчик
-
-
-@dp.message(Form_change_method.start)
-async def select_metod_pay(message: types.Message, state: FSMContext):
+@dp.message(Command('delete_metod'))
+async def select_when_deleted_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
-
-    try:
-        st_data = await state.get_data()
-        i = st_data.get("exi")
-    except:
-        print("Info: First change method pay.")
-
-    if not i:
-        i = 1
 
     if id != ADMIN_ID:
         print(f"This {id} shit made an attempt to enter to Admin Panel.")
@@ -1372,26 +1525,39 @@ async def select_metod_pay(message: types.Message, state: FSMContext):
         return
 
     # Show metods:
+    count = []
     methods = ""
-    for n in all_metods:
-        id = str(n.get("id"))
-        title = n.get("title_method_pay")
-        methods = methods + "\n" + id + " - " + title
 
-    await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method that should be used by default in position number {i}:", parse_mode="Markdown") 
-    await state.update_data(exi=i)
-    await state.set_state(Form_change_method.num)
+    if not isinstance(all_metods, list):
+        data = get_use_met_all(all_metods)
+        id = data.get("id")
+        use = data.get("use")
+        title = data.get("title_method_pay")
+        methods = methods + "\n" + id + " - " + title + " - " + use
+        count.append(data.get("id"))
+    else:
+        for n in all_metods:
+            data = get_use_met_all(n)
+            id = data.get("id")
+            use = data.get("use")
+            title = data.get("title_method_pay")
+            methods = methods + "\n" + id + " - " + title + " - " + use
+            count.append(data.get("id"))
 
-@dp.message(Form_change_method.num)
-async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
-    id_man = user_id(message)
+    await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method you want to delete. Make sure that it is not in use:", parse_mode="HTML") 
+    await state.update_data(count=count)
+    await state.set_state(Form_delete_method.num)
 
-    if id_man != ADMIN_ID:
-        print(f"This {id_man} shit made an attempt to enter to Admin Panel.")
+    
+@dp.message(Form_delete_method.num)
+async def delete_metod_pay(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    count = data.get("count")
+
+    if message.text == "None":
+        await message.reply("a pass!", parse_mode="Markdown") 
+        await state.clear()
         return
-
-    st_data = await state.get_data()
-    i = st_data.get("exi")
 
     try:
         int_value = int(message.text)
@@ -1400,18 +1566,144 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
         await message.reply("This not integer id method pay.", parse_mode="Markdown") 
         return
     
-    if int_value > 4:
+    if message.text not in count:
         print(f"There is no such position.")
-        await message.reply("There are 4 positions in total.", parse_mode="Markdown") 
+        await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
+        return
+
+    confirm = await deleted_one_methods_pay(int_value)
+    if not confirm:
+        print("Error: Not update_methods_pay.")
+        return
+
+    await message.reply(f"The payment method has been deleted.", parse_mode="HTML")
+    await state.clear()
+
+
+
+# ADMIN: SELECT method pay:
+class Form_change_method(StatesGroup):
+    start = State()
+    num = State()
+
+
+@dp.message(Command('select_metod_pay'))
+async def start_metod_pay(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+    
+    await state.set_state(Form_change_method.start)
+    await select_metod_pay(message, state) # Автоматически вызываем следующий обработчик
+
+
+@dp.message(Form_change_method.start)
+async def select_metod_pay(message: types.Message, state: FSMContext):
+
+    try:
+        st_data = await state.get_data()
+        i = st_data.get("exi")
+        place_of_use = st_data.get("place_of_use")
+    except:
+        print("Info: First change method pay.")
+
+    if not i:
+        i = 0
+        place_of_use = []
+
+        if USE_SBP_TRANSFER is not False:
+            place_of_use.append("use_sbp_transfer")
+        if USE_MASTERCARD is not False:
+            place_of_use.append("use_mastercard")
+        if USE_VISA is not False:
+            place_of_use.append("use_visa")
+        if USE_MIRCARD is not False:
+            place_of_use.append("use_mircard")
+        if USE_CRIPTO is not False:
+            place_of_use.append("use_cripto")
+        if USE_SMS is not False:
+            place_of_use.append("use_sms")
+        if USE_STARS is not False:
+            place_of_use.append("use_stars")
+        if USE_TELEGRAM is not False:
+            place_of_use.append("use_telegram")
+        if USE_DIGITAL is not False:
+            place_of_use.append("use_digital")
+
+    # Get metods pay data:
+    all_metods = await read_all_methods_pay()
+
+    if not all_metods:
+        print("Error: Dont have metods pay.")
+        await message.reply("*Error*: Dont have metods pay.", parse_mode="Markdown") 
+        return
+
+    # Show metods:
+    count = []
+    methods = ""
+
+    if not isinstance(all_metods, list):
+        data = get_use_met_all(all_metods)
+        id = data.get("id")
+        use = data.get("use")
+        title = data.get("title_method_pay")
+        methods = methods + "\n" + id + " - " + title + " - " + use
+        count.append(data.get("id"))
+    else:
+        for n in all_metods:
+            data = get_use_met_all(n)
+            id = data.get("id")
+            use = data.get("use")
+            title = data.get("title_method_pay")
+            methods = methods + "\n" + id + " - " + title + " - " + use
+            count.append(data.get("id"))
+
+    place = place_of_use[i]    
+
+    await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method that should be used by default in position number {place}:", parse_mode="HTML") 
+    await state.update_data(exi=i, place_of_use=place_of_use, count=count)
+    await state.set_state(Form_change_method.num)
+
+@dp.message(Form_change_method.num)
+async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
+
+    st_data = await state.get_data()
+    i = st_data.get("exi")
+    place_of_use = st_data.get("place_of_use")
+    count= st_data.get("count")
+
+    if message.text == "None":
+        await message.reply("a pass!", parse_mode="Markdown") 
+        await state.clear()
+        return
+
+    try:
+        int_value = int(message.text)
+    except:
+        print(f"This not integer id method pay.")
+        await message.reply("This not integer id method pay.", parse_mode="Markdown") 
+        return
+    
+    if message.text not in count:
+        print(f"There is no such position.")
+        await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
+        return
+    
+    try:
+        pl_use = place_of_use[i]
+    except:
+        print("Error: Get place_of_use.")
         return
 
     # Unset default method pay:
-    data = await read_one_methods_pay_by_use(i)
+    data = await read_one_methods_pay_by_use(pl_use)
 
     if data:
         pay_data = {
             "id": data.get("id"),
-            f"use_{i}": False,
+            f"{pl_use}": False,
         }
         confirm = await update_methods_pay(pay_data)
         if not confirm:
@@ -1421,16 +1713,16 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     # Set default method pay:
     pay_data = {
         "id": int_value,
-        f"use_{i}": True,
+        f"{pl_use}": True,
     }
     confirm = await update_methods_pay(pay_data)
     if not confirm:
         print("Error: Not update_methods_pay.")
         return
 
-    await message.reply(f"The default payment method in position number {i} has been successfully installed - {int_value}", parse_mode="Markdown")
+    await message.reply(f"The default payment method in place use {pl_use} has been successfully installed - {int_value}", parse_mode="HTML")
     i += 1
-    if i >= 5:
+    if i >= len(place_of_use):
         i = 0
         await message.reply("*The process is completed.*", parse_mode="Markdown")
         await state.clear()
@@ -1455,13 +1747,13 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
 
 
 
-
 ############ AI ###############
 ###############################
 
 # Attempts to give a response to the user:
 async def try_answer_bot(message, answer, data):
     await typing(message)
+    language = data.get("language")
 
     try:
         await message.reply(answer, parse_mode="MarkdownV2")
@@ -1476,7 +1768,10 @@ async def try_answer_bot(message, answer, data):
         return
     
     if len(answer) >= 4096:
-        await message.reply("🇺🇸 *EN:* To translate text into audio, it must be less than 4096 characters.\n\n🇷🇺 *RU:* Для перевода текста в аудио, должно быть меньше 4096 символов.", parse_mode="markdown") # MarkdownV2
+        if language == "ru":
+            await message.reply(f"Для перевода текста в аудио, должно быть меньше 4096 символов.", parse_mode="Markdown")
+        elif language == "en" or language is None:
+            await message.reply(f"To translate text into audio, it must be less than 4096 characters.", parse_mode="Markdown")
         return
     
     # Convert Text to Audio:
@@ -1579,6 +1874,7 @@ async def add_text_to_photo(message: Message, state: FSMContext):
 async def mod_photo(data, message, state: FSMContext):
 
     await typing(message)
+    language = data.get("language")
 
     # Telegram always saves in jpg in compress
     photo = message.photo[-1]  # Используем самый большой размер фотографии
@@ -1619,7 +1915,10 @@ async def mod_photo(data, message, state: FSMContext):
 
     elif data.get("user_content") is None:
         await state.update_data(all_data=data)
-        await message.reply("🇺🇸 *EN:* Question about the attached image:\n\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="Markdown")
+        if language == "ru":
+            await message.reply(f"Вопрос по прикрепленному изображению:", parse_mode="Markdown")
+        elif language == "en" or language is None:
+            await message.reply(f"Question about the attached image:", parse_mode="Markdown")
         await state.set_state(Form_text_img.no_caption)
 
 
@@ -1630,6 +1929,7 @@ async def mod_photo(data, message, state: FSMContext):
 async def mod_documents(data, message, state: FSMContext):
 
     await typing(message)
+    language = data.get("language")
 
     # Get id and name file:
     file_id = message.document.file_id
@@ -1681,7 +1981,10 @@ async def mod_documents(data, message, state: FSMContext):
 
         elif data.get("user_content") is None:
             await state.update_data(all_data=data)
-            await message.reply("🇺🇸 *EN:* Question about the attached image:\n\n🇷🇺 *RU:* Вопрос по прикрепленному изображению:", parse_mode="Markdown")
+            if language == "ru":
+                await message.reply(f"Вопрос по прикрепленному изображению:", parse_mode="Markdown")
+            elif language == "en" or language is None:
+                await message.reply(f"Question about the attached image:", parse_mode="Markdown")
             await state.set_state(Form_text_img.no_caption)
 
     #### DOC ####
@@ -1783,9 +2086,13 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
     data_state = await state.get_data()
     message = data_state.get("message")
     all_data = data_state.get("all_data")
+    language = all_data.get("language")
 
     if callback_query.data == 'draw':
-        await bot.send_message(callback_query.from_user.id, "🇺🇸 *EN:* The image is already being generated, expect it.\n\n🇷🇺 *RU:* Изображение уже генерируется, ожидайте.")
+        if language == "ru":
+            await bot.send_message(callback_query.from_user.id, "Изображение уже генерируется, ожидайте.")
+        elif language == "en" or language is None:
+            await bot.send_message(callback_query.from_user.id, "The image is already being generated, expect it.")
 
         # Generation image:
         if all_data.get("ai_draw") == "openai":
@@ -1818,8 +2125,10 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
 
     elif callback_query.data == 'not_draw':
 
-        # await bot.send_message(callback_query.from_user.id, "🇺🇸 *EN:* Waiting for the response to be generated.\n🇷🇺 *RU:* Ожидание генерации ответа.")
-        sent_message = await bot.send_message(callback_query.from_user.id, "🇺🇸 *EN:* The response is already being generated, expect.\n\n🇷🇺 *RU:* Ответ уже генерируется, ожидайте.", parse_mode='Markdown')
+        if language == "ru":
+            sent_message = await bot.send_message(callback_query.from_user.id, "Ответ уже генерируется, ожидайте.")
+        elif language == "en" or language is None:
+            sent_message = await bot.send_message(callback_query.from_user.id, "The response is already being generated, expect.")
 
         answer = await mod_tex(all_data, message)
 
@@ -1843,15 +2152,26 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
 async def mod_gen_img(data, message, state: FSMContext):
 
     await state.update_data(all_data=data, message=message)
+    language = data.get("language")
+
+    if language == "ru":
+        text_yes = "🖼 Да"
+        text_no = "❌ Нет"
+    elif language == "en" or language is None:
+        text_yes = "🖼 Yes"
+        text_no = "❌ No"
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🖼 Yes / Да", callback_data="draw")],
-            [InlineKeyboardButton(text="❌ No / Нет", callback_data="not_draw")],
+            [InlineKeyboardButton(text=text_yes, callback_data="draw")],
+            [InlineKeyboardButton(text=text_no, callback_data="not_draw")],
         ]
     )
 
-    await bot.send_message(message.chat.id, "🇺🇸 *EN:* Generate an image?\n\n🇷🇺 *RU:* Сгенерировать изображение?", parse_mode="Markdown", reply_markup=keyboard) 
+    if language == "ru":
+        await bot.send_message(message.chat.id, "Сгенерировать изображение?", parse_mode="Markdown", reply_markup=keyboard) 
+    elif language == "en" or language is None:
+        await bot.send_message(message.chat.id, "Generate an image?", parse_mode="Markdown", reply_markup=keyboard)
 
     await state.set_state(Form_draw.draw)
 
@@ -1862,9 +2182,6 @@ async def mod_gen_img(data, message, state: FSMContext):
 # Check request drawing:
 async def check_request_drawing(question):
     typecontent = None
-
-
-
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     draw_words = {  # добавить еще на каждое слово его слово-формы.. так лень, капец.. позже..)
@@ -1917,17 +2234,12 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Getting the user's system data from the database:
     data_from_db = await read_user(id)
+    #language = data_from_db.get("language")
+
+
 
     if not data_from_db: # False or Data
         confirm = await command_start_handler(message) # Go to the regist user to the DB.
-        return
-
-    if data_from_db.get("money") <= 0:
-        await message.reply("🇺🇸 *EN:* There are not enough funds, top up your account.\n\n🇷🇺 *RU:* Недостаточно средств, пополните счет.", parse_mode="Markdown")
-        return
-
-    if data_from_db.get("block") == True:
-        await message.reply("🇺🇸 *EN:* Fortunately, you're blocked...\n\n🇷🇺 *RU:* К счастью, ты заблокирован...", parse_mode="Markdown")
         return
 
     # Get AI:
@@ -2014,6 +2326,19 @@ async def second_function(message: types.Message, state: FSMContext):
     if data_from_db.get("dialog_sum") is not None:
         dialog_sum = data_from_db.get("dialog_sum")
 
+    if data_from_db.get("money") <= 0:
+        if language == "ru":
+            await message.reply(f"Недостаточно средств, пополните счет.", parse_mode="Markdown")
+        else:
+            await message.reply(f"There are not enough funds, top up your account.", parse_mode="Markdown")
+        return
+
+    if data_from_db.get("block") == True:
+        if language == "ru":
+            await message.reply(f"К счастью, ты заблокирован...", parse_mode="Markdown")
+        else:
+            await message.reply(f"Fortunately, you're blocked...", parse_mode="Markdown")
+        return
 
     # Checking the text for a drawing request:
     if typecontent == "text":
@@ -2086,29 +2411,6 @@ async def second_function(message: types.Message, state: FSMContext):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # main def polling
 async def main_bot() -> None:
     await dp.start_polling(bot, skip_updates=False) # skip_updates=False обрабатывать каждое сообщение с серверов Telegram, важно для принятия платежей
@@ -2121,8 +2423,3 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"An error occurred: {e}.")
         print(f"An error occurred: {e}.")
-
-
-
-
-

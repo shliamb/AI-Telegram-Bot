@@ -53,6 +53,21 @@ DEL_UPLOADS = True
 DEL_AUDIO = True
 DEL_VOICE = True
 
+#
+# Как это работает:
+# Активирую нужный пункт, в /admin добавляю новый метод оплаты - method_pay, выбираю его в select_method_pay
+# под названием активированного пункта тут.
+#
+# Place of use pay method:
+USE_SBP_TRANSFER = False
+USE_MASTERCARD = True
+USE_VISA = False
+USE_MIRCARD = True
+USE_CRIPTO = False
+USE_SMS = False
+USE_STARS = False
+USE_TELEGRAM = False
+USE_DIGITAL = False
 
 
 # Prices per 1M tokens models:
