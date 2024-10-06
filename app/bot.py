@@ -13,6 +13,7 @@ import re
 # import random
 import os
 import asyncio
+import json
 #import requests
 from io import StringIO, BytesIO
 #import uuid
@@ -1305,7 +1306,7 @@ async def confirm_my(id, amount, admin_id, mes_id, url, language, use):
     # Кнопка подтверждения
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"confirm_summ_user_id:{id}:{amount}:{admin_id}:{mes_id}:{language}:{use}")], 
+            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"confirm_summ_user_id:{id}:{amount}:{admin_id}:{language}:{use}")], 
         ]
     )
     await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
@@ -1320,9 +1321,9 @@ async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
         id = int(data[1])
         amount = float(data[2])
         admin_id = int(data[3])
-        mes_id = int(data[4])
-        language = str(data[5])
-        # use = str(data[6])
+        mes_id = id#int(data[4])
+        language = str(data[4])
+        use = str(data[5])
     else:
         await bot.send_message(callback_query.from_user.id, "Error: Error in the request data.")
         return
