@@ -762,8 +762,8 @@ async def read_all_payments():
         for record in result:
             data.append(dict(record))
 
-        if len(data) == 1:
-            data = dict(*result)
+        # if len(data) == 1:
+        #     data = dict(*result)
 
         return data
     
@@ -773,6 +773,11 @@ async def read_all_payments():
     finally:
         if connection is not None:
             await connection.close()
+
+
+# # Read all payments:
+# data = asyncio.run(read_all_payments())
+# print(data)
 
 
 # Add payments:
@@ -882,9 +887,6 @@ async def read_all_users():
         for record in result:
             data.append(dict(record))
 
-        if len(data) == 1:
-            data = dict(*result)
-
         return data
     
     except Exception as e:
@@ -895,6 +897,7 @@ async def read_all_users():
 
 
 # data_all_users = asyncio.run(read_all_users())
+# print(data_all_users)
 # for user in data_all_users:
 #     print(user.get("user_id"), user.get("name"), user.get("money"))
 

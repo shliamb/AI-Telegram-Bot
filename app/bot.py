@@ -43,7 +43,7 @@ from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments
 from texts import start_ru, start_en
 
 
@@ -51,13 +51,6 @@ from texts import start_ru, start_en
 
 bot = Bot(TELEGRAM_BOT_TOKEN, parse_mode="markdown") # Initialize Bot instance with a default parse mode which will be passed to all API calls
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
-
-
-
-
-# To Do:
-# Сделать в меню отдельный блок объявлений или новосте, так же кнопку отказа от уведомлений.
-#
 
 
 
@@ -75,12 +68,89 @@ async def typing(action) -> None:
 
 
 
+# START:
+class Form_start(StatesGroup):
+    language = State()
+
+# Select English in to start:
+@dp.callback_query(Form_start.language, lambda c: c.data and c.data.startswith('select_en'))
+async def select_en_in_start(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    user_data = user_data.get("user_date")
+    id = user_data.get("user_id")
+    about = user_data.get("name") if user_data.get("name") else (user_data.get("first_name") if user_data.get("first_name") else (user_data.get("last_name") if user_data.get("last_name") else "User"))
+    language = "en"
+
+    # Read user data:
+    is_user_to_db = await read_user(id)
+
+    if is_user_to_db:
+        await bot.send_message(callback_query.from_user.id, f"Hi {about}! You are already initiated into the bot. You can start using it.")
+        await bot.answer_callback_query(callback_query.id)
+        await state.clear()
+    else:
+        date = {
+            "user_id": id,
+            "name": user_data.get("name"),
+            "full_name": user_data.get("full_name"),
+            "first_name": user_data.get("first_name"),
+            "last_name": user_data.get("last_name"),
+            "money": GIFT,
+            "last_visit": await day_utcnow(),
+            "language": language,
+        }
+
+        confirm = await add_user(date)
+
+        if confirm:
+            await bot.send_message(callback_query.from_user.id, f"Hello, {about}! {start_en}")
+            await bot.answer_callback_query(callback_query.id)
+            await state.clear()
+
+
+
+
+# Select Russian in to start:
+@dp.callback_query(Form_start.language, lambda c: c.data and c.data.startswith('select_ru'))
+async def select_ru_in_start(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    user_data = user_data.get("user_date")
+    id = user_data.get("user_id")
+    about = user_data.get("name") if user_data.get("name") else (user_data.get("first_name") if user_data.get("first_name") else (user_data.get("last_name") if user_data.get("last_name") else "User"))
+    language = "ru"
+
+    # Read user data:
+    is_user_to_db = await read_user(id)
+
+    if is_user_to_db:
+        await bot.send_message(callback_query.from_user.id, f"Привет {about}! Вы уже инициированы в боте. Можете приступить к использованию.")
+        await bot.answer_callback_query(callback_query.id)
+        await state.clear()
+    else:
+        date = {
+            "user_id": id,
+            "name": user_data.get("name"),
+            "full_name": user_data.get("full_name"),
+            "first_name": user_data.get("first_name"),
+            "last_name": user_data.get("last_name"),
+            "money": GIFT,
+            "last_visit": await day_utcnow(),
+            "language": language,
+        }
+
+        confirm = await add_user(date)
+
+        if confirm:
+            await bot.send_message(callback_query.from_user.id, f"Здравствуйте, {about}! {start_ru}")
+            await bot.answer_callback_query(callback_query.id)
+            await state.clear()
+
+
 
 #### Push /start ####
 @dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
+async def command_start_handler(message: Message, state: FSMContext):
     await typing(message)
-
 
     # MENU
     bot_commands = [
@@ -91,48 +161,24 @@ async def command_start_handler(message: Message) -> None:
     ]
     await bot.set_my_commands(bot_commands)
 
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="🇺🇸 ENGLISH", callback_data=f"select_en")],
+            [InlineKeyboardButton(text="🇷🇺 RUSSIAN", callback_data=f"select_ru")],
+        ]
+    )
 
-    id = user_id(message)
-    name = message.from_user.username
-    full_name = message.from_user.full_name
-    first_name = message.from_user.first_name
-    last_name = message.from_user.last_name
-
-    # Choosing a name user
-    about = name if name else (first_name if first_name else (last_name if last_name else "User"))
-
-    is_user_to_db = await read_user(id)
-    language = is_user_to_db.get("language")
-
-    if is_user_to_db:
-
-        if language == "ru":
-            await message.reply(f"Привет {about}! Вы уже инициированы в боте. Можете приступить к пользованию.", parse_mode="Markdown")
-        else:
-            await message.reply(f"Hi {about}! You are already initiated into the bot. You can start using it.", parse_mode="Markdown")
-        return
-    
-    date = {
-        "user_id": id,
-        "name": name,
-        "full_name": full_name,
-        "first_name": first_name,
-        "last_name": last_name,
-        "money": GIFT,
-        "last_visit": await day_utcnow(),
+    user_date = {
+        "user_id": user_id(message),
+        "name": message.from_user.username,
+        "full_name": message.from_user.full_name,
+        "first_name": message.from_user.first_name,
+        "last_name": message.from_user.last_name,
     }
 
-    confirm = await add_user(date)
-
-    if confirm:
-        if language == "ru":
-            await message.reply(f"Здравствуйте, {about}! {start_ru}", parse_mode="Markdown")
-        else:
-            await message.reply(f"Hello, {about}! {start_en}", parse_mode="Markdown")
-        return confirm
-    
-    return
-
+    await state.update_data(user_date=user_date)
+    await bot.send_message(message.chat.id, "*EN:* Select a language:\n*RU:* Выберите язык:", parse_mode="Markdown", reply_markup=keyboard) 
+    await state.set_state(Form_start.language)
 
 
 
@@ -1151,7 +1197,7 @@ async def sbp_ru(message: types.Message, state: FSMContext):
         if language == "ru":
             await message.reply(f"Введите сумму в USD:\nДля отмены введите 0.", parse_mode="HTML")
         else:
-            await message.reply(f"Enter the amount in RUB:\nTo cancel, enter 0.", parse_mode="HTML")
+            await message.reply(f"Enter the amount in USD:\nTo cancel, enter 0.", parse_mode="HTML")
 
     await state.update_data(language=language, use=use)
     await state.set_state(Form_my_pay.add_summ)
@@ -1259,7 +1305,7 @@ async def confirm_my(id, amount, admin_id, mes_id, url, language, use):
     # Кнопка подтверждения
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"confirm_summ_user_id:{id}:{amount}:{admin_id}:{mes_id}:{language}")], 
+            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"confirm_summ_user_id:{id}:{amount}:{admin_id}:{mes_id}:{language}:{use}")], 
         ]
     )
     await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
@@ -1276,8 +1322,9 @@ async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
         admin_id = int(data[3])
         mes_id = int(data[4])
         language = str(data[5])
+        # use = str(data[6])
     else:
-        await bot.answer_callback_query(callback_query.id, text="Error: Error in the request data.", show_alert=True)
+        await bot.send_message(callback_query.from_user.id, "Error: Error in the request data.")
         return
 
     data_set = await read_user(id)
@@ -1285,9 +1332,21 @@ async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
     new_paid = data_set.get("paid") + 1
 
     updated_data = {"user_id": id, "money": new_money, "paid": new_paid}
-    confirm = await update_user(updated_data)
+    confirm_save = await update_user(updated_data)
 
-    if confirm is True:
+
+    # pay_data = {
+    #     "date": await day_utcnow(),
+    #     "title_method_pay": use,
+    #     "sum": float(amount),
+    #     "user_id": id
+    #     }
+    
+    # confirm_pay_stat =  add_payments(pay_data)
+    # if not confirm_pay_stat:
+    #     print("Error: Dont save payments.")
+
+    if confirm_save is True:
         # Admin:
         await bot.send_message(admin_id, f"Счет клиента {id} пополнен, общий:  {new_money} $.")
         
@@ -1366,27 +1425,28 @@ async def gemini(message: types.Message):
 
 <b>INFO: (11)</b>
     /get_info_by_users
+    /get_info_a_payments
 
 <b>LOGS:</b>
-    /get_logs
+    */get_logs
 
 <b>CLEAR:</b>
-    /clear_logs
-    /clear_table_statistic
-    /clear_table_dialog
+    */clear_logs
+    */clear_table_statistic
+    */clear_table_dialog
 
 <b>BACKUP & RESTORE:</b>  
-    /get_backup
-    /upload_and_restore_db
+    */get_backup
+    */upload_and_restore_db
 
 <b>STATISTICS:</b>
-    /get_month_pay_stat
-    /get_stat_pay_year
+    */get_month_pay_stat
+    */get_stat_pay_year
 
 <b>METHODS PAY: </b>
     /add_metod_pay - add method
     /select_metod_pay - select method
-    /use_random_metod_pay  - use random
+    */use_random_metod_pay  - use random
     /delete_metod 
 
     '''
@@ -1404,13 +1464,11 @@ async def get_info_by_users(message: types.Message):
         return
 
     all_data = await read_all_users()
-    all_static, i = [], 0
-
-    all_static.append(["№", "User id", "Name", "Full Name", "First Name", "Last Name", "Block", "Last Visit", "Time Zone", "Language", "Paid?", "Money $", "Notifications", "Dialog", "Dialog Summarization", "Voise answer", "Ai", "Model Language", "Ai draw", "Model Draw", "System Content"])
-    
+    all_static, i = [], 1
+    all_static.append(["№", "User id", "Name", "Full Name", "First Name", "Last Name", "Block", "Last Visit", "Time Zone", "Language", "Paid", "Money $", "Notifications", "Dialog", "Dialog Summarization", "Voise answer", "Ai", "Model Language", "Ai draw", "Model Draw", "System Content"])
     for data in all_data:
-        i += 1
         all_static.append([i, data.get("user_id"), data.get("name"), data.get("full_name"), data.get("first_name"), data.get("last_name"), data.get("block"), data.get("last_visit"), data.get("time_zone"), data.get("language"), data.get("paid"), data.get("money"), data.get("notifications"), data.get("dialog"), data.get("dialog_sum"), data.get("voice_answer"), data.get("system_content")])
+        i += 1
 
     # Create csv file
     output = StringIO()
@@ -1427,6 +1485,55 @@ async def get_info_by_users(message: types.Message):
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
         print(f"Error sending documentb User stat")
+
+
+
+
+
+# ADMIN: Get Info a Payments:
+@dp.message(Command('get_info_a_payments'))
+async def get_info_a_payments_users(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    data_payments = await read_all_payments()
+
+    if not data_payments:
+        await message.reply("No payment was found.", parse_mode="Markdown")
+        return
+    
+
+    all_static = []
+    all_static.append(["№", "Date", "Title Method Pay", "$", "user_id"])
+    for data in data_payments:
+        all_static.append([data.get("id"), data.get("date"), data.get("title_method_pay"), data.get("sum"), data.get("user_id")])
+
+    # Create csv file
+    output = StringIO()
+    writer = csv.writer(output)
+    for row in all_static:
+        writer.writerow(row)
+    csv_data = output.getvalue()
+    output.close()
+
+    # csv file to download
+    file_name = f"Info_a_payments-{random_name_2X()}.csv"
+    buffered_input_file = types.input_file.BufferedInputFile(file=csv_data.encode(), filename=file_name)
+    try:
+        await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
+    except:
+        print(f"Error sending documentb User stat")
+
+
+
+
+
+
+
+
 
 
 
@@ -2236,11 +2343,6 @@ async def second_function(message: types.Message, state: FSMContext):
     data_from_db = await read_user(id)
     #language = data_from_db.get("language")
 
-
-
-    if not data_from_db: # False or Data
-        confirm = await command_start_handler(message) # Go to the regist user to the DB.
-        return
 
     # Get AI:
     if data_from_db.get("ai"):
