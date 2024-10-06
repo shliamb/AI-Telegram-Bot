@@ -1074,20 +1074,101 @@ async def get_stat(message: types.Message):
 ####################
 
 
+# 6 Обработчик подтверждения
+@dp.callback_query(lambda c: c.data and c.data.startswith('admin_conf'))
+async def confirm_callback(callback_query: types.CallbackQuery):
+
+    data = callback_query.data.split(':')
+
+    if not data:
+        print("Error: dont get data - data_button.")
+        await bot.send_message(callback_query.from_user.id, "Error: dont get data - data_button.")
+        return
+    
+    id = int(data[1])
+    amount = float(data[2])
+    use = str(data[3])
+    data_user = await read_user(id)
+    language = data_user.get("language")
+    admin_id = ADMIN_ID
+    mes_id = id
+    new_money = data_user.get("money") + (float(amount))
+    new_paid = data_user.get("paid") + 1
+
+    updated_data = {"user_id": id, "money": new_money, "paid": new_paid}
+    confirm_save = await update_user(updated_data)
+
+    pay_data = {
+        "date": await day_utcnow(),
+        "title_method_pay": use,
+        "sum": float(amount),
+        "user_id": id
+        }
+    
+    confirm_pay_stat =  await add_payments(pay_data)
+    if not confirm_pay_stat:
+        print("Error: Dont save payments.")
+
+    if confirm_save is True:
+        # Admin:
+        await bot.send_message(admin_id, f"Счет клиента {id} пополнен, общий:  {new_money} $.")
+        
+        # User:
+        if language == "ru":
+            await bot.send_message(mes_id, f"Ваш счет пополнен. На балансе - {new_money}$. Поздравляем!")
+        else:
+            await bot.send_message(mes_id, f"Your account has been topped up. On the balance sheet - {new_money}$. Congratulations!")
+
+        await bot.answer_callback_query(callback_query.id)
+        return
+    else:
+        await bot.send_message(admin_id, "Error: A replenishment error occurred.")
+        await bot.answer_callback_query(callback_query.id)
+        return
+
+
+
+
+# 5 Вызов у админа кнопки подтверждения
+async def confirm_my_button(data_button):
+
+    id = data_button.get("id")
+    amount = data_button.get("amount")
+    admin_id = data_button.get("admin_id")
+    mes_id = data_button.get("mes_id")
+    url = data_button.get("url")
+    language = data_button.get("language")
+    use = data_button.get("use")
+
+    if use == "use_sbp_transfer" or use == "use_mircard":
+        amount = float(amount) / float(RUBTOUSD)
+    else:
+        amount = float(amount)
+
+    # Кнопка подтверждения
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"admin_conf:{id}:{amount}:{use}")], 
+        ]
+    )
+    await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
+    return
+
+
+
 class Form_my_pay(StatesGroup):
     text = State()
     add_summ = State()
     confirm_summ = State()
+    #admin_confirm = State()
 
-# Select method pay:
+# 1 Select method pay:
 @dp.message(Command("add_money"))
 async def add_money(message: types.Message, state: FSMContext):
 
     id = user_id(message)
     data_user = await read_user(id)
     language = data_user.get("language")
-    # paid = data_user.get("paid")
-    # money = data_user.get("money")
 
     answer = ""
 
@@ -1163,7 +1244,7 @@ Choosing a payment method:
 
 
 
-# 
+# 2
 @dp.message(Form_my_pay.text)
 async def sbp_ru(message: types.Message, state: FSMContext):
 
@@ -1203,6 +1284,8 @@ async def sbp_ru(message: types.Message, state: FSMContext):
     await state.update_data(language=language, use=use)
     await state.set_state(Form_my_pay.add_summ)
 
+
+# 3
 @dp.message(Form_my_pay.add_summ)
 async def sbp_ru_input(message: types.Message, state: FSMContext):
 
@@ -1255,6 +1338,8 @@ async def sbp_ru_input(message: types.Message, state: FSMContext):
     await state.update_data(language=language, amount=amount, use=use)
     await state.set_state(Form_my_pay.confirm_summ)
 
+
+# 4
 @dp.message(Form_my_pay.confirm_summ)
 async def sbp_ru_confirm(message: types.Message, state: FSMContext):
 
@@ -1278,92 +1363,37 @@ async def sbp_ru_confirm(message: types.Message, state: FSMContext):
             await message.reply("После проверки платежа, ваш счет пополнится и придет уведомление.", parse_mode="HTML")
         else:
             await message.reply("After checking the payment, your account will be replenished and a notification will be sent.", parse_mode="HTML")
+        
+        # End state:
+        await state.clear()
 
         mes_id = message.chat.id
         id = user_id(message)
         admin_id = ADMIN_ID
         url = f"tg://user?id={id}"
 
-        # Send message to ADMIN:
-        await confirm_my(id, amount, admin_id, mes_id, url, language, use)
-        await state.clear()
+        data_button = {
+            "id": id,
+            "amount": amount,
+            "admin_id": admin_id,
+            "mes_id": mes_id,
+            "url": url,
+            "language": language,
+            "use": use
+        }
 
+        # Send message to ADMIN:
+        await confirm_my_button(data_button)
+        return
+    
     else:
         if language == "ru":
             await message.reply("После успешного перевода, введите 'Готово' или 'Отмена' - для отмены.", parse_mode="HTML")
         else:
             await message.reply("After successful transfer, enter 'Done' or 'Cancel' to cancel.", parse_mode="HTML")
 
+#####
 
-# Вызов у админа кнопки подтверждения
-async def confirm_my(id, amount, admin_id, mes_id, url, language, use):
-
-    if use == "use_sbp_transfer" or use == "use_mircard":
-        amount = float(amount) / float(RUBTOUSD)
-    else:
-        amount = float(amount)
-
-    # Кнопка подтверждения
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"confirm_summ_user_id:{id}:{amount}:{admin_id}:{language}:{use}")], 
-        ]
-    )
-    await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
-    return
-
-
-# Обработчик подтверждения
-@dp.callback_query(lambda c: c.data and c.data.startswith('confirm_summ_user_id'))
-async def confirm_callback_handler_d(callback_query: types.CallbackQuery):
-    data = callback_query.data.split(':')
-    if len(data) == 6:
-        id = int(data[1])
-        amount = float(data[2])
-        admin_id = int(data[3])
-        mes_id = id#int(data[4])
-        language = str(data[4])
-        use = str(data[5])
-    else:
-        await bot.send_message(callback_query.from_user.id, "Error: Error in the request data.")
-        return
-
-    data_set = await read_user(id)
-    new_money = data_set.get("money") + (float(amount))
-    new_paid = data_set.get("paid") + 1
-
-    updated_data = {"user_id": id, "money": new_money, "paid": new_paid}
-    confirm_save = await update_user(updated_data)
-
-
-    # pay_data = {
-    #     "date": await day_utcnow(),
-    #     "title_method_pay": use,
-    #     "sum": float(amount),
-    #     "user_id": id
-    #     }
-    
-    # confirm_pay_stat =  add_payments(pay_data)
-    # if not confirm_pay_stat:
-    #     print("Error: Dont save payments.")
-
-    if confirm_save is True:
-        # Admin:
-        await bot.send_message(admin_id, f"Счет клиента {id} пополнен, общий:  {new_money} $.")
-        
-        # User:
-        if language == "ru":
-            await bot.send_message(mes_id, f"Ваш счет пополнен. На балансе - {new_money}$. Поздравляем!")
-        else:
-            await bot.send_message(mes_id, f"Your account has been topped up. On the balance sheet - {new_money}$. Congratulations!")
-
-        await bot.answer_callback_query(callback_query.id)
-        return
-    else:
-        await bot.send_message(admin_id, "Error: A replenishment error occurred.")
-        await bot.answer_callback_query(callback_query.id)
-        return
-####
 
 
 
