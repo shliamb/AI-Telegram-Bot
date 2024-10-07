@@ -1,9 +1,6 @@
-import requests
-from config import URL, DEFAULT_DALL_E
+from config import URL, NULL_TOKEN
 from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
-
-
-
+import aiohttp
 
 
 async def mod_openai_dall_e(data):
@@ -35,14 +32,20 @@ async def mod_openai_dall_e(data):
         KEY_API_AI: VALUE_KEY_API_AI,
     }
 
-    response = requests.post(url, headers=headers, data=data)
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, data=data) as response:
+            if response.status == 200:
+                try:
+                    return await response.json()
+                except aiohttp.ContentTypeError:
+                    text_response = await response.text()
+                    return {'response': text_response, "used_tokens": NULL_TOKEN}
+            elif response.status == 400 or response.status == 500:
+                text_response = await response.text()
+                return {'response': text_response, "used_tokens": NULL_TOKEN}
 
-    if response.status_code == 200:
-        print
-        print(response.text)
-        print
-        answer = response.json()
-        answer_response = answer.get("response")
-        return answer_response
-    else:
-        print(response.status_code, response.text)
+
+# return {"response":"https://oaidalleapiprodscus.blob.core.windows.net/private/org-uhWB0qfaxHXgZEMKyRt5RKG9/user-ynhKanTD5u5duWFG6UDs0OXb/img-fTqt7lgsT5tk6N5u9IythNne.png?st=2024-10-07T19%3A09%3A18Z&se=2024-10-07T21%3A09%3A18Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-10-06T23%3A54%3A57Z&ske=2024-10-07T23%3A54%3A57Z&sks=b&skv=2024-08-04&sig=KisUS7ahor%2Bo18cXIPwmEhFLMVoknVs%2Bzb143gORVUw%3D","expenses":0.04,"pictures":1}
+
+
+

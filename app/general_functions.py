@@ -19,7 +19,7 @@ from io import BytesIO
 
 
 
-# Encode the image
+# Encode the image base64:
 async def encode_file(file_path):
   async with aiofiles.open(file_path, "rb") as file:
     content = await file.read()
@@ -32,6 +32,7 @@ def random_name() -> str:
     text = random.choice(random_letters) + random_num
     return text
 
+# Run Random name:
 def random_name_2X() -> str:
     name = f"{random_name()}-{random_name()}"
     return name
@@ -79,8 +80,7 @@ def bool_to_str(bools, lang):
             text = "Off"
     return text.upper()
 
-
-# Calculation of the cost of used tokens
+# Calculation of the cost of used tokens:
 async def calculation(data, input_data):
     one_price, use_model, data_stat = None, None, {}
     
@@ -118,7 +118,6 @@ async def calculation(data, input_data):
         data_stat["price_1"] = one_price
         data_stat["price"] = total_price
 
-
         # Save statistic data to DB:
         confirm = await add_statistics(data_stat)
         if not confirm:
@@ -127,22 +126,19 @@ async def calculation(data, input_data):
         # Getting user data
         user_data = await read_user(data.get("user_id"))
         new_money = user_data.get("money") - total_price
-        data_money = {"money": new_money, "user_id": data.get("user_id"),}
+        data_money = {"money": new_money, "user_id": data.get("user_id"), "last_visit": await day_utcnow()}
 
         # The balance was changed taking into account the expense
         confirm = await update_user(data_money)
         if not confirm:
             print("Error: update_user")
-
         return True
     
     except Exception as error:
         print("Error:", error)
         return False
 
-
-
-# We consider tokens from the text to be average and I'm not sure what is correct
+# Counts the number of tokens from the text:
 def tiktroken(user_content):
     # Statistic *** Ебанный костыль, пока что не знаю как подругому сделать ****   Available encodings: ['gpt2', 'r50k_base', 'p50k_base', 'p50k_edit', 'cl100k_base', 'o200k_base']
     enc = tiktoken.get_encoding("gpt2")
@@ -150,11 +146,8 @@ def tiktroken(user_content):
     used_tokens = len(tokens)
     return used_tokens
 
-
-
-# Set model OpenAI Dall-e
+# Set right model OpenAI Dall-e:
 def set_model_dalle(data):
-
     quality = data.get("quality")
     size = data.get("size")
     model = data.get("model_draw")
@@ -192,12 +185,8 @@ def set_model_dalle(data):
             model = "dall-e-3-1024"
         return model
 
-
 # Get activ use pay method:
 def get_use_met_all(n):
-
-    id = str(n.get("id"))
-    title = n.get("title_method_pay")
     if n.get("use_sbp_transfer") is True:
         use = "use_sbp_transfer"
     elif n.get("use_mastercard") is True:
@@ -218,7 +207,32 @@ def get_use_met_all(n):
         use = "use_digital"
     else:
         use = "not use"
-    return {"id": id, "use": use, "title_method_pay": title}
+    return use
+
+# Async save file:
+async def write_file(file, file_path):
+    async with aiofiles.open(file_path, "wb") as buffer:
+        while content := await file.read(1024):  # Читаем файл порциями по 1024 байта
+            await buffer.write(content)
+            return
+
+# Remove File OS Async
+async def remove_file_os(file_path):
+    loop = asyncio.get_running_loop()
+    
+    if await loop.run_in_executor(None, os.path.exists, file_path):
+        await loop.run_in_executor(None, os.remove, file_path)
+        logging.info(f"The {file_path} file was successfully deleted.")
+        return True
+    else:
+        logging.error(f"The {file_path} file does not exist.")
+        return False
+
+
+
+
+
+
 
 
 
@@ -248,31 +262,6 @@ def get_use_met_all(n):
 #                 return length_sound
 
 
-# Remove File OS
-# async def remove_file_os(file_path):
-#     if os.path.exists(file_path):
-#         os.remove(file_path)
-#         #print(f"The {file_path} file was successfully deleted.")
-#         logging.info(f"The {file_path} file was successfully deleted.")
-#         return True
-#     else:
-#         #print(f"The {file_path} file does not exist.")
-#         logging.error(f"The {file_path} file does not exist.")
-#         return False
-
-# # Remove File OS Async
-# async def remove_file_os(file_path):
-#     loop = asyncio.get_running_loop()
-    
-#     if await loop.run_in_executor(None, os.path.exists, file_path):
-#         await loop.run_in_executor(None, os.remove, file_path)
-#         logging.info(f"The {file_path} file was successfully deleted.")
-#         return True
-#     else:
-#         logging.error(f"The {file_path} file does not exist.")
-#         return False
-    
-
 # # Cleaner model AI
 # async def cleaner_model(name_model):
 #     pattern = r"(dall-e-\d)"
@@ -282,15 +271,6 @@ def get_use_met_all(n):
 #     return match
 
 
-
-  
-
-# # Async save file
-# async def write_file(file, file_path):
-#     async with aiofiles.open(file_path, "wb") as buffer:
-#         while content := await file.read(1024):  # Читаем файл порциями по 1024 байта
-#             await buffer.write(content)
-#             return
 
 
 

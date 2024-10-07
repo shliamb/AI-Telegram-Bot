@@ -1,9 +1,10 @@
 from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
-import requests
-import base64
+from config import URL, AUDIO_FOLDER
+from general_functions import random_name_2X, encode_file
+import aiohttp
+import aiofiles
 
-from config import URL, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AUDIO_FOLDER
-from general_functions import random_name_2X
+import base64
 
 
 
@@ -30,26 +31,31 @@ async def get_voice_openai(data):
         KEY_API_AI: VALUE_KEY_API_AI,
     }
 
-    response = requests.post(url, headers=headers, data=data)
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, data=data) as response:
+            if response.status == 200:
+                json_response = await response.json()
+                b64_json = json_response.get("b64_json")
 
-    format_audio = data["response_format"]
+                if b64_json:
+                    audio_data = base64.b64decode(b64_json)
+                    little = random_name_2X()
+                    file_path = f"{AUDIO_FOLDER}output_audio-{little}.{response_format}"
 
-    if response.status_code == 200:
+                    try:
+                        async with aiofiles.open(file_path, "wb") as audio_file:
+                            await audio_file.write(audio_data)
+                            print(f"The audio file is saved as {file_path}")
+                            return file_path
 
-        json_response = response.json()
-        b64_json = json_response.get("b64_json")
+                    except aiohttp.ContentTypeError:
+                        text_response = await response.text()
+                        print(text_response)
 
-        if b64_json:
-            audio_data = base64.b64decode(b64_json)
-            little = random_name_2X()
-            file_path = f"{AUDIO_FOLDER}output_audio-{little}.{format_audio}"
-            with open(file_path, "wb") as audio_file:
-                audio_file.write(audio_data)
-
-            #print(f"The audio file is saved as output_audio.{format_audio}")
-            return file_path
-    else:
-        print(f"Error: {response.status_code} - {response.text}")
+            elif response.status == 400 or response.status == 500:
+                text_response = await response.text()
+                print(text_response)
 
 
 # Only file
+

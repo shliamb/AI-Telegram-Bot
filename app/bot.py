@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO
 
 
 import logging
@@ -43,8 +43,8 @@ from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
-from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments
+from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments, read_one_methods_pay
 from texts import start_ru, start_en
 
 
@@ -105,6 +105,7 @@ async def select_en_in_start(callback_query: types.CallbackQuery, state: FSMCont
 
         if confirm:
             await bot.send_message(callback_query.from_user.id, f"Hello, {about}! {start_en}")
+            logging.info(f"New registration - {id}.")
             await bot.answer_callback_query(callback_query.id)
             await state.clear()
 
@@ -143,6 +144,7 @@ async def select_ru_in_start(callback_query: types.CallbackQuery, state: FSMCont
 
         if confirm:
             await bot.send_message(callback_query.from_user.id, f"Здравствуйте, {about}! {start_ru}")
+            logging.info(f"New registration - {id}.")
             await bot.answer_callback_query(callback_query.id)
             await state.clear()
 
@@ -201,6 +203,7 @@ async def start(message: types.Message):
 async def main_menu(message: types.Message):
 
     id = user_id(message)
+    logging.info(f"Push menu -  {id}.")
 
     data = await read_user(id)
 
@@ -1040,6 +1043,16 @@ async def get_sys_content(message: types.Message):
 async def get_stat(message: types.Message):
     id = user_id(message)
     all_data = await read_statistics(id)
+    is_user_to_db = await read_user(id)
+    language = is_user_to_db.get("language")
+
+    if not all_data:
+        if language == "ru":
+            await message.answer("У вас еще нет статистики.", parse_mode="HTML")
+        else:
+            await message.answer("You don't have statistics yet.", parse_mode="HTML")
+        return
+
     all_static = []
 
     all_static.append(["№", "User id", "Date", "Use model AI", "Tokens", "Minutes Audio", "Image", "Price for one", "Full session consumption"])
@@ -1098,6 +1111,8 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     updated_data = {"user_id": id, "money": new_money, "paid": new_paid}
     confirm_save = await update_user(updated_data)
 
+    logging.info(f"Adding funds to your account - {id}.")
+
     pay_data = {
         "date": await day_utcnow(),
         "title_method_pay": use,
@@ -1108,6 +1123,18 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     confirm_pay_stat =  await add_payments(pay_data)
     if not confirm_pay_stat:
         print("Error: Dont save payments.")
+
+    one_method = await read_one_methods_pay_by_use(use)
+    if one_method:
+        old_coint = one_method.get("counts")
+        if old_coint == None:
+            old_coint = 0
+        metod_id = one_method.get("id")
+        counts = old_coint + 1
+        method_data = {"id": metod_id, "counts": counts}
+        confirm_update_met =  await update_methods_pay(method_data)
+        if not confirm_update_met:
+            print("Error: Dont update counts pay method.")
 
     if confirm_save is True:
         # Admin:
@@ -1179,11 +1206,6 @@ async def add_money(message: types.Message, state: FSMContext):
 Choosing a payment method:
 '''
 
-    if language == "ru":
-        answer = answer + intro_ru
-    else:
-        answer = answer + intro_en
-
     if USE_SBP_TRANSFER and await read_one_methods_pay_by_use("use_sbp_transfer"):
         if language == "ru":
             answer = answer + "\n/sbp_ru - перевод RUB по СБП"
@@ -1237,6 +1259,20 @@ Choosing a payment method:
             answer = answer + "/use_digital"
         else:
             answer = answer + "/use_digital"
+
+    if answer == "":
+        print("Error: not default method pay.")
+        if language == "ru":
+            await message.reply("Нет способов оплаты, извините.", parse_mode="HTML")
+        else:
+            await message.reply("There are no payment methods, sorry.", parse_mode="HTML")
+        await state.clear()
+        return
+
+    if language == "ru":
+        answer = intro_ru + answer
+    else:
+        answer = intro_en + answer
 
     await message.reply(answer, parse_mode="HTML")
     await state.update_data(language=language)
@@ -1666,21 +1702,12 @@ async def select_when_deleted_metod_pay(message: types.Message, state: FSMContex
     count = []
     methods = ""
 
-    if not isinstance(all_metods, list):
-        data = get_use_met_all(all_metods)
-        id = data.get("id")
-        use = data.get("use")
-        title = data.get("title_method_pay")
+    for n in all_metods:
+        use = get_use_met_all(n)
+        id = str(n.get("id"))
+        title = n.get("title_method_pay")
         methods = methods + "\n" + id + " - " + title + " - " + use
-        count.append(data.get("id"))
-    else:
-        for n in all_metods:
-            data = get_use_met_all(n)
-            id = data.get("id")
-            use = data.get("use")
-            title = data.get("title_method_pay")
-            methods = methods + "\n" + id + " - " + title + " - " + use
-            count.append(data.get("id"))
+        count.append(id)
 
     await message.reply(f"{methods}\n\nSelect the number corresponding to the name of the method you want to delete. Make sure that it is not in use:", parse_mode="HTML") 
     await state.update_data(count=count)
@@ -1711,7 +1738,7 @@ async def delete_metod_pay(message: types.Message, state: FSMContext):
 
     confirm = await deleted_one_methods_pay(int_value)
     if not confirm:
-        print("Error: Not update_methods_pay.")
+        print("Error: Not deleted_methods_pay.")
         return
 
     await message.reply(f"The payment method has been deleted.", parse_mode="HTML")
@@ -1782,21 +1809,13 @@ async def select_metod_pay(message: types.Message, state: FSMContext):
     count = []
     methods = ""
 
-    if not isinstance(all_metods, list):
-        data = get_use_met_all(all_metods)
-        id = data.get("id")
-        use = data.get("use")
-        title = data.get("title_method_pay")
+
+    for n in all_metods:
+        use = get_use_met_all(n)
+        id = str(n.get("id"))
+        title = n.get("title_method_pay")
         methods = methods + "\n" + id + " - " + title + " - " + use
-        count.append(data.get("id"))
-    else:
-        for n in all_metods:
-            data = get_use_met_all(n)
-            id = data.get("id")
-            use = data.get("use")
-            title = data.get("title_method_pay")
-            methods = methods + "\n" + id + " - " + title + " - " + use
-            count.append(data.get("id"))
+        count.append(id)
 
     place = place_of_use[i]    
 
@@ -1823,7 +1842,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
         print(f"This not integer id method pay.")
         await message.reply("This not integer id method pay.", parse_mode="Markdown") 
         return
-    
+
     if message.text not in count:
         print(f"There is no such position.")
         await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
@@ -1935,6 +1954,9 @@ async def try_answer_bot(message, answer, data):
         print(f"The file is empty or missing - {voice_answer_file_path}")
         logging.error(f"The file is empty or missing - {voice_answer_file_path}")
 
+    if DEL_AUDIO == True:
+        await remove_file_os(voice_answer_file_path)
+
     data = {}
     return
 
@@ -1943,6 +1965,11 @@ async def try_answer_bot(message, answer, data):
 async def mod_tex(data, message):
 
     await typing(message)
+
+    id = user_id(message)
+    user_content = data.get("user_content")
+    system_content = data.get("system_content")
+    logging.info(f"User {id}: {user_content} : {system_content}.")
 
     if data.get("ai") == "gemini":
         answer = await mod_gemini_chat(data)
@@ -2017,11 +2044,16 @@ async def mod_photo(data, message, state: FSMContext):
     # Telegram always saves in jpg in compress
     photo = message.photo[-1]  # Используем самый большой размер фотографии
     file_id = photo.file_id
-    file = await bot.get_file(file_id)
     little = random_name_2X()
     photo_file_name = f"photo-{little}-{message.photo[-1].file_id}.jpg"
     file_path = f'{DOWNLOADS_FOLDER}{photo_file_name}'
-    await bot.download_file(file.file_path, file_path)
+    try:
+        file = await bot.get_file(file_id)
+        await bot.download_file(file.file_path, file_path)
+    except:
+        print("Error: Couldn't get a photo.")
+        await message.reply("Error: Couldn't get a photo.", parse_mode="Markdown")
+        return
 
     data["file_path"] = file_path
     data["name_file"] = photo_file_name
@@ -2035,6 +2067,9 @@ async def mod_photo(data, message, state: FSMContext):
 
         if not answer:
             return
+
+        if DEL_DOWNLOADS == True:
+            await remove_file_os(file_path)
 
         text = answer.get("response")
         used_tokens = answer.get("used_tokens")
@@ -2085,8 +2120,15 @@ async def mod_documents(data, message, state: FSMContext):
     if extension.lower() == "jpg" or extension.lower() == "png":
 
         file_path = f'{DOWNLOADS_FOLDER}{name_file}'
-        file = await bot.get_file(file_id)
-        await bot.download_file(file.file_path, file_path)
+
+        try:
+            file = await bot.get_file(file_id)
+            await bot.download_file(file.file_path, file_path)
+        except:
+            print("Error: Couldn't get a picture.")
+            await message.reply("Error: Couldn't get a picture.", parse_mode="Markdown")
+            return
+
 
         data["file_path"] = file_path
         data["name_file"] = name_file
@@ -2101,6 +2143,9 @@ async def mod_documents(data, message, state: FSMContext):
             if not answer:
                 return
             
+            if DEL_DOWNLOADS == True:
+                await remove_file_os(file_path)
+
             data["file_path"] = None
             data["name_file"] = None
             
@@ -2170,9 +2215,14 @@ async def mod_voice_to_text(data, message):
     file_id = voice.file_id
     little = random_name_2X()
     voice_file_name = f"voice-{little}-{voice.file_id}.ogg"
-    file = await bot.get_file(file_id)
     file_path = f'{VOICE_FOLDER}{voice_file_name}'
-    await bot.download_file(file.file_path, file_path)
+    try:
+        file = await bot.get_file(file_id)
+        await bot.download_file(file.file_path, file_path)
+    except:
+        print("Error: Voice transmission error.")
+        await message.reply("Error: Voice transmission error.", parse_mode="Markdown")
+        return
 
     data["file_path"] = file_path
     data["name_file"] = voice_file_name
@@ -2182,6 +2232,9 @@ async def mod_voice_to_text(data, message):
     # elif data.get("ai_voice_to_text") == "gemini":
     #     convert_answer = await get_text_openai(data)
     
+    if DEL_VOICE == True:
+        await remove_file_os(file_path)
+
     if not convert_answer:
         print("Error: Convet voice to text.")
         return
@@ -2239,7 +2292,8 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
         #     answer = await mod_openai_dall_e(all_data) # Sorry)))
 
         if not answer:
-            print("Error: Convet voice to text.")
+            print("Error: Generation image.")
+            return
 
         # get model dall-e
         peps_model = set_model_dalle(all_data)
@@ -2258,7 +2312,7 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
             return
 
         # Response to the user:
-        await bot.send_message(callback_query.from_user.id, answer)
+        await bot.send_message(callback_query.from_user.id, answer.get("response"))
 
 
     elif callback_query.data == 'not_draw':

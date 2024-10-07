@@ -238,10 +238,6 @@ async def read_statistics(user_id):
         data = []
         for record in result:
             data.append(dict(record))
-
-        if len(data) == 1:
-            data = dict(*result)
-
         return data
     
     except Exception as e:
@@ -372,10 +368,6 @@ async def read_discussion(user_id):
         data = []
         for record in result:
             data.append(dict(record))
-
-        if len(data) == 1:
-            data = dict(*result)
-
         return data
     
     except Exception as e:
@@ -442,10 +434,6 @@ async def read_all_methods_pay():
         data = []
         for record in result:
             data.append(dict(record))
-
-        if len(data) == 1:
-            data = dict(*result)
-            
         return data
     
     except Exception as e:
@@ -455,7 +443,13 @@ async def read_all_methods_pay():
         if connection is not None:
             await connection.close()
 
+# data = asyncio.run(read_all_methods_pay())
+# print(data)
 
+# if data:
+#     for n in data:
+#         print(n.get("id"))
+#         #print(n)
 
 # Read one methods_pay by title:
 async def read_one_methods_pay(title: str):
@@ -544,11 +538,11 @@ async def read_one_methods_pay_by_use(place_of_use):
             await connection.close()
 
 
-# # Read one method pay by USE:
-# i = 2
+# Read one method pay by USE:
+# i = "use_mircard"
 # data = asyncio.run(read_one_methods_pay_by_use(i))
 # print(data)
-# print(data.get(f"use_{i}"))
+# print(data.get(f"counts"))
 
 
 # Deleted one methods_pay:
@@ -710,37 +704,37 @@ async def update_methods_pay(pay_data):
 #########################
 
 
-# Read all payments for one user_id:
-async def read_all_payments_for_user_id(user_id):
-    connection = None
-    try:
-        connection = await get_connection()
-        result = await connection.fetch(
-            '''
-                SELECT * FROM payments WHERE user_id = $1;
-            ''',
-            user_id
-        )
+# # Read all payments for one user_id:
+# async def read_all_payments_for_user_id(user_id):
+#     connection = None
+#     try:
+#         connection = await get_connection()
+#         result = await connection.fetch(
+#             '''
+#                 SELECT * FROM payments WHERE user_id = $1;
+#             ''',
+#             user_id
+#         )
 
-        if not result:
-            print(f"User {user_id} not pay.")
-            return False
+#         if not result:
+#             print(f"User {user_id} not pay.")
+#             return False
 
-        data = []
-        for record in result:
-            data.append(dict(record))
+#         data = []
+#         for record in result:
+#             data.append(dict(record))
 
-        if len(data) == 1:
-            data = dict(*result)
+#         # if len(data) == 1:
+#         #     data = dict(*result)
 
-        return data
+#         return data
     
-    except Exception as e:
-        print(f"Error read_all_payments_for_user_id: {e}")
-        return False
-    finally:
-        if connection is not None:
-            await connection.close()
+#     except Exception as e:
+#         print(f"Error read_all_payments_for_user_id: {e}")
+#         return False
+#     finally:
+#         if connection is not None:
+#             await connection.close()
 
 
 # Read all payments:
@@ -898,6 +892,7 @@ async def read_all_users():
 
 # data_all_users = asyncio.run(read_all_users())
 # print(data_all_users)
+
 # for user in data_all_users:
 #     print(user.get("user_id"), user.get("name"), user.get("money"))
 

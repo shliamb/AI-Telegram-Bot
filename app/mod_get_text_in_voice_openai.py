@@ -1,18 +1,11 @@
 from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
-import requests
-
-from config import URL, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AUDIO_FOLDER, AI_DEFAULT_MODEL_VOICE_TO_TEXT
-#from general_functions import random_name_2X
-
-
+from config import URL, AI_DEFAULT_MODEL_VOICE_TO_TEXT, NULL_TOKEN
+import aiohttp
+import aiofiles
 
 
 
 async def get_text_openai(data):
-
-
-
-
 
     model = data.get("model_voice_to_text", AI_DEFAULT_MODEL_VOICE_TO_TEXT) # whisper-1 AI_DEFAULT_MODEL_VOICE_TO_TEXT !!!!!!!!!!!!!!!!!
     prompt = data.get("user_content") # The prompt should match the audio language.
@@ -21,40 +14,43 @@ async def get_text_openai(data):
     file_path = data.get("file_path")
     name_file = data.get("name_file")
 
-
     url = f"{URL}/api/transcription-openai/"
 
     data = {
             "username": USERNAME_API_AI,
             "model": model,
-            # timestamp_granularities=["word"],                                                             # Not suport
-            # timestamp_granularities=["segment"]                                                           # Not suport
     }
-
-    data["language"] = language
-    data["prompt"] = prompt
-    data["response_format"] = response_format
 
     headers = {
         KEY_API_AI: VALUE_KEY_API_AI,
     }
 
-
     if file_path:
-        with open(file_path, 'rb') as f:
-            file = {
-                'audio': (name_file, f)
-            }
+        async with aiohttp.ClientSession() as session:
+                async with aiofiles.open(file_path, 'rb') as f:
+                    form = aiohttp.FormData()
+                    content = await f.read()
+                    form.add_field('audio', content, filename=name_file)
+                    form.add_field('username', USERNAME_API_AI)
+                    form.add_field('model', model)
+                    if language:
+                        form.add_field('language', language)
+                    if prompt:
+                        form.add_field('prompt', prompt)
+                    if response_format:
+                        form.add_field('response_format', response_format)
 
-            response = requests.post(url, headers=headers, data=data, files=file)
+                    async with session.post(url, headers=headers, data=form) as response:
+                        if response.status == 200:
+                            try:
+                                return await response.json()
+                            except aiohttp.ContentTypeError:
+                                text_response = await response.text()
+                                return {'response': text_response, "minutes": NULL_TOKEN}
+                        elif response.status == 400 or response.status == 500:
+                            text_response = await response.text()
+                            return {'response': text_response, "minutes": NULL_TOKEN}
 
-            # Проверка статуса ответа и вывод результата
-            if response.status_code == 200:
-                answer = response.json()
-                return answer
-
-            else:
-                print("Error", response.status_code, response.text)
 
 
 
