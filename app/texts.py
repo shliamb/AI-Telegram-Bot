@@ -23,3 +23,81 @@ system_content = '''
 System content в OpenAI ChatGPT — это предварительно заданные инструкции или контекст, которые помогают модели понять, как она должна взаимодействовать с пользователем. Это может включать указания о тоне общения, стиле ответов и других аспектах, чтобы обеспечить более целенаправленный и релевантный опыт для пользователя.
 
 '''
+
+
+prices_ru = '''
+
+Языковая модель OpenAI 1млн токенов в USD:
+    'o1-preview': 150,
+    'o1-preview-2024-09-12': 150,
+    'o1-mini': 30,
+    'o1-mini-2024-09-12': 30,
+    'chatgpt-4o-latest': 40,
+    'gpt-4o': 40,
+    'gpt-4o-2024-05-13': 40,
+    'gpt-4o-2024-08-06': 25,
+    'gpt-4o-mini': 1.5,
+    'gpt-4o-mini-2024-07-18': 1.5,
+    'gpt-4-turbo-2024-04-09': 80,
+
+Языковая модель от Google 1млн в USD:
+    'gemini-1.5-pro-latest': 93.75,
+    'gemini-1.5-flash-latest': 1.125,
+    'gemini-1.0-pro-latest': 4,
+
+Генерация изображений за одну в USD:
+    'dall-e-3-1024': 0.08,
+    'dall-e-3-1792': 0.16,
+    'dall-e-3-hd-1024': 0.16,
+    'dall-e-3-hd-1792': 0.24,
+    'dall-e-2-1024': 0.04,
+    'dall-e-2-512': 0.036,
+    'dall-e-2-256': 0.032,
+
+Генерация голоса 1млн символов в USD:
+    'tts-1': 30,
+    'tts-1-hd': 60,
+
+Транскрипция из аудио в текст мин. в USD:
+    'whisper-1': 0.012,
+
+'''
+
+
+prices_en = '''
+
+OpenAI language model 1 million tokens in $:
+    'o1-preview': 150,
+    'o1-preview-2024-09-12': 150,
+    'o1-mini': 30,
+    'o1-mini-2024-09-12': 30,
+    'chatgpt-4o-latest': 40,
+    'gpt-4o': 40,
+    'gpt-4o-2024-05-13': 40,
+    'gpt-4o-2024-08-06': 25,
+    'gpt-4o-mini': 1.5, # no vision
+    'gpt-4o-mini-2024-07-18': 1.5, # no vision
+    'gpt-4-turbo-2024-04-09': 80,
+
+The language model from Google is 1 million in $:
+    'gemini-1.5-pro-latest': 93.75,
+    'gemini-1.5-flash-latest': 1.125,
+    'gemini-1.0-pro-latest': 4,
+
+Generating images for one in $:
+    'dall-e-3-1024': 0.08,
+    'dall-e-3-1792': 0.16,
+    'dall-e-3-hd-1024': 0.16,
+    'dall-e-3-hd-1792': 0.24,
+    'dall-e-2-1024': 0.04,
+    'dall-e-2-512': 0.036,
+    'dall-e-2-256': 0.032,
+
+Voice generation of 1M characters in $:
+    'tts-1': 30,
+    'tts-1-hd': 60,
+
+Transcription from audio to text min. in $:
+    'whisper-1': 0.012,
+
+'''

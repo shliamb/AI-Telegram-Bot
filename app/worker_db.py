@@ -338,9 +338,10 @@ async def add_discussion(discussion_data):
 
 # # Add discussion:
 # discussion_data = {
+#     "timestamp": 33,
 #     "user_id": 485435943,
-#     "user_say": "Ничего, тебе показалось..",
-#     "model_say": "Нет, ты явно что то хотел, повтори.",
+#     "user_question": "Ничего, тебе показалось..",
+#     "assistant_response": "Нет, ты явно что то хотел, повтори.",
 #     "summarization": True,
 # }
 
@@ -379,7 +380,7 @@ async def read_discussion(user_id):
 # # Read discussion by user_id:
 # data_user = asyncio.run(read_discussion(485435943))
 # for one in data_user:
-#     print(one.get("user_say"), one.get("model_say"), one.get("summarization"))
+#     print(one.get("user_question"), one.get("assistant_response"), one.get("summarization"))
 
 
 # Clear discussion:

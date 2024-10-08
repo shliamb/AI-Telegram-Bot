@@ -77,9 +77,9 @@ def create_tables_in_db():
         create_table_discussion = '''
         CREATE TABLE IF NOT EXISTS discussion (
             id SERIAL PRIMARY KEY,
-            date TIMESTAMP,
-            user_say TEXT,
-            model_say TEXT,
+            timestamp TIMESTAMP,
+            user_question TEXT,
+            assistant_response TEXT,
             summarization BOOLEAN,
             user_id BIGINT,
             FOREIGN KEY (user_id) REFERENCES users(user_id)

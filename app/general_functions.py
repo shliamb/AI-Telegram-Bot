@@ -62,9 +62,9 @@ async def day_utcnow(time_zone=None):
 
 # UNFORMAT TIME:
 async def unformat_date(date):
-    day_now = str(date.strftime("%Y-%m-%d"))
-    time_now = float(date.strftime("%H.%M"))
-    return day_now, time_now
+    day = str(date.strftime("%Y-%m-%d"))
+    time = str(date.strftime("%H.%M"))
+    return {"day": day, "time": time}
 
 # in BOOL out STR TEXT UPPER:
 def bool_to_str(bools, lang):
@@ -231,44 +231,6 @@ async def remove_file_os(file_path):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# # Async calculating the length of an audio file:
-# async def read_audio_file(file_path: str) -> float: # mp3 (ID3v1 и ID3v2), flac, ogg Vorbis, acc (and M4A), wav, wma (limited support), aiff
-#     async with aiofiles.open(file_path, 'rb') as f:
-#         content = await f.read()
-#         audio_file = BytesIO(content)
-        
-#         # Загружаем аудиофайл с помощью mutagen
-#         audio = File(audio_file)
-        
-#         if audio is None or audio.info is None:
-#             print("The audio file could not be uploaded.")
-#             logging.error("The audio file could not be uploaded.")
-#         else:
-#             # print(audio.pprint())
-#             duration = audio.info.length  # Получаем длину в секундах
-#             if duration:
-#                 length_sound = float(f"{duration:.2f}")
-#                 return length_sound
-
-
-# # Cleaner model AI
-# async def cleaner_model(name_model):
-#     pattern = r"(dall-e-\d)"
-#     match = re.search(pattern, name_model)
-#     if match:
-#         match = match.group(1)
-#     return match
 
 
 

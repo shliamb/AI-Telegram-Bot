@@ -3,6 +3,7 @@
 #### BASIC CONFIG ####
 
 # System:
+NAME_BOT = "AI bot"
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
@@ -14,6 +15,7 @@ DIALOG_SUM = True # AI compress history dialog
 LANGUAGE = "en"
 NOTIFICATIONS = True
 DIALOG_SUM = False
+BACKUP_PATH = "./backup_db/"
 
 # Language models:
 AI_DEFAULT = "gemini" # gemini or openai, anthropic in future

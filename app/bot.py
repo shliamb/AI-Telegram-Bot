@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT
 
 
 import logging
@@ -17,7 +17,7 @@ import json
 #import requests
 from io import StringIO, BytesIO
 #import uuid
-#from pathlib import Path # Работа с файловыми путями 
+from pathlib import Path # Работа с файловыми путями 
 # from datetime import datetime, timezone, timedelta
 # import time
 # import sys
@@ -45,7 +45,9 @@ from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os
 from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments, read_one_methods_pay
-from texts import start_ru, start_en
+from texts import start_ru, start_en, prices_en, prices_ru
+from backupdb import backup_db
+from restore_db import restore_db
 
 
 
@@ -988,6 +990,9 @@ async def speed_1_25(message: types.Message):
 
 
 
+
+
+
 # Set system content:
 class Form_system(StatesGroup):
     content = State()
@@ -1075,6 +1080,32 @@ async def get_stat(message: types.Message):
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
         print(f"Error sending documentb User stat")
+
+
+
+
+# MENU: PRICES:
+@dp.message(Command('prices'))
+async def get_prices(message: types.Message):
+
+    id = user_id(message)
+    user_data = await read_user(id)
+    language = user_data.get("language")
+
+    if language == "ru":
+        await message.answer(prices_ru, parse_mode="HTML")
+    else:
+        await message.answer(prices_en, parse_mode="HTML")
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1451,10 +1482,107 @@ async def sbp_ru_confirm(message: types.Message, state: FSMContext):
 
 @dp.message(Command('help'))
 async def start(message: types.Message):
-    help = '''
-    help
-    '''
-    await message.reply(f"{help}", parse_mode="Markdown")
+
+    id = user_id(message)
+    data = await read_user(id)
+    language = data.get("language")
+
+    text_button = "📝 Сообщение разработчику" if language == "ru" else "📝 Message to the developer"
+
+    keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=text_button, callback_data=f"send_message")], 
+            ]
+        )
+
+    if language == "ru":
+        await bot.send_message(message.chat.id, f"{start_ru}", parse_mode="HTML", reply_markup=keyboard)
+    elif language == "en":
+        await bot.send_message(message.chat.id, f"{start_en}", parse_mode="HTML", reply_markup=keyboard)
+
+
+class Form_send(StatesGroup):
+    send_admin = State()
+
+@dp.callback_query(lambda c: c.data and c.data.startswith('send_message'))
+async def send_to_admin(callback_query: types.CallbackQuery, state: FSMContext):
+    id = user_id(callback_query)
+    data = await read_user(id)
+    language = data.get("language")
+    block = data.get("block")
+
+    if block:
+        print(f"This dude - {id} is trying to write blocked.")
+        if language == "ru":
+            await bot.send_message(callback_query.from_user.id, "У вас больше нет попыток написать.", parse_mode="HTML")
+        elif language == "en":
+            await bot.send_message(callback_query.from_user.id, "You don't have any more attempts to write.", parse_mode="HTML")
+        await bot.answer_callback_query(callback_query.id)
+        return
+
+    if language == "ru":
+        await bot.send_message(callback_query.from_user.id, "Напишите сообщение:", parse_mode="HTML")
+    elif language == "en":
+        await bot.send_message(callback_query.from_user.id, "Write a message:", parse_mode="HTML")
+
+    await bot.answer_callback_query(callback_query.id)
+    await state.set_state(Form_send.send_admin)
+
+
+
+@dp.message(Form_send.send_admin)
+async def in_text_send_admin(message: types.Message, state: FSMContext):
+    id = user_id(message)
+    data = await read_user(id)
+    language = data.get("language")
+
+    mes_id = message.chat.id
+    admin_id = ADMIN_ID
+    url = f"tg://user?id={id}"
+    
+    if message.text:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="🤯 Blocking", callback_data=f"block_now:{id}")], 
+            ]
+        )
+        escape_text = escape_special_chars(message.text)
+        await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, написал вам сообщение из бота {NAME_BOT}:", parse_mode="HTML")
+        await bot.send_message(admin_id, escape_text, parse_mode="HTML", reply_markup=keyboard)
+
+    if language == "ru":
+        await bot.send_message(message.chat.id, "Ваше сообщение отправлено.", parse_mode="HTML")
+    elif language == "en":
+        await bot.send_message(message.chat.id, "Your message has been sent.", parse_mode="HTML")
+
+    await state.clear()
+
+
+# Block user:
+@dp.callback_query(lambda c: c.data and c.data.startswith('block_now'))
+async def blocking_dude(callback_query: types.CallbackQuery):
+
+    data = callback_query.data.split(':')
+
+    if not data:
+        print("Error: dont get data - data_button.")
+        await bot.send_message(callback_query.from_user.id, "Error: dont get data - data_button.")
+        return
+
+    id = int(data[1])
+    print(id)
+
+    updated_data = {"user_id": id, "block": True}
+    confirm_save = await update_user(updated_data)
+    logging.info(f"The user is blocked - {id}.")
+
+    if confirm_save is True:
+        # to Admin:
+        await bot.send_message(ADMIN_ID, f"Пользователь - {id} успешно заблокирован. Поздравляю бля!")
+    
+    await bot.answer_callback_query(callback_query.id)
+####
+
 
 
 
@@ -1503,8 +1631,8 @@ async def gemini(message: types.Message):
     */clear_table_dialog
 
 <b>BACKUP & RESTORE:</b>  
-    */get_backup
-    */upload_and_restore_db
+    /backup
+    /restore_db
 
 <b>STATISTICS:</b>
     */get_month_pay_stat
@@ -1888,7 +2016,97 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
         await state.set_state(Form_change_method.start)
         await select_metod_pay(message, state)
 
+
+
+# ADMIN: Backup:
+@dp.message(Command('backup'))
+async def backup(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    confirm = await backup_db() # Create Backup DB
+
+    if confirm:
+        await message.reply("The backup copy of the database was created successfully and is presented below. The 3 latest versions are saved in the working folder, the rest are deleted.", parse_mode="HTML")
+    else:
+        await message.reply("Error: Database backup error.", parse_mode="HTML")
+
+    await asyncio.sleep(0.5)
+    data_folder = Path(BACKUP_PATH)
+    files = [entry for entry in data_folder.iterdir() if entry.is_file()] # Получаем список всех файлов в директории
+    sorted_files = sorted(files, key=lambda x: x.stat().st_mtime, reverse=True) # Сортируем список файлов по дате изменения (от новых к старым)
+    for file_to_delete in sorted_files[3:]: # Оставляем последние 3 файла, удаляем остальные
+        os.remove(file_to_delete)
+    logging.info("Remove all file DB, saved 3 latest files.")
+    last_downloaded_file = sorted_files[0] if sorted_files else None   # Последний скачанный файл будет первым в отсортированном списке (новейшим) (адрес)
+    logging.info("Download last DB file.")
+
+    await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(last_downloaded_file))
+
+
+#
+# Admin Restore DB
+#
+# Нажимаю кнопку восстановления, прикрепляю свой файл db бинарный в .sql, он загружается в папку download_db.
+# Далее скрипт останавливает все запросы и очищает память. Очищается полностью и даже разметка работающей базы 
+# и полностью переписывается с закаченного файла. Он не удаляется из папки, не думаю что их будет много...
+#
+ 
+ # ADMIN: Restore DB:
+class Restor_db(StatesGroup):
+    load_db = State()
+    #restor_db = State()
+
+#Push button - restore
+@dp.message(Command('restore_db'))
+async def restore_db_admin(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+    
+    await bot.send_message(message.chat.id, "Attach and send the necessary copy of the database for recovery.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
+    await state.set_state(Restor_db.load_db)
+
+# Next step - download db and restore
+@dp.message(Restor_db.load_db)
+async def load_a_base(message: Message, state: FSMContext):
+
+    if not isinstance(message.document, types.Document):
+        await message.answer("The file you submitted is not a database. Try again.")
+        return
+
+    file_extension = message.document.file_name.split('.')[-1]
+    allowed_extensions = ['sql']
+
+    if file_extension not in allowed_extensions:
+        await message.answer("The file you submitted is not sql . Try again.")
+        return    
+
+    # Name file
+    formtime = random_name_2X()
+    file_path = f"{BACKUP_PATH}Uploaded-db-{formtime}.sql"
+    await bot.download(message.document, file_path)
+    await bot.session.close()
+    await dp.storage.close()
+
+    # Restore DB:
+    confirm = await restore_db(file_path)
+
+    if confirm:
+        await message.answer("The database recovery was successful.")
+    else:
+        await message.answer("When restoring the database, something went wrong.")
+
+    await state.clear()
+
+
 ####
+
 
 
 
