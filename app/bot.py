@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS
 
 
 import logging
@@ -43,8 +43,8 @@ from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
-from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments, read_one_methods_pay
+from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os, unformat_date
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments, read_one_methods_pay, read_discussion, add_discussion, clear_discussion_by_id
 from texts import start_ru, start_en, prices_en, prices_ru
 from backupdb import backup_db
 from restore_db import restore_db
@@ -159,7 +159,7 @@ async def command_start_handler(message: Message, state: FSMContext):
 
     # MENU
     bot_commands = [
-        BotCommand(command="/reset", description="RESET"),
+        BotCommand(command="/reset", description="CLEAR MEMORY"), # clear memory
         BotCommand(command="/menu", description="MENU"),
         BotCommand(command="/prices", description="PRICES"),
         BotCommand(command="/help", description="HELP"),
@@ -191,12 +191,23 @@ async def command_start_handler(message: Message, state: FSMContext):
 
 #### WORK MENU ####
 
-# RESET
+# RESET clear memory
 @dp.message(Command('reset'))
 async def start(message: types.Message):
+    id = user_id(message)
+    data = await read_user(id)
+    language = data.get("language")
 
-    await message.reply(f"I reset the history. You're clean)", parse_mode="Markdown")
-    #await bot.answer_callback_query(callback_query.id)
+    confirm = await clear_discussion_by_id(id)
+
+    if not confirm:
+        print("Error: The dialog history has not been cleared.")
+
+    if language == "ru":
+        await message.answer("История диалога очищена.", parse_mode="HTML")
+    else:
+        await message.answer("The dialog history has been cleared.", parse_mode="HTML")
+
 
 
 
@@ -2117,8 +2128,8 @@ async def load_a_base(message: Message, state: FSMContext):
 
 
 
-
-
+# # Конвертируй текст в HTML
+# answer = markdown2.markdown("Ваш текст с *форматированием*")
 
 
 
@@ -2128,10 +2139,12 @@ async def load_a_base(message: Message, state: FSMContext):
 # Attempts to give a response to the user:
 async def try_answer_bot(message, answer, data):
     await typing(message)
+    id = user_id(message)
     language = data.get("language")
 
+    # TRY TRANSFER ANSWER TO TELERAM:
     try:
-        await message.reply(answer, parse_mode="MarkdownV2")
+        await message.reply(answer, parse_mode="markdown")
     except:
         try:
             await message.reply(answer, parse_mode="HTML")
@@ -2139,41 +2152,86 @@ async def try_answer_bot(message, answer, data):
             escape_text = escape_special_chars(answer)
             await message.reply(escape_text)
 
-    if data.get("voice_answer") is False:
-        return
-    
-    if len(answer) >= 4096:
-        if language == "ru":
-            await message.reply(f"Для перевода текста в аудио, должно быть меньше 4096 символов.", parse_mode="Markdown")
-        elif language == "en" or language is None:
-            await message.reply(f"To translate text into audio, it must be less than 4096 characters.", parse_mode="Markdown")
-        return
-    
-    # Convert Text to Audio:
-    data["user_content"] = answer
-    voice_answer_file_path = await get_voice_openai(data)
 
-    # Get tokens to Text input:
-    token_in_text = tiktroken(answer)
+    # VOICE ANSWER: 
+    if data.get("voice_answer") and len(answer) < 4096:
 
-    data["used_tokens"] = None
-    data["used_tokens"] = token_in_text
-    data["min"] = None
-    
-    # Calculation:
-    confirm = await calculation(data, "text_to_voice")
+        # Convert Text to Audio:
+        data["user_content"] = answer
+        voice_answer_file_path = await get_voice_openai(data)
+
+        # Get tokens to Text input:
+        token_in_text = tiktroken(answer)
+
+        data["used_tokens"] = None
+        data["used_tokens"] = token_in_text
+        data["min"] = None
+        
+        # Calculation voice:
+        confirm = await calculation(data, "text_to_voice")
+        if not confirm:
+            print("Error: calculation.")
+
+        # Save file answer:
+        if os.path.exists(voice_answer_file_path) and os.path.getsize(voice_answer_file_path) > 0:
+            await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(voice_answer_file_path))
+        else:
+            print(f"The file is empty or missing - {voice_answer_file_path}")
+            logging.error(f"The file is empty or missing - {voice_answer_file_path}")
+
+        if DEL_AUDIO == True:
+            await remove_file_os(voice_answer_file_path)
+
+
+    # HISTORY:
+
+    # Сheck button dialog user:
+    dialog = data.get("dialog")
+    if not dialog:
+        data = {}
+        return
+
+    # confirm = await save_history_to_db() !!!!
+
+
+    # Summirization answer:
+    dialog_sum = data.get("dialog_sum")
+    if dialog_sum and len(answer) > MAX_SIMBOLS:
+        print("dialog_sum:", dialog_sum)
+
+        zip_data = {
+            "user_content": answer,
+            "system_content": "Сократи текст, сохранив смысл.",
+            "file_path": None,
+            "name_file": None,
+            "assist_content": None,
+            "model_language": "gemini-1.5-flash-latest"
+        }
+
+        zip_answer = await mod_gemini_chat(zip_data)
+        if zip_answer:
+            answer = zip_answer.get("response")
+
+        #print("zip_answer: ", zip_answer)
+
+
+
+
+
+    # Save history:
+    user_content = data.get("user_content")
+    update_history = {
+        "user_id": id,
+        "date": await day_utcnow(),
+        "user_say": user_content,
+        "assist_say": answer,
+    }
+    confirm = await add_discussion(update_history)
+
     if not confirm:
-        print("Error: calculation.")
+        print("Error save history.")
+        logging.error("Error save history.")
 
-    # Save file answer:
-    if os.path.exists(voice_answer_file_path) and os.path.getsize(voice_answer_file_path) > 0:
-        await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(voice_answer_file_path))
-    else:
-        print(f"The file is empty or missing - {voice_answer_file_path}")
-        logging.error(f"The file is empty or missing - {voice_answer_file_path}")
-
-    if DEL_AUDIO == True:
-        await remove_file_os(voice_answer_file_path)
 
     data = {}
     return
@@ -2183,12 +2241,33 @@ async def try_answer_bot(message, answer, data):
 async def mod_tex(data, message):
 
     await typing(message)
-
     id = user_id(message)
-    user_content = data.get("user_content")
-    system_content = data.get("system_content")
-    logging.info(f"User {id}: {user_content} : {system_content}.")
+    history, assist_content = None, None
 
+    # Building a story:
+    dialog = data.get("dialog")
+    if dialog:
+        history = await read_discussion(id)
+
+    if history:
+        assist_content = []
+        history.reverse()
+        for chunk in history:
+            # time_chunk = chunk.get("date")
+            # date_time = await unformat_date(time_chunk)
+            # dates = f"{date_time.get('day')} {date_time.get('time')}: "
+            assist_content.append({"user": chunk.get("user_say")}) # dates + 
+            assist_content.append({"assistant": chunk.get("assist_say")})
+
+    elif not history:
+        print("Info: History is empty.")
+
+    # Add to Data - assist_content:
+    if assist_content:
+        data["assist_content"] = assist_content
+
+
+    # Select AI:
     if data.get("ai") == "gemini":
         answer = await mod_gemini_chat(data)
     elif data.get("ai") == "openai":
@@ -2196,7 +2275,12 @@ async def mod_tex(data, message):
 
     if not answer:
         return
-    
+
+    try: 
+        answer.get("response")
+    except:
+        answer = {'response': answer, "used_tokens": NULL_TOKEN}
+
     text = answer.get("response")
     used_tokens = answer.get("used_tokens")
     data["used_tokens"] = None

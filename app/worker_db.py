@@ -1,4 +1,5 @@
 from get_keys import USER_DB, PASSWORD_DB
+from config import HISTORY_LINE_LIMIT
 import asyncpg
 import asyncio
 
@@ -357,8 +358,8 @@ async def read_discussion(user_id):
     try:
         connection = await get_connection()
         result = await connection.fetch(
-            '''
-                SELECT * FROM discussion WHERE user_id = $1 ORDER BY id DESC LIMIT 10;
+            f'''
+                SELECT * FROM discussion WHERE user_id = $1 ORDER BY id DESC LIMIT {HISTORY_LINE_LIMIT};
             ''',
             user_id,
         )
@@ -373,6 +374,8 @@ async def read_discussion(user_id):
     
     except Exception as e:
         print(f"Error read_discussion: {e}")
+        return False
+
     finally:
         if connection is not None:
             await connection.close()
@@ -381,6 +384,29 @@ async def read_discussion(user_id):
 # data_user = asyncio.run(read_discussion(485435943))
 # for one in data_user:
 #     print(one.get("user_question"), one.get("assistant_response"), one.get("summarization"))
+
+
+# Clear discussion by id:
+async def clear_discussion_by_id(user_id):
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            DELETE FROM discussion WHERE user_id = $1;
+            ''', 
+            (user_id)
+        )
+        return True
+    
+    except Exception as e:
+        print(f"Error clear_discussion by id {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
+
 
 
 # Clear discussion:

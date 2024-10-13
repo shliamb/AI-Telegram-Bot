@@ -10,8 +10,10 @@ MIN_PAY = 1 # $ Minimum pay
 RUBTOUSD = 100 # The internal exchange rate
 GIFT = 0.1 # $ The amount on the account at the beginning
 VOICE_THE_ANSWER = True # False or True
+HISTORY_LINE_LIMIT = 50 # The number of rows in the history table that will be used
+MAX_SIMBOLS = 500 # Maximum number of characters of text to compress  
 DIALOG = True # History dialog
-DIALOG_SUM = True # AI compress history dialog
+DIALOG_SUM = False # AI compress history dialog
 LANGUAGE = "en"
 NOTIFICATIONS = True
 DIALOG_SUM = False
@@ -90,6 +92,8 @@ PRICE = {
     'gpt-4o-mini': 1.5, # no vision
     'gpt-4o-mini-2024-07-18': 1.5, # no vision
     'gpt-4-turbo-2024-04-09': 80,
+
+    'babbage-002': 0.8, # For summarizing texts, the clean price is 0.8 ???
 
     # Images to one img:
     'dall-e-3-1024': 0.08,
