@@ -1,9 +1,4 @@
 /venv
 .env
-/log
 /app/__pycache__/
 /app/test.py
-/downloads/
-/audio/
-/voice/
-/mp3/

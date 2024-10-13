@@ -2142,15 +2142,22 @@ async def try_answer_bot(message, answer, data):
     id = user_id(message)
     language = data.get("language")
 
-    # TRY TRANSFER ANSWER TO TELERAM:
-    try:
-        await message.reply(answer, parse_mode="markdown")
-    except:
+
+
+    # Разбиваем текст на части
+    text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
+
+    # Отправляем сообщения по частям
+    for part in text_parts:
+        # TRY TRANSFER ANSWER TO TELERAM:
         try:
-            await message.reply(answer, parse_mode="HTML")
+            await message.reply(part, parse_mode="markdown")
         except:
-            escape_text = escape_special_chars(answer)
-            await message.reply(escape_text)
+            try:
+                await message.reply(part, parse_mode="HTML")
+            except:
+                escape_text = escape_special_chars(part)
+                await message.reply(escape_text)
 
 
     # VOICE ANSWER: 
