@@ -11,3 +11,5 @@ USER_DB = os.environ.get('user_db')
 PASSWORD_DB = os.environ.get('password_db')
 ADMIN_ID = int(os.environ.get('admin_id'))
 DB_NAME = os.environ.get('db_name')
+
+TELEGRAM_BOT_TOKEN_OLD = os.environ.get('telegram_bot_token_old')

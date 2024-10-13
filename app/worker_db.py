@@ -8,7 +8,7 @@ import asyncio
 # Asinc onnection to DB:
 async def get_connection():
     connection = await asyncpg.connect(
-        host="localhost",
+        host="app_postgres", # app_postgres  localhost  имя контейнера
         database="my_database",
         user=USER_DB,
         password=PASSWORD_DB

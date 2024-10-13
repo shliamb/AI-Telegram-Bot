@@ -8,12 +8,12 @@ import logging
 
 
 async def restore_db(file_path):
-                                                            # localhost  postgres
-    terminate_command = f'PGPASSWORD={PASSWORD_DB} psql -h localhost -p 5432 -U {USER_DB} -d {DB_NAME} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname=\'{DB_NAME}\';"'
+                                                            # localhost  app_postgres
+    terminate_command = f'PGPASSWORD={PASSWORD_DB} psql -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname=\'{DB_NAME}\';"'
 
-    clear_command = f'PGPASSWORD={PASSWORD_DB} psql -h localhost -p 5432 -U {USER_DB} -d {DB_NAME} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
+    clear_command = f'PGPASSWORD={PASSWORD_DB} psql -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
 
-    pg_restore_command = f'PGPASSWORD={PASSWORD_DB} pg_restore -h localhost -p 5432 -U {USER_DB} -d {DB_NAME} {file_path}'
+    pg_restore_command = f'PGPASSWORD={PASSWORD_DB} pg_restore -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} {file_path}'
     
     try:
         subprocess.run(terminate_command, shell=True) # Формирование команды для завершения активных сеансов
