@@ -18,9 +18,9 @@ async def mod_gemini_chat(data):
     assist_content = data.get("assist_content")
 
     #############
-    if assist_content:
-        for n in assist_content:
-            print(n)
+    # if assist_content:
+    #     for n in assist_content:
+    #         print(n)
 
     # URL:
     url = f"{URL}/api/gemini/"

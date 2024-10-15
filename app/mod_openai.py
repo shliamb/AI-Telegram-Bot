@@ -23,9 +23,9 @@ async def mod_openai_chat(data):
     headers = {KEY_API_AI : VALUE_KEY_API_AI}
 
     ########################
-    if assist_content:
-        for n in assist_content:
-            print(n)
+    # if assist_content:
+    #     for n in assist_content:
+    #         print(n)
 
 
     async with aiohttp.ClientSession() as session:
