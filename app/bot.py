@@ -161,6 +161,7 @@ async def command_start_handler(message: Message, state: FSMContext):
     bot_commands = [
         BotCommand(command="/reset", description="CLEAR MEMORY"), # clear memory
         BotCommand(command="/menu", description="MENU"),
+        #BotCommand(command="/gen_draw", description="GEN DRAW"),
         BotCommand(command="/prices", description="PRICES"),
         BotCommand(command="/help", description="HELP"),
     ]
@@ -2123,13 +2124,6 @@ async def load_a_base(message: Message, state: FSMContext):
 
 
 
-
-
-
-
-
-# # Конвертируй текст в HTML
-# answer = markdown2.markdown("Ваш текст с *форматированием*")
 
 
 

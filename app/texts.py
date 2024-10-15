@@ -61,6 +61,8 @@ prices_ru = '''
 Транскрипция из аудио в текст мин. в USD:
     'whisper-1': 0.012,
 
+/add_money — пополнить баланс
+
 '''
 
 
@@ -99,5 +101,7 @@ Voice generation of 1M characters in $:
 
 Transcription from audio to text min. in $:
     'whisper-1': 0.012,
+
+/add_money — replenish    
 
 '''

@@ -64,7 +64,7 @@ DEL_VOICE = True
 #
 # Place of use pay method:
 USE_SBP_TRANSFER = False
-USE_MASTERCARD = False
+USE_MASTERCARD = True
 USE_VISA = False
 USE_MIRCARD = True
 USE_CRIPTO = False
