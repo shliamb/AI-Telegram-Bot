@@ -4,11 +4,11 @@ from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEF
 
 import logging
 # in terminal:
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
 # in file:
-# logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
-# logging.basicConfig(level=logging.INFO, filename='./log/bot.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
+logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
+logging.basicConfig(level=logging.INFO, filename='./log/bot.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
 import re
 # import random
 import os
@@ -2136,7 +2136,7 @@ async def try_answer_bot(message, answer, data):
     id = user_id(message)
     language = data.get("language")
 
-
+    logging.info(f"User: {id}, say: {data.get("user_content")}")
 
     # Разбиваем текст на части
     text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
