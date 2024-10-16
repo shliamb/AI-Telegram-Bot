@@ -1635,10 +1635,10 @@ async def gemini(message: types.Message):
     /get_info_a_payments
 
 <b>LOGS:</b>
-    */get_logs
+    /get_logs
 
 <b>CLEAR:</b>
-    */clear_logs
+    /clear_logs
     */clear_table_statistic
     */clear_table_dialog
 
@@ -1697,6 +1697,54 @@ async def get_info_by_users(message: types.Message):
 
 
 
+
+# ADMIN: Get Info a Payments:
+@dp.message(Command('get_logs'))
+async def get_logs_bot(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    if os.path.exists("./log/bot.log") and os.path.getsize("./log/bot.log") > 0:
+        await bot.send_document(message.chat.id, document=types.input_file.FSInputFile("./log/bot.log"))
+    else:
+        await bot.send_message(message.chat.id, "The bot.log file is empty or missing.")
+
+    # if os.path.exists("./log/api.log") and os.path.getsize("./log/api.log") > 0:
+    #     await bot.send_document(message.chat.id, document=types.input_file.FSInputFile("./log/api.log"))
+    # else:
+    #     await bot.send_message(message.chat.id, "The api.log file is empty or missing.")
+
+
+
+# Admin clear logs /clearlog
+@dp.message(Command("clear_logs"))
+async def admin_clear_logs(message: types.Message):
+
+    if os.path.exists("./log/bot.log") and os.path.getsize("./log/bot.log") > 0:
+
+        with open("./log/bot.log", 'w'):
+            pass
+        await bot.send_message(message.chat.id, "The bot.log file has been cleared successfully.")
+    else:
+        await bot.send_message(message.chat.id, "The bot.log file is empty or missing.")
+
+    # if os.path.exists("./log/api.log") and os.path.getsize("./log/api.log") > 0:
+
+    #     with open("./log/api.log", 'w'):
+    #         pass
+    #     await bot.send_message(message.chat.id, "The api.log file has been cleared successfully.")
+    # else:
+    #     await bot.send_message(message.chat.id, "The api.log file is empty or missing.")
+
+
+
+
+
+
+
 # ADMIN: Get Info a Payments:
 @dp.message(Command('get_info_a_payments'))
 async def get_info_a_payments_users(message: types.Message):
@@ -1733,11 +1781,6 @@ async def get_info_a_payments_users(message: types.Message):
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
         print(f"Error sending documentb User stat")
-
-
-
-
-
 
 
 
@@ -2136,7 +2179,8 @@ async def try_answer_bot(message, answer, data):
     id = user_id(message)
     language = data.get("language")
 
-    logging.info(f"User: {id}, say: {data.get("user_content")}")
+    text = data.get("user_content")
+    logging.info(f"User: {id}, Say: {text}")
 
     # Разбиваем текст на части
     text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
