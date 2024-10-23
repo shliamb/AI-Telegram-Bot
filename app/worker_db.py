@@ -20,11 +20,11 @@ async def get_connection():
 
 
 #### USERS TABLE: ####
-#######################
+######################
 
 # Add user:
 async def add_user(user_data):
-    keys_list, values_list, num_list, i, connection = [], [], [], 1, None
+    keys_list, values_list, num_list, i, connection = [], [], [], 1, None 
 
     user_id = user_data.get("user_id")
 
