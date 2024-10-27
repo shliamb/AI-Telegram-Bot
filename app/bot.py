@@ -194,7 +194,7 @@ async def command_start_handler(message: Message, state: FSMContext):
 
 # RESET clear memory
 @dp.message(Command('reset'))
-async def start(message: types.Message):
+async def reset_history(message: types.Message):
     id = user_id(message)
     data = await read_user(id)
     language = data.get("language")
@@ -360,9 +360,10 @@ async def main_menu(message: types.Message):
    
 
 <b>😋 Новые возможности:</b>
-   - можно передать изображение и обсудить его с ИИ,
+   - можно передать изображение как фото или как документ и обсудить его с ИИ,
    - можно передать голосовое сообщение, ИИ ответит,
-   - можно попросить нарисовать, ИИ нарисует.
+   - в меню есть кнопка нарисовать,
+   - напишите 'забудь' - история очистится.
 
     '''
 
@@ -477,9 +478,10 @@ async def main_menu(message: types.Message):
 
 
 <b>😋 New features:</b>
-   - you can transfer the image and discuss it with the AI,
+   - you can transfer the image as a photo or as a document and discuss it with the AI,
    - You can send a voice message And it will respond,
-   - You can ask him to draw, And he will draw.
+   - there is a draw button in the menu,
+   - write 'forget it' - the story will be cleared.
 
     '''
 
@@ -1630,7 +1632,7 @@ async def gemini(message: types.Message):
     admin = f'''
 <b>ADMIN PANEL:</b>
 
-<b>INFO: (11)</b>
+<b>INFO:</b>
     /get_info_by_users
     /get_info_a_payments
 
@@ -2240,7 +2242,8 @@ async def try_answer_bot(message, answer, data):
     # Summirization answer:
     dialog_sum = data.get("dialog_sum")
     if dialog_sum and len(answer) > MAX_SIMBOLS:
-        #print("dialog_sum:", dialog_sum)
+        # #print("dialog_sum:", dialog_sum)
+
 
         zip_data = {
             "user_id": id,
@@ -2617,147 +2620,59 @@ async def mod_voice_to_text(data, message):
 class Form_draw(StatesGroup):
     draw = State()
 
-#     wt_draw = State()
-
-
-# @dp.message(Command('gen_draw'))
-# async def call_gen_draw(message: types.Message):
-#     id = user_id(message)
-#     # language = data.get("language")
-
-
-
-#     await bot.send_message(message.chat.id, "Опишите изображение которое вы бы хотели сгенерировать:", parse_mode="Markdown")
-
-
-
-# @dp.message(Form_draw.wt_draw, F.content_type.in_({'text'})) 
-# async def wt_draw_now(message: types.Message, state: FSMContext):
-
-#     await state.update_data(all_data=data, message=message)
-#     language = data.get("language")
-
-#     if language == "ru":
-#         text_yes = "🖼 Да"
-#         text_no = "❌ Нет"
-#     elif language == "en" or language is None:
-#         text_yes = "🖼 Yes"
-#         text_no = "❌ No"
-
-#     keyboard = InlineKeyboardMarkup(
-#         inline_keyboard=[
-#             [InlineKeyboardButton(text=text_yes, callback_data="draw")],
-#             [InlineKeyboardButton(text=text_no, callback_data="not_draw")],
-#         ]
-#     )
-
-#     if language == "ru":
-#         await bot.send_message(message.chat.id, "Сгенерировать изображение?", parse_mode="Markdown", reply_markup=keyboard) 
-#     elif language == "en" or language is None:
-#         await bot.send_message(message.chat.id, "Generate an image?", parse_mode="Markdown", reply_markup=keyboard)
-
-#     await state.set_state(Form_draw.draw)
-
-
-@dp.message(Command('gen_draw'))
-async def call_gen_draw(message: types.Message, state: FSMContext):
-    # id = user_id(message)
-    # # language = data.get("language")
-
-    # callback_query = types.CallbackQuery(id=id, data="draw")  # Имитация колбек-кнопки
-    # await process_callback_draw(callback_query, state)
-
-    user_id_str = str(user_id(message))  # Конвертируйте в строку
-    callback_data = {'id': user_id_str, 'data': 'draw'}
-    
-    # Создаем объект CallbackQuery
-    callback_query = types.CallbackQuery(id=user_id_str, data=callback_data, message=message)
-
-    # Передаем его в функцию обработки
-    await process_callback_draw(callback_query, state)
-
-
 
 # Confirmations to draw:
-@dp.callback_query(Form_draw.draw, lambda c: c.data in ["draw", "not_draw"])
-async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMContext):
-
-    chat_id = callback_query.message.chat.id
-    await bot.send_chat_action(chat_id, action='typing')
+@dp.message(Form_draw.draw)
+async def process_draw(message: types.Message, state: FSMContext):
 
     data_state = await state.get_data()
-    message = data_state.get("message")
     all_data = data_state.get("all_data")
+    all_data["user_content"] = message.text
     language = all_data.get("language")
-
-    if callback_query.data == 'draw':
-
-        # Deleted keyboard and message:
-        await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)     # await bot.edit_message_reply_markup(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id, reply_markup=None)
-
-
-        if language == "ru":
-            await bot.send_message(callback_query.from_user.id, "Изображение уже генерируется, ожидайте.")
-        elif language == "en" or language is None:
-            await bot.send_message(callback_query.from_user.id, "The image is already being generated, expect it.")
-
-        # Generation image:
-        if all_data.get("ai_draw") == "openai":
-            answer = await mod_openai_dall_e(all_data)
-        # elif all_data.get("ai_draw") == "gemini":
-        #     answer = await mod_openai_dall_e(all_data) # Sorry)))
-
-        if not answer:
-            print("Error: Generation image.")
-            return
-
-        # get model dall-e
-        peps_model = set_model_dalle(all_data)
-
-        # Statistic:
-        all_data["file_path"] = None
-        all_data["name_file"] = None
-        all_data["used_tokens"] = None
-        all_data["min"] = None
-        all_data["model_draw"] = peps_model
-
-        confirm = await calculation(all_data, "gen_img")
-
-        if not confirm:
-            print("Error: calculation tokens draw.")
-            return
-
-        # Response to the user:
-        await bot.send_message(callback_query.from_user.id, answer.get("response"))
-
-
-    elif callback_query.data == 'not_draw':
-
-        # Deleted keyboard and message:
-        await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)     # await bot.edit_message_reply_markup(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id, reply_markup=None)
-
-
-        if language == "ru":
-            sent_message = await bot.send_message(callback_query.from_user.id, "Ответ уже генерируется, ожидайте.")
-        elif language == "en" or language is None:
-            sent_message = await bot.send_message(callback_query.from_user.id, "The response is already being generated, expect.")
-
-        answer = await mod_tex(all_data, message)
-
-        if not answer:
-            return
-        
-        # Response to the user:
-        await try_answer_bot(message, answer, all_data)
-
-        await bot.delete_message(chat_id=callback_query.from_user.id, message_id=sent_message.message_id) # Должен удалять сообщение выше, но чет не пашет
     
-    # elif callback_query.data == 'gen_draw':
-    #     print("draw")
 
+    if message.text.lower() == "no" or message.text.lower() == "нет":
+        if language == "ru":
+            await bot.send_message(message.chat.id, "❌ Генерация изображения отменена. ", parse_mode="Markdown") 
+        elif language == "en" or language is None:
+            await bot.send_message(message.chat.id, "❌ Image generation has been canceled. ", parse_mode="Markdown")
+        return await state.clear()
 
+    if language == "ru":
+        await bot.send_message(message.chat.id, "Изображение уже генерируется, ожидайте.", parse_mode="Markdown") 
+    elif language == "en" or language is None:
+        await bot.send_message(message.chat.id, "The image is already being generated, expect it.", parse_mode="Markdown")
 
-    await bot.answer_callback_query(callback_query.id)
+    # Generation image:
+    if all_data.get("ai_draw") == "openai":
+        answer = await mod_openai_dall_e(all_data)
+    # elif all_data.get("ai_draw") == "gemini":
+    #     answer = await mod_openai_dall_e(all_data) # Sorry)))
+
+    if not answer:
+        print("Error: Generation image.")
+        return
+
+    print(answer)
+    # Response to the user:
+    await bot.send_message(message.chat.id, answer.get("response"))
+
+    # get model dall-e
+    peps_model = set_model_dalle(all_data)
+
+    # Statistic:
+    all_data["file_path"] = None
+    all_data["name_file"] = None
+    all_data["used_tokens"] = None
+    all_data["min"] = None
+    all_data["model_draw"] = peps_model
+
+    confirm = await calculation(all_data, "gen_img")
+
+    if not confirm:
+        print("Error: calculation tokens draw.")
+        return
+
     await state.clear()
 
 
@@ -2765,30 +2680,16 @@ async def process_callback_draw(callback_query: types.CallbackQuery, state: FSMC
 
 
 
-# Drawing Dall-e 3:
+# Drawing:
 async def mod_gen_img(data, message, state: FSMContext):
 
     await state.update_data(all_data=data, message=message)
     language = data.get("language")
 
     if language == "ru":
-        text_yes = "🖼 Да"
-        text_no = "❌ Нет"
+        await bot.send_message(message.chat.id, "🖼 Опишите желаемое изображение или 'Нет' для отмены: ", parse_mode="Markdown") 
     elif language == "en" or language is None:
-        text_yes = "🖼 Yes"
-        text_no = "❌ No"
-
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text=text_yes, callback_data="draw")],
-            [InlineKeyboardButton(text=text_no, callback_data="not_draw")],
-        ]
-    )
-
-    if language == "ru":
-        await bot.send_message(message.chat.id, "Сгенерировать изображение?", parse_mode="Markdown", reply_markup=keyboard) 
-    elif language == "en" or language is None:
-        await bot.send_message(message.chat.id, "Generate an image?", parse_mode="Markdown", reply_markup=keyboard)
+        await bot.send_message(message.chat.id, "🖼 Describe the desired image or 'No' to cancel: ", parse_mode="Markdown")
 
     await state.set_state(Form_draw.draw)
 
@@ -2800,16 +2701,11 @@ async def mod_gen_img(data, message, state: FSMContext):
 async def check_request_drawing(question):
     typecontent = None
 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    draw_words = {  # добавить еще на каждое слово его слово-формы.. так лень, капец.. позже..)
-        "draw", "sketch", "illustrate", "depict", "paint", "render", "нарисуй", "нарисуйте", "нарисовал", "нарисовала", "нарисовало", "нарисовать",  \
-        "рисунок", "изобрази", "схема", "нарисовали", "рисуешь", "иллюстрация", "набросок", "макет", "дизайн", "чертеж", "сгенерируй рисунок", "generate a drawing", \
-        "сгенерируй изображение", "generate an image", "сгенерируй фотографию", "generate a photo", "сгенерируй картинку", "generate a picture"
-    }
+    draw_words = {"/gen_draw"}
     question_words = set(question.lower().split())
     if draw_words & question_words:
         typecontent = "draw"
-    
+
     return typecontent
 
 
@@ -2952,10 +2848,19 @@ async def second_function(message: types.Message, state: FSMContext):
             await message.reply(f"Fortunately, you're blocked...", parse_mode="Markdown")
         return
 
-    # Checking the text for a drawing request:
+    # Checking the text for a DRAWING request:
     if typecontent == "text":
         drawing_request = await check_request_drawing(question)
         typecontent = drawing_request or typecontent
+
+    # Checking the text for a CLEAR HISTORY:
+    if typecontent == "text":
+        draw_words = {"забудь", "forget"}
+        question_words = set(question.lower().split())
+        if draw_words & question_words:
+            print("Yes")
+            await reset_history(message)
+            return
 
     # Data collection to API:
     data = {

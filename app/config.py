@@ -3,14 +3,14 @@
 #### BASIC CONFIG ####
 
 # System:
-NAME_BOT = "AI bot"
+NAME_BOT = "Multimodal AI bot"
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
 RUBTOUSD = 100 # The internal exchange rate
 GIFT = 0.1 # $ The amount on the account at the beginning
 VOICE_THE_ANSWER = True # False or True
-HISTORY_LINE_LIMIT = 50 # The number of rows in the history table that will be used
+HISTORY_LINE_LIMIT = 30 # The number of rows in the history table that will be used
 MAX_SIMBOLS = 500 # Maximum number of characters of text to compress  
 DIALOG = True # History dialog
 DIALOG_SUM = False # AI compress history dialog
