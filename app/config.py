@@ -8,6 +8,7 @@ URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
 RUBTOUSD = 100 # The internal exchange rate
+LIMIT_STAT = 500 # CSV file last 500
 GIFT = 0.1 # $ The amount on the account at the beginning
 VOICE_THE_ANSWER = True # False or True
 HISTORY_LINE_LIMIT = 30 # The number of rows in the history table that will be used

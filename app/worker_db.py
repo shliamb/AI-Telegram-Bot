@@ -1,5 +1,5 @@
 from get_keys import USER_DB, PASSWORD_DB
-from config import HISTORY_LINE_LIMIT
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT
 import asyncpg
 import asyncio
 
@@ -229,8 +229,8 @@ async def read_statistics(user_id):
     try:
         connection = await get_connection()
         result = await connection.fetch(
-            '''
-                SELECT * FROM statistics WHERE user_id = $1 ORDER BY id DESC LIMIT 100;
+            f'''
+                SELECT * FROM statistics WHERE user_id = $1 ORDER BY id DESC LIMIT {LIMIT_STAT};
             ''',
             user_id,
         )
