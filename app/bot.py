@@ -214,7 +214,7 @@ async def reset_history(message: types.Message):
 
 # MENU
 @dp.message(Command('menu'))
-async def main_menu(message: types.Message):
+async def main_menu(message: types.Message, submenu="main"):
 
     id = user_id(message)
     logging.info(f"Push menu -  {id}.")
@@ -247,77 +247,69 @@ async def main_menu(message: types.Message):
     model_text_to_voice = data["model_text_to_voice"] if data.get("model_text_to_voice") is not None else AI_DEFAULT_MODEL_TEXT_TO_VOICE
     voice = data["voice"] if data.get("voice") is not None else VOICE
     voice_speed = data["voice_speed"] if data.get("voice_speed") is not None else VOICE_SPEED
-    money = data.get("money")
+    money = round(data.get("money"), 4)
     system_content = True if data.get("system_content") is not None else False
     system_content = bool_to_str(system_content, language)
 
 
-    menu_ru = f'''
 
-<b>⚙️ Настройки:</b>
+    img_menu_ru = f'''
+<b>⚙️ НАСТРОЙКИ ГЕН. ИЗО.:</b>
 
-
-<b>ЯЗЫК: {language.upper()}</b>
-    /en — английский
-    /ru — русский
-
-<b>УВЕДОМЛЕНИЯ: {notifications}</b>
-    /notif_on — вкл уведомления
-    /notif_off — выкл уведомления
-
-<b>ИСТОРИЯ ДИАЛОГА: {dialog}</b>
-    /dialog_on — вкл диалог
-    /dialog_off — выкл диалог
-
-<b>СЖАТИЕ ИСТОРИИ: {dialog_sum}</b>
-    /sum_on — вкл сжатие диалога
-    /sum_off — вык сжатие диалога
-
-<b>АУДИО ОТВЕТА: {voice_answer}</b>
-    /audio_on — вкл аудио ответ
-    /audio_off — выкл аудио ответ
-
-    
-<b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
-<b>МОДЕЛЬ: {model_language.upper()}</b>
-
-<b>модели openai:</b>
-    /gpt_4o_mini - 1.5$ 1м ток
-    /gpt_4o - 40$ 1м ток
-    /gpt_4o_2024_05_13 - 40$ 1м ток
-    /gpt_4o_2024_08_06 - 25$ 1м ток
-    /gpt_4_turbo - 80$ 1м ток
-    /chatgpt_4o_latest - 40$ 1м ток
-
-<b>модели google:</b>
-    /gemini_1_5_flash - 1.125$ 1м ток
-    /gemini_1_0_pro - 4$ 1м ток
-    /gemini_1_5_pro - 93.75$ 1м ток
-   
-        
 <b>ГЕНЕРАЦИЯ КАРТИНОК ИИ: {ai_draw.upper()}</b>
-<b>МОДЕЛЬ: {model_draw.upper()}</b>
+<b>МОДЕЛЬ СЕЙЧАС: {model_draw.upper()}</b>
 
-<b>модели openai:</b>
-    /dall_e_3
-    /dall_e_2
+<b>Модели openai:</b>
+    {"/dall_e_2" if model_draw == "dall-e-3" else "/dall_e_3"}
 
-<b>модели midjourney:</b>
-    /midjourney
-
-<b>openai размер изо: {img_size.upper()}</b>
+<b>Размер изо: {img_size.upper()}</b>
     /1792x1024
     /1024x1792
     /1024x1024
 
-<b>openai качество изо: {img_quality.upper()}</b>
+<b>Качество изо: {img_quality.upper()}</b>
     /standard
     /hd
 
-<b>openai стиль изо: {img_style.upper()}</b>
+<b>Стиль изо: {img_style.upper()}</b>
     /vivid
     /natural
 
+    
+/menu - вернуться назад
+    '''
+
+    img_menu_en = f'''
+<b>⚙️ IMAGE GEN. SETTINGS:</b>
+
+<b>IMAGE GENERATION AI: {ai_draw.upper()}</b>
+<b>MODEL NOW: {model_draw.upper()}</b>
+
+<b>Models openai:</b>
+    {"/dall_e_2" if model_draw == "dall-e-3" else "/dall_e_3"}
+
+<b>img size: {img_size.upper()}</b>
+    /1792x1024
+    /1024x1792
+    /1024x1024
+
+<b>img quality: {img_quality.upper()}</b>
+    /standard
+    /hd
+
+<b>img style: {img_style.upper()}</b>
+    /vivid
+    /natural
+
+    
+/menu - Go back
+    '''
+
+
+
+
+    voice_menu_ru = f'''
+<b>⚙️ НАСТРОЙКИ ГОЛОСА:</b>
     
 <b>РАСПОЗ. ГОЛОСА ИИ: {ai_voice_to_text.upper()}</b>
 <b>МОДЕЛЬ: {model_voice_to_text.upper()}</b>
@@ -346,20 +338,97 @@ async def main_menu(message: types.Message):
     /speed_1 - 1.0
     /speed_1_25 - 1.25
 
+
+/menu - вернуться назад
+    '''
+
+    voice_menu_en = f'''
+<b>⚙️ VOICE SETTINGS:</b>
+    
+<b>VOICE RECOGNITION AI: {ai_voice_to_text.upper()}</b>
+<b>MODEL NOW: {model_voice_to_text.upper()}</b>
+
+<b>Models openai: {model_voice_to_text.upper()}</b>
+    /whisper_1
+
         
+<b>VOICE GENERATION AI: {ai_text_to_voice.upper()}</b>
+<b>MODEL NOW: {model_text_to_voice.upper()}:</b>
+
+<b>Model from OpenAI: {model_text_to_voice.upper()}</b>
+    /tts_1
+    /tts_1_hd - hd and more expensive
+
+<b>Voice style: {voice.upper()}</b>
+    /nova - a woman's voice
+    /alloy
+    /echo
+    /fable
+    /onyx
+    /shimmer
+
+<b>The speed of the voice: {voice_speed}</b>
+    /speed_0_75 - 0.75
+    /speed_1 - 1.0
+    /speed_1_25 - 1.25
+
+    
+/menu - Go back
+    '''
+
+
+
+    menu_ru = f'''
+<b>⚙️ НАСТРОЙКИ:</b>
+
+<b>ЯЗЫК: {language.upper()}</b>
+    /en - английский
+
+<b>УВЕДОМЛЕНИЯ: {notifications}</b>
+    {"/notif_off - выкл. уведомления" if notifications == "ВКЛЮЧЕНО" else "/notif_on - вкл. уведомления"}
+
+<b>ИСТОРИЯ ДИАЛОГА: {dialog}</b>
+    {"/dialog_off - выкл. диалог" if dialog == "ВКЛЮЧЕНО" else "/dialog_on - вкл. диалог"}
+
+<b>СЖАТИЕ ИСТОРИИ: {dialog_sum}</b>
+    {"/sum_off - выкл. сжатие диалога" if dialog_sum == "ВКЛЮЧЕНО" else "/sum_on - вкл. сжатие диалога"}
+
+<b>АУДИО ОТВЕТА: {voice_answer}</b>
+    {"/audio_off - выкл. аудио ответ" if voice_answer == "ВКЛЮЧЕНО" else "/audio_on - вкл. аудио ответ"}
+
 <b>ИНСТРУКЦИИ ДЛЯ ИИ: {system_content}</b>
-    /system_content — добавить
+    /system_content - добавить
     /get_sys_content - посмотреть
 
 <b>БАЛАНС СЧЕТА: {money} $</b>
-    /add_money — пополнить
+    /add_money - пополнить
 
-<b>СКАЧАТЬ ОТЧЕТЫ:</b>
-    /get_stat — статистика 
+<b>ФИН. ОТЧЕТЫ:</b>
+    /get_stat - скачать в .CSV 
 
+
+<b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
+<b>МОДЕЛЬ: {model_language.upper()}</b>
+
+<b>Модели openai:</b>
+    /gpt_4o_mini - 1.5$ 1м ток
+    /gpt_4o_2024_08_06 - 25$ 1м ток
+    /gpt_4o_2024_05_13 - 40$ 1м ток
+    /chatgpt_4o_latest - 40$ 1м ток
+    /gpt_4o - 40$ 1м ток
+    /gpt_4_turbo - 80$ 1м ток
+
+<b>Модели google:</b>
+    /gemini_1_5_flash - 1.125$ 1м ток
+    /gemini_1_5_pro - 93.75$ 1м ток
    
 
-<b>😋 Новые возможности:</b>
+<b>ДОПОЛНИТЕЛЬНО:</b>
+    /img_menu - параметры ген. изо.
+    /voice_menu - параметры голоса  
+
+    
+<b>😋 НОВЫЕ ВОЗМОЖНОСТИ:</b>
    - можно передать изображение как фото или как документ и обсудить его с ИИ,
    - можно передать голосовое сообщение, ИИ ответит,
    - в меню есть кнопка нарисовать,
@@ -371,110 +440,52 @@ async def main_menu(message: types.Message):
 
 
     menu_en = f'''
-
 <b>⚙️ Settings:</b>
 
-
 <b>LANGUAGE: {language.upper()}</b>
-    /en — English
-    /ru — Russian
+    /ru - russian
 
 <b>NOTIFICATIONS: {notifications}</b>
-    /notif_on — On notifications
-    /notif_off — Off notifications
+    {"/notif_on - on notifications" if notifications == "OFF" else "/notif_off - off notifications"}
 
 <b>HISTORY OF DIALOGUE: {dialog}</b>
-    /dialog_on — On the dialog
-    /dialog_off — Off the dialog
+    {"/dialog_on - on the dialog" if dialog == "OFF" else "/dialog_off - off the dialog"}
 
 <b>HISTORY COMPRESSION: {dialog_sum}</b>
-    /sum_on — On compression
-    /sum_off — Off compression
+    {"/sum_off - off compression" if dialog_sum == "ON" else "/sum_on - on compression"}
 
 <b>AUDIO RESPONSE: {voice_answer}</b>
-    /audio_on — On audio response
-    /audio_off — Off audio response
+    {"/audio_off - off audio response" if voice_answer == "ON" else "/audio_on - on audio response"}
 
-   
-<b>LANGUAGE AI: {ai.upper()}</b>
-<b>MODEL: {model_language.upper()}</b>
-
-<b>models openai:</b>
-    /gpt_4o_mini - 1.5$ 1m tok
-    /gpt_4o - 40$ 1m tok
-    /gpt_4o_2024_05_13 - 40$ 1m tok
-    /gpt_4o_2024_08_06 - 25$ 1m tok
-    /gpt_4_turbo - 80$ 1m tok
-    /chatgpt_4o_latest - 40$ 1m tok
-
-<b>models google:</b>
-    /gemini_1_5_flash - 1.125$ 1m tok
-    /gemini_1_0_pro - 4$ 1m tok
-    /gemini_1_5_pro - 93.75$ 1m tok
-   
-
-<b>IMAGE GENERATION AI: {ai_draw.upper()}</b>
-<b>MODEL: {model_draw.upper()}</b>
-
-<b>models openai:</b>
-    /dall_e_3
-    /dall_e_2
-
-<b>models midjourney:</b>
-    /midjourney
-
-<b>openai img size: {img_size.upper()}</b>
-    /1792x1024
-    /1024x1792
-    /1024x1024
-
-<b>openai img quality: {img_quality.upper()}</b>
-    /standard
-    /hd
-
-<b>openai img style: {img_style.upper()}</b>
-    /vivid
-    /natural
-
-    
-<b>VOICE RECOGNITION AI: {ai_voice_to_text.upper()}</b>
-<b>MODEL: {model_voice_to_text.upper()}</b>
-
-<b>models openai: {model_voice_to_text.upper()}</b>
-    /whisper_1
-
-      
-<b>VOICE GENERATION AI: {ai_text_to_voice.upper()}</b>
-<b>MODEL: {model_text_to_voice.upper()}</b>
-
-<b>model from OpenAI: {model_text_to_voice.upper()}</b>
-    /tts_1
-    /tts_1_hd 
-
-<b>Voice style: {voice.upper()}</b>
-    /nova - a woman's voice
-    /alloy
-    /echo
-    /fable
-    /onyx
-    /shimmer
-    
-<b>The speed of the voice: {voice_speed}</b>
-    /speed_0_25 - 0.25
-    /speed_1 - 1.0
-    /speed_1_25 - 1.25
-
-    
 <b>SYSTEM CONTENT: {system_content}</b>
-    /system_content — add text
+    /system_content - add text
     /get_sys_content - watch
 
 <b>ACCOUNT BALANS: {money} $</b>
-    /add_money — replenish
+    /add_money - replenish
 
-<b>DOWNLOAD REPORTS:</b>
-    /get_stat — statistics 
+<b>FINANCIAL REPORTS:</b>
+    /get_stat - download in .CSV
 
+<b>LANGUAGE AI: {ai.upper()}</b>
+<b>MODEL: {model_language.upper()}</b>
+
+<b>Models openai:</b>
+    /gpt_4o_mini - 1.5$ 1m tok
+    /gpt_4o_2024_08_06 - 25$ 1m tok
+    /gpt_4o_2024_05_13 - 40$ 1m tok
+    /chatgpt_4o_latest - 40$ 1m tok
+    /gpt_4o - 40$ 1m tok
+    /gpt_4_turbo - 80$ 1m tok
+
+<b>Models google:</b>
+    /gemini_1_5_flash - 1.125$ 1m tok
+    /gemini_1_5_pro - 93.75$ 1m tok
+   
+    
+<b>ADDITIONALLY:</b>
+    /img_menu - image generation parameters
+    /voice_menu - voice parameters 
 
 
 <b>😋 New features:</b>
@@ -485,17 +496,37 @@ async def main_menu(message: types.Message):
 
     '''
 
-    if language == "ru":
+    if language == "ru" and submenu == "main":
         await message.answer(f"{menu_ru}", parse_mode="HTML")
-    elif language == "en":
+    elif language == "en" and submenu == "main":
         await message.answer(f"{menu_en}", parse_mode="HTML")
 
+    if language == "ru" and submenu == "voice_menu":
+        await message.answer(f"{voice_menu_ru}", parse_mode="HTML")
+    elif language == "en" and submenu == "voice_menu":
+        await message.answer(f"{voice_menu_en}", parse_mode="HTML")
+
+    if language == "ru" and submenu == "img_menu":
+        await message.answer(f"{img_menu_ru}", parse_mode="HTML")
+    elif language == "en" and submenu == "img_menu":
+        await message.answer(f"{img_menu_en}", parse_mode="HTML")
 
 
 
 
 
 
+
+
+# SUB MENU IMG:
+@dp.message(Command('img_menu'))
+async def en(message: types.Message):
+    await main_menu(message, "img_menu")
+
+# SUB MENU VOICE:
+@dp.message(Command('voice_menu'))
+async def en(message: types.Message):
+    await main_menu(message, "voice_menu")
 
 # Language:
 @dp.message(Command('en'))
@@ -507,7 +538,7 @@ async def en(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('ru'))
 async def ru(message: types.Message):
@@ -518,7 +549,7 @@ async def ru(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 # Notifications:
 @dp.message(Command('notif_on'))
@@ -530,7 +561,7 @@ async def notif_on(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('notif_off'))
 async def notif_off(message: types.Message):
@@ -541,7 +572,7 @@ async def notif_off(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 # History:
 @dp.message(Command('dialog_on'))
@@ -553,7 +584,7 @@ async def dialog_on(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('dialog_off'))
 async def dialog_off(message: types.Message):
@@ -564,7 +595,7 @@ async def dialog_off(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 
 # History Compression:
@@ -577,7 +608,7 @@ async def sum_on(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('sum_off'))
 async def sum_off(message: types.Message):
@@ -588,7 +619,7 @@ async def sum_off(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 
 # Audio response:
@@ -601,7 +632,7 @@ async def audio_on(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('audio_off'))
 async def audio_off(message: types.Message):
@@ -612,7 +643,7 @@ async def audio_off(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 
 
@@ -627,7 +658,7 @@ async def gpt_4o_mini(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('gpt_4o'))
 async def gpt_4o(message: types.Message):
@@ -639,7 +670,7 @@ async def gpt_4o(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('gpt_4o_2024_05_13'))
 async def gpt_4o_2024_05_13(message: types.Message):
@@ -651,7 +682,7 @@ async def gpt_4o_2024_05_13(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('gpt_4o_2024_08_06'))
 async def gpt_4o_2024_08_06(message: types.Message):
@@ -663,7 +694,7 @@ async def gpt_4o_2024_08_06(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('gpt_4_turbo'))
 async def gpt_4_turbo(message: types.Message):
@@ -675,7 +706,7 @@ async def gpt_4_turbo(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 @dp.message(Command('chatgpt_4o_latest'))
 async def chatgpt_4o_latest(message: types.Message):
@@ -687,7 +718,7 @@ async def chatgpt_4o_latest(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 
 # Google models:
@@ -701,19 +732,19 @@ async def gemini_1_5_flash(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
-@dp.message(Command('gemini_1_0_pro'))
-async def gemini_1_0_pro_latest(message: types.Message):
-    id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "gemini",
-        "model_language": "gemini-1.0-pro-latest",
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message)
+# @dp.message(Command('gemini_1_0_pro'))
+# async def gemini_1_0_pro_latest(message: types.Message):
+#     id = user_id(message)
+#     data = {
+#         "user_id": id,
+#         "ai": "gemini",
+#         "model_language": "gemini-1.0-pro",
+#     }
+#     confirm = await update_user(data)
+#     if confirm:
+#         await main_menu(message, "main")
 
 @dp.message(Command('gemini_1_5_pro'))
 async def gemini_1_5_pro_latest(message: types.Message):
@@ -725,7 +756,7 @@ async def gemini_1_5_pro_latest(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "main")
 
 
 
@@ -740,7 +771,7 @@ async def dall_e_3(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('dall_e_2'))
 async def dall_e_2(message: types.Message):
@@ -753,7 +784,7 @@ async def dall_e_2(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('midjourney'))
 async def midjourney(message: types.Message):
@@ -765,7 +796,7 @@ async def midjourney(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('1792x1024'))
 async def dall_e_3_1792x1024(message: types.Message):
@@ -778,7 +809,7 @@ async def dall_e_3_1792x1024(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('1024x1792'))
 async def dall_e_3_1024x1792(message: types.Message):
@@ -791,7 +822,7 @@ async def dall_e_3_1024x1792(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('1024x1024'))
 async def dall_e_3_1024x1024(message: types.Message):
@@ -804,7 +835,7 @@ async def dall_e_3_1024x1024(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('standard'))
 async def dall_e_3_standard(message: types.Message):
@@ -817,7 +848,7 @@ async def dall_e_3_standard(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('hd'))
 async def dall_e_3_hd(message: types.Message):
@@ -830,7 +861,7 @@ async def dall_e_3_hd(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('vivid'))
 async def dall_e_3_vivid(message: types.Message):
@@ -843,7 +874,7 @@ async def dall_e_3_vivid(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 @dp.message(Command('natural'))
 async def dall_e_3_natural(message: types.Message):
@@ -856,7 +887,7 @@ async def dall_e_3_natural(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "img_menu")
 
 
 # Voice recognition:
@@ -870,7 +901,7 @@ async def whisper_1(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 # Voice generation:
@@ -884,7 +915,7 @@ async def tts_1(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 @dp.message(Command('tts_1_hd'))
 async def tts_1_hd(message: types.Message):
@@ -896,7 +927,7 @@ async def tts_1_hd(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 @dp.message(Command('nova'))
 async def nova(message: types.Message):
@@ -907,7 +938,7 @@ async def nova(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 @dp.message(Command('alloy'))
@@ -919,7 +950,7 @@ async def alloy(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 @dp.message(Command('echo'))
 async def echo(message: types.Message):
@@ -930,7 +961,7 @@ async def echo(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 @dp.message(Command('fable'))
@@ -942,7 +973,7 @@ async def fable(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 @dp.message(Command('onyx'))
@@ -954,7 +985,7 @@ async def onyx(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 @dp.message(Command('shimmer'))
 async def shimmer(message: types.Message):
@@ -965,7 +996,7 @@ async def shimmer(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 @dp.message(Command('speed_0_75'))
@@ -977,7 +1008,7 @@ async def speed_0_75(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 @dp.message(Command('speed_1'))
 async def speed_1(message: types.Message):
@@ -988,7 +1019,7 @@ async def speed_1(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 @dp.message(Command('speed_1_25'))
@@ -1000,7 +1031,7 @@ async def speed_1_25(message: types.Message):
     }
     confirm = await update_user(data)
     if confirm:
-        await main_menu(message)
+        await main_menu(message, "voice_menu")
 
 
 
@@ -2858,7 +2889,6 @@ async def second_function(message: types.Message, state: FSMContext):
         draw_words = {"забудь", "forget"}
         question_words = set(question.lower().split())
         if draw_words & question_words:
-            print("Yes")
             await reset_history(message)
             return
 

@@ -21,8 +21,8 @@ BACKUP_PATH = "./backup_db/"
 
 # Language models:
 AI_DEFAULT = "gemini" # gemini or openai, anthropic in future
-AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest" #  gemini-1.5-flash-latest or gpt-4o-mini-2024-07-18
-AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini-2024-07-18"
+AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest"
+AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini"
 
 # Gen Audio models:
 AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
@@ -114,7 +114,7 @@ PRICE = {
     # Google Gemini to 1M tokens:
     'gemini-1.5-pro-latest': 93.75,
     'gemini-1.5-flash-latest': 1.125,
-    'gemini-1.0-pro-latest': 4,
+    #'gemini-1.0-pro': 4, # Не срабатывает, так как не поддерживает системные инструкции, json режим, выполнение кода, лучше не пользоваться ею
     # 'text-embedding-004': 0, # Free  хз пока что как ее пользовать
     # 'aqa': 0,
     }

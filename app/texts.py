@@ -43,7 +43,6 @@ prices_ru = '''
 Языковая модель от Google 1млн в USD:
     'gemini-1.5-pro-latest': 93.75,
     'gemini-1.5-flash-latest': 1.125,
-    'gemini-1.0-pro-latest': 4,
 
 Генерация изображений за одну в USD:
     'dall-e-3-1024': 0.08,
@@ -84,7 +83,6 @@ OpenAI language model 1 million tokens in $:
 The language model from Google is 1 million in $:
     'gemini-1.5-pro-latest': 93.75,
     'gemini-1.5-flash-latest': 1.125,
-    'gemini-1.0-pro-latest': 4,
 
 Generating images for one in $:
     'dall-e-3-1024': 0.08,
@@ -96,7 +94,7 @@ Generating images for one in $:
     'dall-e-2-256': 0.032,
 
 Voice generation of 1M characters in $:
-    'tts-1': 30,
+    'tts-1': 30, 
     'tts-1-hd': 60,
 
 Transcription from audio to text min. in $:
@@ -105,3 +103,25 @@ Transcription from audio to text min. in $:
 /add_money — replenish    
 
 '''
+
+
+
+# 🇺🇸 EN: 
+# [OpenAI - ChatGPT, Google - Gemini, Anthropic - Claude]
+
+# - The bot accepts images, voice messages, text,
+# - The bot can respond with text, audio response, generate an image,
+# - The ability to give AI system instructions separately,
+# - Perfect dialogue history management and on-the-fly language model switching while maintaining the context of communication,
+# - Quick response of the whole response model.
+
+
+
+# 🇷🇺 RU:
+# [OpenAI - ChatGPT, Google - Gemini, Anthropic - Claude]
+
+# - Бот принимает изображения, голосовые сообщения, текст,
+# - Бот может отвечать текстом, аудио ответом, сгенерировать изображение,
+# - Возможность дать ИИ системные инструкции отдельно,
+# - Идеальное ведение истории диалога и переключение на лету языковой модели с сохранением контекста общения,
+# - Быстрый ответ модели всего ответа целиком.
