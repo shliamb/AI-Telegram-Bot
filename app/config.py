@@ -24,6 +24,7 @@ BACKUP_PATH = "./backup_db/"
 AI_DEFAULT = "gemini" # gemini or openai, anthropic in future
 AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest"
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini"
+AI_DEFAULT_MODEL_CLAUDE = "claude-3-haiku-20240307"
 
 # Gen Audio models:
 AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
@@ -96,6 +97,24 @@ PRICE = {
 
     'babbage-002': 0.8, # For summarizing texts, the clean price is 0.8 ???
 
+    # Google Gemini to 1M tokens:
+    'gemini-1.5-pro-latest': 93.75,
+    'gemini-1.5-flash-latest': 1.125,
+    #'gemini-1.0-pro': 4, # Не срабатывает, так как не поддерживает системные инструкции, json режим, выполнение кода, лучше не пользоваться ею
+    # 'text-embedding-004': 0, # Free  хз пока что как ее пользовать
+    # 'aqa': 0,
+
+
+    # Antropic Claude to 1M tokens:  Context window - 200k, 
+    # New:
+    'claude-3-5-sonnet-latest': 36, # output 8192 tokens
+    'claude-3-5-haiku-latest': 12, # no vision and output 8192 tokens
+    'claude-3-opus-latest': 180, # 4096 tokens
+    # Old:
+    'claude-3-sonnet-20240229': 36, # 4096 tokens
+    'claude-3-haiku-20240307': 3, # 4096 tokens
+
+
     # Images to one img:
     'dall-e-3-1024': 0.08,
     'dall-e-3-1792': 0.16,
@@ -112,10 +131,4 @@ PRICE = {
     'tts-1-hd': 60, # / 1M characters
     'whisper-1': 0.012, # minute (rounded to the nearest second)
 
-    # Google Gemini to 1M tokens:
-    'gemini-1.5-pro-latest': 93.75,
-    'gemini-1.5-flash-latest': 1.125,
-    #'gemini-1.0-pro': 4, # Не срабатывает, так как не поддерживает системные инструкции, json режим, выполнение кода, лучше не пользоваться ею
-    # 'text-embedding-004': 0, # Free  хз пока что как ее пользовать
-    # 'aqa': 0,
     }

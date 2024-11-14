@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE
 
 
 import logging
@@ -38,6 +38,7 @@ from aiogram.fsm.state import State, StatesGroup
 # from worker_db import get_user_by_id, get_user_by_username, update_user, adding_user, get_all_data_user_by_username, get_last_statistics
 # from general_functions import day_utcnow, unformat_date
 # from config import money_to_start, my_app_key, time_correction, min_pay
+from mod_claude import mod_claude_chat
 from mod_gemini import mod_gemini_chat
 from mod_openai import mod_openai_chat
 from mod_get_voice_in_text_openai import get_voice_openai
@@ -235,6 +236,9 @@ async def main_menu(message: types.Message, submenu="main"):
         def_model_language = AI_DEFAULT_MODEL_OPENAI
     elif ai == "gemini":
         def_model_language = AI_DEFAULT_MODEL_GEMINI
+    elif ai == "claude":
+        def_model_language = AI_DEFAULT_MODEL_CLAUDE
+        
     model_language = data["model_language"] if data.get("model_language") is not None else def_model_language
     ai_draw = data["ai_draw"] if data.get("ai_draw") is not None else AI_DRAW
     model_draw = data["model_draw"] if data.get("model_draw") is not None else DEFAULT_DALL_E
@@ -410,7 +414,7 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
 <b>МОДЕЛЬ: {model_language.upper()}</b>
 
-<b>Модели openai:</b>
+<b>Модели OpenAI:</b>
     /gpt_4o_mini - 1.5$ 1м ток
     /gpt_4o_2024_08_06 - 25$ 1м ток
     /gpt_4o_2024_05_13 - 40$ 1м ток
@@ -418,10 +422,17 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4o - 40$ 1м ток
     /gpt_4_turbo - 80$ 1м ток
 
-<b>Модели google:</b>
+<b>Модели Google:</b>
     /gemini_1_5_flash - 1.125$ 1м ток
     /gemini_1_5_pro - 93.75$ 1м ток
-   
+
+<b>Модели Anthropic:</b>
+    /claude_3_5_sonnet - 36$ 1м ток
+    /claude_3_5_haiku - 12$ 1м ток
+    /claude_3_opus - 180$ 1м ток
+    /claude_3_sonnet - 36$ 1м ток
+    /claude_3_haiku - 3$ 1м ток
+
 
 <b>ДОПОЛНИТЕЛЬНО:</b>
     /img_menu - параметры ген. изо.
@@ -429,10 +440,10 @@ async def main_menu(message: types.Message, submenu="main"):
 
     
 <b>😋 НОВЫЕ ВОЗМОЖНОСТИ:</b>
-   - можно передать изображение как фото или как документ и обсудить его с ИИ,
-   - можно передать голосовое сообщение, ИИ ответит,
+   - принимает изображение как фото или документ,
+   - принимает голосовое сообщение,
    - в меню есть кнопка нарисовать,
-   - напишите 'забудь' - история очистится.
+   - напишите 'забудь' боту - история очистится.
 
     '''
 
@@ -467,10 +478,11 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>FINANCIAL REPORTS:</b>
     /get_stat - download in .CSV
 
+    
 <b>LANGUAGE AI: {ai.upper()}</b>
 <b>MODEL: {model_language.upper()}</b>
 
-<b>Models openai:</b>
+<b>Models OpenAI:</b>
     /gpt_4o_mini - 1.5$ 1m tok
     /gpt_4o_2024_08_06 - 25$ 1m tok
     /gpt_4o_2024_05_13 - 40$ 1m tok
@@ -478,11 +490,18 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4o - 40$ 1m tok
     /gpt_4_turbo - 80$ 1m tok
 
-<b>Models google:</b>
+<b>Models Google:</b>
     /gemini_1_5_flash - 1.125$ 1m tok
     /gemini_1_5_pro - 93.75$ 1m tok
-   
+
+<b>Models Anthropic:</b>
+    /claude_3_5_sonnet - 36$ 1m tok
+    /claude_3_5_haiku - 12$ 1m tok
+    /claude_3_opus - 180$ 1m tok
+    /claude_3_sonnet - 36$ 1m tok
+    /claude_3_haiku - 3$ 1m tok 
     
+
 <b>ADDITIONALLY:</b>
     /img_menu - image generation parameters
     /voice_menu - voice parameters 
@@ -758,6 +777,68 @@ async def gemini_1_5_pro_latest(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
+
+
+# Anthropic models:
+@dp.message(Command('claude_3_5_sonnet'))
+async def claude_3_5_sonnet(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-3-5-sonnet-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('claude_3_5_haiku'))
+async def claude_3_5_haiku(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-3-5-haiku-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('claude_3_opus'))
+async def claude_3_opus(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-3-opus-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('claude_3_sonnet'))
+async def claude_3_sonnet(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-3-sonnet-20240229",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('claude_3_haiku'))
+async def claude_3_haiku(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-3-haiku-20240307",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
 
 
 # Image generation:
@@ -2357,6 +2438,8 @@ async def mod_tex(data, message):
         answer = await mod_gemini_chat(data)
     elif data.get("ai") == "openai":
         answer = await mod_openai_chat(data)
+    elif data.get("ai") == "claude":
+        answer = await mod_claude_chat(data)
 
     if not answer:
         return
@@ -2399,6 +2482,8 @@ async def add_text_to_photo(message: Message, state: FSMContext):
         answer = await mod_gemini_chat(all_data)
     elif all_data.get('ai') == "openai":
         answer = await mod_openai_chat(all_data)
+    elif all_data.get("ai") == "claude":
+        answer = await mod_claude_chat(all_data)
 
     if not answer:
         return
@@ -2451,6 +2536,8 @@ async def mod_photo(data, message, state: FSMContext):
             answer = await mod_gemini_chat(data)
         elif data.get("ai") == "openai":
             answer = await mod_openai_chat(data)
+        elif data.get("ai") == "claude":
+            answer = await mod_claude_chat(data)
 
         if not answer:
             return
@@ -2526,6 +2613,8 @@ async def mod_documents(data, message, state: FSMContext):
                 answer = await mod_gemini_chat(data)
             elif data.get("ai") == "openai":
                 answer = await mod_openai_chat(data)
+            elif data.get("ai") == "claude":
+                answer = await mod_claude_chat(data)
 
             if not answer:
                 return
@@ -2753,6 +2842,7 @@ async def second_function(message: types.Message, state: FSMContext):
     default_model_ai = {
         "openai": AI_DEFAULT_MODEL_OPENAI,
         "gemini": AI_DEFAULT_MODEL_GEMINI,
+        "claude": AI_DEFAULT_MODEL_CLAUDE,
     }
     # Gen Img models:
     default_model_draw = {

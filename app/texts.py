@@ -44,6 +44,13 @@ prices_ru = '''
     'gemini-1.5-pro-latest': 93.75,
     'gemini-1.5-flash-latest': 1.125,
 
+Языковая модель от Anthropic 1млн в USD:
+    'claude-3-5-sonnet-latest': 36,
+    'claude-3-5-haiku-latest': 12,
+    'claude-3-opus-latest': 180,
+    'claude-3-sonnet-20240229': 36,
+    'claude-3-haiku-20240307': 3,
+
 Генерация изображений за одну в USD:
     'dall-e-3-1024': 0.08,
     'dall-e-3-1792': 0.16,
@@ -83,6 +90,13 @@ OpenAI language model 1 million tokens in $:
 The language model from Google is 1 million in $:
     'gemini-1.5-pro-latest': 93.75,
     'gemini-1.5-flash-latest': 1.125,
+
+The language model from Anthropic is 1 million in $:
+    'claude-3-5-sonnet-latest': 36,
+    'claude-3-5-haiku-latest': 12,
+    'claude-3-opus-latest': 180,
+    'claude-3-sonnet-20240229': 36,
+    'claude-3-haiku-20240307': 3,
 
 Generating images for one in $:
     'dall-e-3-1024': 0.08,
