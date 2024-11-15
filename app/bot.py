@@ -10,7 +10,7 @@ import logging
 logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 logging.basicConfig(level=logging.INFO, filename='./log/bot.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
 import re
-# import random
+import random
 import os
 import asyncio
 import json
@@ -438,12 +438,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /img_menu - параметры ген. изо.
     /voice_menu - параметры голоса  
 
-    
-<b>😋 НОВЫЕ ВОЗМОЖНОСТИ:</b>
-   - принимает изображение как фото или документ,
-   - принимает голосовое сообщение,
-   - в меню есть кнопка нарисовать,
-   - напишите 'забудь' боту - история очистится.
 
     '''
 
@@ -506,12 +500,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /img_menu - image generation parameters
     /voice_menu - voice parameters 
 
-
-<b>😋 New features:</b>
-   - you can transfer the image as a photo or as a document and discuss it with the AI,
-   - You can send a voice message And it will respond,
-   - there is a draw button in the menu,
-   - write 'forget it' - the story will be cleared.
 
     '''
 
@@ -1320,7 +1308,7 @@ async def confirm_my_button(data_button):
     amount = data_button.get("amount")
     admin_id = data_button.get("admin_id")
     mes_id = data_button.get("mes_id")
-    url = data_button.get("url")
+    url = f"<a href='tg://user?id={id}'>{id}</a>"
     language = data_button.get("language")
     use = data_button.get("use")
 
@@ -1335,7 +1323,7 @@ async def confirm_my_button(data_button):
             [InlineKeyboardButton(text="👛 Confirmation", callback_data=f"admin_conf:{id}:{amount}:{use}")], 
         ]
     )
-    await bot.send_message(admin_id, f"Пользователь: <a href='{url}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
+    await bot.send_message(admin_id, f"Пользователь: <a href='tg://user?id={id}'>{id}</a>, хочет пополнить счет на: {amount}$, вариант оплаты - '{use}'", parse_mode="HTML", reply_markup=keyboard)
     return
 
 
@@ -1770,6 +1758,8 @@ async def gemini(message: types.Message):
     */use_random_metod_pay  - use random
     /delete_metod 
 
+<b>SENDING NEWS: </b>
+    /sending_news - start
     '''
 
     await message.answer(admin, parse_mode="HTML")
@@ -1808,6 +1798,81 @@ async def get_info_by_users(message: types.Message):
         print(f"Error sending documentb User stat")
 
 
+
+
+
+
+
+# ADMIN: SEND NEWS USER's:
+
+class News(StatesGroup):
+    news_ru = State()
+    news_en = State()
+    confirm_send_news = State()
+
+@dp.message(Command('sending_news'))
+async def sending_news(message: types.Message, state: FSMContext):
+    await message.answer("News message on RU:", parse_mode="HTML")
+    await state.set_state(News.news_ru)
+
+@dp.message(News.news_ru)
+async def text_news_ru(message: types.Message, state: FSMContext):
+    text_news_ru = message.text
+    await state.update_data(text_news_ru=text_news_ru)
+    await message.answer("News message on EN:", parse_mode="HTML")
+    await state.set_state(News.news_en)
+
+@dp.message(News.news_en)
+async def text_news_en(message: types.Message, state: FSMContext):
+    text_news_en = message.text
+    await state.update_data(text_news_en=text_news_en)
+    await message.answer("Type 'Yes' or 'No':", parse_mode="HTML")
+    await state.set_state(News.confirm_send_news)
+
+@dp.message(News.confirm_send_news)
+async def confirm_send_news(message: types.Message, state: FSMContext):
+
+    if message.text.lower() == "no":
+        await message.answer("Canceling.", parse_mode="HTML")
+        await state.clear()
+
+    elif message.text.lower() == "yes":
+        admin_id = ADMIN_ID
+        all_users_data = await read_all_users()
+        state_data = await state.get_data()
+        text_news_ru = state_data.get("text_news_ru")
+        text_news_en = state_data.get("text_news_en")
+
+        #print(all_users_data)
+        for user in all_users_data:
+            user_id = user.get("user_id")
+            language = user.get("language")
+            notifications = user.get("notifications")
+
+            if notifications == True or notifications == None:
+
+                try:
+                    if language == "ru":
+                        await bot.send_message(user_id, text_news_ru, parse_mode="HTML")
+                    else:
+                        await bot.send_message(user_id, text_news_en, parse_mode="HTML")
+
+                    await bot.send_message(admin_id, f"The message was sent successfully to the user <a href='tg://user?id={user_id}'>{user_id}</a>", parse_mode="HTML")
+                except:
+                    await bot.send_message(admin_id, f"Error: sending a message to the user <a href='tg://user?id={user_id}'>{user_id}</a>.", parse_mode="HTML")
+
+                aw_time = random.uniform(1, 3)
+                await asyncio.sleep(aw_time)
+                await bot.send_message(admin_id, f"wating {round(aw_time, 2)}", parse_mode="HTML")
+
+            else:
+                await bot.send_message(admin_id, f"The user has disabled notifications. <a href='tg://user?id={user_id}'>{user_id}</a>.", parse_mode="HTML")
+
+        await bot.send_message(admin_id, f"The newsletter is completed.", parse_mode="HTML")
+        await state.clear()
+
+    else:
+        await message.answer("I don't understand, say it again.", parse_mode="HTML")
 
 
 
