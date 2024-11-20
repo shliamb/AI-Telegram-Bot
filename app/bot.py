@@ -427,7 +427,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /o1_mini_2024_09_12 - 30$ 1м ток
 
 
-
 <b>Модели Google:</b>
     /gemini_1_5_flash - 1.125$ 1м ток
     /gemini_1_5_pro - 93.75$ 1м ток
@@ -494,6 +493,7 @@ async def main_menu(message: types.Message, submenu="main"):
     /o1_mini - 30$ 1m tok
     /o1_mini_2024_09_12 - 30$ 1m tok
 
+    
 <b>Models Google:</b>
     /gemini_1_5_flash - 1.125$ 1m tok
     /gemini_1_5_pro - 93.75$ 1m tok
@@ -739,53 +739,53 @@ async def chatgpt_4o_latest(message: types.Message):
 
 # o1:
 
-@dp.message(Command('o1_preview'))
-async def o1_preview(message: types.Message):
-    id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "openai",
-        "model_language": "o1-preview",
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message, "main")
+# @dp.message(Command('o1_preview'))
+# async def o1_preview(message: types.Message):
+#     id = user_id(message)
+#     data = {
+#         "user_id": id,
+#         "ai": "openai",
+#         "model_language": "o1-preview",
+#     }
+#     confirm = await update_user(data)
+#     if confirm:
+#         await main_menu(message, "main")
 
-@dp.message(Command('o1_preview_2024_09_12'))
-async def o1_preview_2024_09_12(message: types.Message):
-    id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "openai",
-        "model_language": "o1-preview-2024-09-12",
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message, "main")
+# @dp.message(Command('o1_preview_2024_09_12'))
+# async def o1_preview_2024_09_12(message: types.Message):
+#     id = user_id(message)
+#     data = {
+#         "user_id": id,
+#         "ai": "openai",
+#         "model_language": "o1-preview-2024-09-12",
+#     }
+#     confirm = await update_user(data)
+#     if confirm:
+#         await main_menu(message, "main")
 
-@dp.message(Command('o1_mini'))
-async def o1_mini(message: types.Message):
-    id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "openai",
-        "model_language": "o1-mini",
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message, "main")
+# @dp.message(Command('o1_mini'))
+# async def o1_mini(message: types.Message):
+#     id = user_id(message)
+#     data = {
+#         "user_id": id,
+#         "ai": "openai",
+#         "model_language": "o1-mini",
+#     }
+#     confirm = await update_user(data)
+#     if confirm:
+#         await main_menu(message, "main")
 
-@dp.message(Command('o1_mini_2024_09_12'))
-async def o1_mini_2024_09_12(message: types.Message):
-    id = user_id(message)
-    data = {
-        "user_id": id,
-        "ai": "openai",
-        "model_language": "o1-mini-2024-09-12",
-    }
-    confirm = await update_user(data)
-    if confirm:
-        await main_menu(message, "main")
+# @dp.message(Command('o1_mini_2024_09_12'))
+# async def o1_mini_2024_09_12(message: types.Message):
+#     id = user_id(message)
+#     data = {
+#         "user_id": id,
+#         "ai": "openai",
+#         "model_language": "o1-mini-2024-09-12",
+#     }
+#     confirm = await update_user(data)
+#     if confirm:
+#         await main_menu(message, "main")
 
 
 
