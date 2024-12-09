@@ -2429,6 +2429,10 @@ async def try_answer_bot(message, answer, data):
     text = data.get("user_content")
     logging.info(f"User: {id}, Say: {text}")
 
+    # If OpenAI is no money for account.
+    if text == "Error: There is no money for OpenAI account.":
+        await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for OpenAI account.")
+        
     # Разбиваем текст на части
     text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
 
@@ -2604,12 +2608,15 @@ class Form_text_img(StatesGroup):
 # Add a separate description of the image:
 @dp.message(Form_text_img.no_caption, F.content_type.in_({'text'}))
 async def add_text_to_photo(message: Message, state: FSMContext):
+    id = user_id(message)
     answer = None
     # Из прошлого State
     data_state = await state.get_data()
     all_data = data_state.get('all_data')
 
     all_data["user_content"] = message.text
+
+    logging.info(f"User: {id} sent a photo and Say: {message.text}")
 
     if all_data.get('ai') == "gemini":
         answer = await mod_gemini_chat(all_data)
@@ -2644,6 +2651,7 @@ async def add_text_to_photo(message: Message, state: FSMContext):
 async def mod_photo(data, message, state: FSMContext):
 
     await typing(message)
+    id = user_id(message)
     language = data.get("language")
 
     # Telegram always saves in jpg in compress
@@ -2664,6 +2672,9 @@ async def mod_photo(data, message, state: FSMContext):
     data["name_file"] = photo_file_name
 
     if data.get("user_content"):
+
+        text = data.get("user_content")
+        logging.info(f"User: {id} sent a photo and Say: {text}")
 
         if data.get("ai") == "gemini":
             answer = await mod_gemini_chat(data)
@@ -2709,6 +2720,7 @@ async def mod_photo(data, message, state: FSMContext):
 async def mod_documents(data, message, state: FSMContext):
 
     await typing(message)
+    id = user_id(message)
     language = data.get("language")
 
     # Get id and name file:
@@ -2741,6 +2753,9 @@ async def mod_documents(data, message, state: FSMContext):
         data["name_file"] = name_file
 
         if data.get("user_content"):
+
+            text = data.get("user_content")
+            logging.info(f"User: {id} sent a photo.document and Say: {text}")
 
             if data.get("ai") == "gemini":
                 answer = await mod_gemini_chat(data)
@@ -2878,11 +2893,13 @@ class Form_draw(StatesGroup):
 @dp.message(Form_draw.draw)
 async def process_draw(message: types.Message, state: FSMContext):
 
+    id = user_id(message)
     data_state = await state.get_data()
     all_data = data_state.get("all_data")
     all_data["user_content"] = message.text
     language = all_data.get("language")
-    
+
+    logging.info(f"User: {id} image generation and Say: {message.text}")
 
     if message.text.lower() == "no" or message.text.lower() == "нет":
         if language == "ru":
