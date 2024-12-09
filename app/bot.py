@@ -2430,7 +2430,7 @@ async def try_answer_bot(message, answer, data):
     logging.info(f"User: {id}, Say: {text}")
 
     # If OpenAI is no money for account.
-    if text == "Error: There is no money for OpenAI account.":
+    if answer == "Error: There is no money for OpenAI account.":
         await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for OpenAI account.")
         
     # Разбиваем текст на части
