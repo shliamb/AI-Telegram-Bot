@@ -1807,11 +1807,6 @@ async def gemini(message: types.Message):
 <b>LOGS:</b>
     /get_logs
 
-<b>CLEAR:</b>
-    /clear_logs
-    */clear_table_statistic
-    */clear_table_dialog
-
 <b>BACKUP & RESTORE:</b>  
     /backup
     /restore_db
@@ -1824,7 +1819,12 @@ async def gemini(message: types.Message):
     /add_metod_pay - add method
     /select_metod_pay - select method
     */use_random_metod_pay  - use random
-    /delete_metod 
+    /delete_metod
+
+<b>CLEAR:</b>
+    /clear_logs
+    */clear_table_statistic
+    */clear_table_dialog
 
 <b>SENDING NEWS: </b>
     /sending_news - start
