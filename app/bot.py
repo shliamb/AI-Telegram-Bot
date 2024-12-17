@@ -1321,7 +1321,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     new_money = data_user.get("money") + (float(amount))
     new_paid = data_user.get("paid") + 1
 
-    updated_data = {"user_id": id, "money": new_money, "paid": new_paid}
+    updated_data = {"user_id": id, "money": new_money, "paid": new_paid, "block": False}
     confirm_save = await update_user(updated_data)
 
     logging.info(f"Adding funds to your account - {id}.")
