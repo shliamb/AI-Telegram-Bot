@@ -88,8 +88,10 @@ OpenAI language model 1 million tokens in $:
     'gpt-4-turbo-2024-04-09': 80,
 
 The language model from Google is 1 million in $:
-    'gemini-1.5-pro-latest': 93.75,
-    'gemini-1.5-flash-latest': 1.125,
+    'gemini-2.0-flash-exp': 25,
+    'gemini-1.5-pro-latest': 25,
+    'gemini-1.5-flash-latest': 1.2,
+    'gemini-1.5-flash-8b': 0.8,
 
 The language model from Anthropic is 1 million in $:
     'claude-3-5-sonnet-latest': 36,
