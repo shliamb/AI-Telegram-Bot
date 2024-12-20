@@ -41,8 +41,10 @@ prices_ru = '''
     'gpt-4-turbo-2024-04-09': 80,
 
 Языковая модель от Google 1млн в USD:
-    'gemini-1.5-pro-latest': 93.75,
-    'gemini-1.5-flash-latest': 1.125,
+    'gemini-2.0-flash-exp': 25,
+    'gemini-1.5-pro-latest': 25,
+    'gemini-1.5-flash-latest': 1.2,
+    'gemini-1.5-flash-8b': 0.8,
 
 Языковая модель от Anthropic 1млн в USD:
     'claude-3-5-sonnet-latest': 36,
