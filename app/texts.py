@@ -131,10 +131,6 @@ prices_ru = '''
 prices_en = '''
 
 OpenAI language model 1 million tokens in $:
-    'o1': 150,
-    'o1-2024-12-17': 150,
-    'o3-mini': 11,
-    'o3-mini-2025-01-31': 11,
     'chatgpt-4o-latest': 40,
     'gpt-4o': 40,
     'gpt-4o-2024-05-13': 40,

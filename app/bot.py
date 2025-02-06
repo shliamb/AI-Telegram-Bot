@@ -479,8 +479,6 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>MODEL: {model_language.upper()}</b>
 
 <b>Models OpenAI:</b>
-    /o1 - 150$ 1m tok
-    /o3_mini - 11$ 1m tok
     /gpt_4_turbo - 80$ 1m tok
     /chatgpt_4o_latest - 40$ 1m tok
     /gpt_4o_2024_05_13 - 40$ 1m tok
@@ -752,7 +750,7 @@ async def o1(message: types.Message):
     data = {
         "user_id": id,
         "ai": "openai",
-        "model_language": "o1-preview",
+        "model_language": "o1",
     }
     confirm = await update_user(data)
     if confirm:
@@ -765,7 +763,7 @@ async def o3_mini(message: types.Message):
     data = {
         "user_id": id,
         "ai": "openai",
-        "model_language": "o1-mini",
+        "model_language": "o3-mini",
     }
     confirm = await update_user(data)
     if confirm:
