@@ -33,6 +33,8 @@ start_ru = '''
     Для нового пользователя придусмотренна проверочная сумма на счете. Далее, вы можете пополнить счет для дальнейшей работы.
 - Скачать CSV файл последних 50 трат /get_stat
 
+От разработчика: "Эта программа сейчас на стадии тестирования. Никаких гарантий, никаких обязательств, никакой ответственности – вообще ничего! Используя её, ты полностью соглашаешься с этим беспределом. Но, между нами, надеюсь, тебе понравится 😉"
+
 '''
 
 
@@ -68,6 +70,8 @@ Settings:
 - Top up your financial account balance /add_money
     The verification amount on the account is provided for the new user. Next, you can add funds to your account for further work.
 - Download the CSV file of the last 50 expenses /get_stat
+
+From the developer: "This program is currently under testing. No guarantees, no obligations, no responsibilities – nothing at all! By using it, you completely agree with this lawlessness. But just between you and me, I hope you like it. 😉"
 
 '''
 
