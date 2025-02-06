@@ -752,7 +752,7 @@ async def o1(message: types.Message):
     data = {
         "user_id": id,
         "ai": "openai",
-        "model_language": "o1-2024-12-17",
+        "model_language": "o1-preview",
     }
     confirm = await update_user(data)
     if confirm:
@@ -765,7 +765,7 @@ async def o3_mini(message: types.Message):
     data = {
         "user_id": id,
         "ai": "openai",
-        "model_language": "o3-mini-2025-01-31",
+        "model_language": "o1-mini",
     }
     confirm = await update_user(data)
     if confirm:
