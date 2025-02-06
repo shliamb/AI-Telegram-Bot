@@ -11,7 +11,7 @@ RUBTOUSD = 110 # The internal exchange rate
 LIMIT_STAT = 500 # CSV file last 500
 GIFT = 0.1 # $ The amount on the account at the beginning
 VOICE_THE_ANSWER = True # False or True
-HISTORY_LINE_LIMIT = 25 # The number of rows in the history table that will be used   ----- 10 25 30 50 !!! Сделать в настройках изменяемые..
+HISTORY_LINE_LIMIT = 15 # The number of rows in the history table that will be used   ----- 10 25 30 50 !!! Сделать в настройках изменяемые..
 MAX_SIMBOLS = 500 # Maximum number of characters of text to compress  
 DIALOG = True # History dialog
 DIALOG_SUM = False # AI compress history dialog
@@ -91,8 +91,8 @@ PRICE = {
     'gpt-4o': 40,
     'gpt-4o-2024-05-13': 40,
     'gpt-4o-2024-08-06': 25,
-    'gpt-4o-mini': 1.5, # no vision
-    'gpt-4o-mini-2024-07-18': 1.5, # no vision
+    'gpt-4o-mini': 3, # no vision
+    'gpt-4o-mini-2024-07-18': 3, # no vision
     'gpt-4-turbo-2024-04-09': 80,
 
     'babbage-002': 0.8, # For summarizing texts, the clean price is 0.8 ???
