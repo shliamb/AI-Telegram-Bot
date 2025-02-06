@@ -81,9 +81,9 @@ NULL_TOKEN = 0
 PRICE = {
     # OpenAI to 1M tokes:
     # New:
-    'o1': 150,
 
-    'o3-mini': 11,
+    'o1-2024-12-17': 150,
+    'o3-mini-2025-01-31': 11,
 
     'chatgpt-4o-latest': 40,
     'gpt-4o': 40,
