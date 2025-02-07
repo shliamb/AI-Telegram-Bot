@@ -2495,11 +2495,11 @@ async def try_answer_bot(message, answer, data):
 
     # Messages to the administrator about a zero balance
     # If OpenAI is no money for account.
-    if answer == "Error: There is no money for OpenAI account.":
+    if "Error: There is no money for OpenAI account" in answer and data.get("ai") == "openai":
         await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for OpenAI account.")
 
     # If DeepSeek is no money for account.
-    if "Insufficient Balance" in answer:
+    if "Insufficient Balance" in answer and data.get("ai") == "deepseek":
         await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for DeepSeek account.")
         
     # Разбиваем текст на части
