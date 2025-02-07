@@ -3,11 +3,11 @@
 #### BASIC CONFIG ####
 
 # System:
-NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude ]"
+NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
-RUBTOUSD = 110 # The internal exchange rate
+RUBTOUSD = 100 # The internal exchange rate
 LIMIT_STAT = 500 # CSV file last 500
 GIFT = 0.1 # $ The amount on the account at the beginning
 VOICE_THE_ANSWER = True # False or True
@@ -21,10 +21,11 @@ DIALOG_SUM = False
 BACKUP_PATH = "./backup_db/"
 
 # Language models:
-AI_DEFAULT = "gemini" # gemini or openai, anthropic in future
-AI_DEFAULT_MODEL_GEMINI = "gemini-1.5-flash-latest"
+AI_DEFAULT = "gemini" # gemini or openai, anthropic, deepseek
+AI_DEFAULT_MODEL_GEMINI = "gemini-2.0-flash-exp"
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini"
 AI_DEFAULT_MODEL_CLAUDE = "claude-3-haiku-20240307"
+AI_DEFAULT_MODEL_DEEPSEEK = "deepseek-chat"
 
 # Gen Audio models:
 AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
@@ -80,14 +81,11 @@ USE_DIGITAL = False
 NULL_TOKEN = 0
 PRICE = {
     # OpenAI to 1M tokes:
-    # New:
 
     # 'o1': 150,
     # 'o3-mini': 11,
-
     'o1-preview': 150,
     'o1-mini': 11,
-
     'chatgpt-4o-latest': 40,
     'gpt-4o': 40,
     'gpt-4o-2024-05-13': 40,
@@ -107,6 +105,9 @@ PRICE = {
     # 'text-embedding-004': 0, # Free  хз пока что как ее пользовать
     # 'aqa': 0,
 
+    # DeepSeek:
+    'deepseek-reasoner': 4.7,
+    'deepseek-chat': 2.34,
 
     # Antropic Claude to 1M tokens:  Context window - 200k, 
     # New:
