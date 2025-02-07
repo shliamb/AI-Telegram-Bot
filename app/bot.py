@@ -417,7 +417,6 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>Модели OpenAI:</b>
     /o1_preview -  150$ 1м ток,
     /o1_mini - 11$ 1м ток,
-
     /gpt_4_turbo - 80$ 1м ток   
     /chatgpt_4o_latest - 40$ 1м ток
     /gpt_4o_2024_05_13 - 40$ 1м ток
@@ -482,6 +481,8 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>MODEL: {model_language.upper()}</b>
 
 <b>Models OpenAI:</b>
+    /o1_preview -  150$ 1m tok
+    /o1_mini - 11$ 1m tok
     /gpt_4_turbo - 80$ 1m tok
     /chatgpt_4o_latest - 40$ 1m tok
     /gpt_4o_2024_05_13 - 40$ 1m tok
@@ -1275,18 +1276,18 @@ async def get_stat(message: types.Message):
 
 
 
-# MENU: PRICES:
-@dp.message(Command('prices'))
-async def get_prices(message: types.Message):
+# # MENU: PRICES:
+# @dp.message(Command('prices'))
+# async def get_prices(message: types.Message):
 
-    id = user_id(message)
-    user_data = await read_user(id)
-    language = user_data.get("language")
+#     id = user_id(message)
+#     user_data = await read_user(id)
+#     language = user_data.get("language")
 
-    if language == "ru":
-        await message.answer(prices_ru, parse_mode="HTML")
-    else:
-        await message.answer(prices_en, parse_mode="HTML")
+#     if language == "ru":
+#         await message.answer(prices_ru, parse_mode="HTML")
+#     else:
+#         await message.answer(prices_en, parse_mode="HTML")
 
 
 

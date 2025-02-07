@@ -96,7 +96,7 @@ PRICE = {
     'gpt-4o-mini-2024-07-18': 3, # no vision
     'gpt-4-turbo-2024-04-09': 80,
 
-    'babbage-002': 0.8, # For summarizing texts, the clean price is 0.8 ???
+    # 'babbage-002': 0.8, # For summarizing texts, the clean price is 0.8 ???
 
     # Google Gemini to 1M tokens:
     'gemini-2.0-flash-exp': 25,
