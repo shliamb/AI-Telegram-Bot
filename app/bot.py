@@ -435,6 +435,7 @@ async def main_menu(message: types.Message, submenu="main"):
 
     
 <b>Модели DeepSeek:</b>
+(Временные проблемы с оплатой DeepSeek)
     /deepseek_reasoner R1 🔥 - 4.7$ 1м ток
     /deepseek_chat 🔥 - 2.34$ 1м ток
 
@@ -507,6 +508,7 @@ async def main_menu(message: types.Message, submenu="main"):
 
     
 <b>Models DeepSeek:</b>
+(Temporary problems with DeepSeek payment)
     /deepseek_reasoner R1 🔥 - 4.7$ 1m tok
     /deepseek_chat 🔥 - 2.34$ 1m tok
 
@@ -2501,6 +2503,14 @@ async def try_answer_bot(message, answer, data):
     # If DeepSeek is no money for account.
     if "Insufficient Balance" in answer and data.get("ai") == "deepseek":
         await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for DeepSeek account.")
+
+    # # If Gemini is no money for account.
+    # if "" in answer and data.get("ai") == "gemini":
+    #     await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for Gemini account.")
+
+    # # If Anthropic is no money for account.
+    # if "" in answer and data.get("ai") == "anthropic":
+    #     await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for Anthropic account.")
         
     # Разбиваем текст на части
     text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
