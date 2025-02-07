@@ -2492,9 +2492,15 @@ async def try_answer_bot(message, answer, data):
     text = data.get("user_content")
     logging.info(f"User: {id}, Say: {text}")
 
+
+    # Messages to the administrator about a zero balance
     # If OpenAI is no money for account.
     if answer == "Error: There is no money for OpenAI account.":
         await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for OpenAI account.")
+
+    # If DeepSeek is no money for account.
+    if "Insufficient Balance" in answer:
+        await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for DeepSeek account.")
         
     # Разбиваем текст на части
     text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
