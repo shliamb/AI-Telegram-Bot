@@ -415,6 +415,9 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>МОДЕЛЬ: {model_language.upper()}</b>
 
 <b>Модели OpenAI:</b>
+    /o1_preview -  150$ 1м ток,
+    /o1_mini - 11$ 1м ток,
+
     /gpt_4_turbo - 80$ 1м ток   
     /chatgpt_4o_latest - 40$ 1м ток
     /gpt_4o_2024_05_13 - 40$ 1м ток
@@ -744,26 +747,26 @@ async def chatgpt_4o_latest(message: types.Message):
 '''
 
 
-@dp.message(Command('o1'))
+@dp.message(Command('o1_preview'))
 async def o1(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
         "ai": "openai",
-        "model_language": "o1",
+        "model_language": "o1-preview",
     }
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "main")
 
 
-@dp.message(Command('o3_mini'))
+@dp.message(Command('o1_mini'))
 async def o3_mini(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
         "ai": "openai",
-        "model_language": "o3-mini",
+        "model_language": "o1-mini",
     }
     confirm = await update_user(data)
     if confirm:

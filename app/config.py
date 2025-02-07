@@ -82,12 +82,11 @@ PRICE = {
     # OpenAI to 1M tokes:
     # New:
 
-    'o1': 150,
-    'o3-mini': 11,
+    # 'o1': 150,
+    # 'o3-mini': 11,
 
     'o1-preview': 150,
     'o1-mini': 11,
-
 
     'chatgpt-4o-latest': 40,
     'gpt-4o': 40,

@@ -52,7 +52,7 @@ async def mod_openai_chat(data):
                 form = aiohttp.FormData()
                 form.add_field('username', USERNAME_API_AI)
                 form.add_field('model', model)
-                if system_content:
+                if system_content and system_content not in ("o1-preview", "o1-mini", "o1", "o3-mini"):
                     form.add_field('system_content', system_content)
                 if response_format:
                     form.add_field('response_format', json.dumps(response_format))
