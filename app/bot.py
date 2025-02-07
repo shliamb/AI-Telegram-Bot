@@ -415,17 +415,17 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>МОДЕЛЬ: {model_language.upper()}</b>
 
 <b>Модели OpenAI:</b>
-    /o1_preview -  150$ 1м ток,
-    /o1_mini - 11$ 1м ток,
+    /o1_preview -  150$ 1м ток
+    /o1_mini 🔥 - 11$ 1м ток
     /gpt_4_turbo - 80$ 1м ток   
-    /chatgpt_4o_latest - 40$ 1м ток
+    /chatgpt_4o_latest 🔥 - 40$ 1м ток
     /gpt_4o_2024_05_13 - 40$ 1м ток
     /gpt_4o_2024_08_06 - 25$ 1м ток
     /gpt_4o_mini - 3$ 1м ток
 
 
 <b>Модели Google:</b>
-    /gemini_2_0_flash_exp - 25$ 1м ток
+    /gemini_2_0_flash_exp 🔥 - 25$ 1м ток
     /gemini_1_5_pro - 25$ 1м ток
     /gemini_1_5_flash - 1.3$ 1м ток
     /gemini_1_5_flash_8b - 0.8$ 1м ток
@@ -481,17 +481,17 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>MODEL: {model_language.upper()}</b>
 
 <b>Models OpenAI:</b>
-    /o1_preview -  150$ 1m tok
-    /o1_mini - 11$ 1m tok
+    /o1_preview 🔥 -  150$ 1m tok
+    /o1_mini 🔥 - 11$ 1m tok
     /gpt_4_turbo - 80$ 1m tok
-    /chatgpt_4o_latest - 40$ 1m tok
+    /chatgpt_4o_latest 🔥 - 40$ 1m tok
     /gpt_4o_2024_05_13 - 40$ 1m tok
     /gpt_4o_2024_08_06 - 25$ 1m tok
     /gpt_4o_mini - 3$ 1m tok
     
     
 <b>Models Google:</b>
-    /gemini_2_0_flash_exp - 25$ 1m tok
+    /gemini_2_0_flash_exp 🔥 - 25$ 1m tok
     /gemini_1_5_pro - 25$ 1m tok
     /gemini_1_5_flash - 1.2$ 1m tok
     /gemini_1_5_flash_8b - 0.8$ 1m tok
