@@ -15,5 +15,5 @@ DB_NAME = os.environ.get('db_name')
 
 ADMIN_ID = int(os.environ.get('admin_id'))
 
-KEY_API_DEEPSEEK = int(os.environ.get('key_api_deepseek'))
+KEY_API_DEEPSEEK = os.environ.get('key_api_deepseek')
 
