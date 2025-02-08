@@ -901,7 +901,7 @@ async def grok_vision_beta(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai": "deepseek",
+        "ai": "grok",
         "model_language": "grok-vision-beta",
     }
     confirm = await update_user(data)
@@ -913,7 +913,7 @@ async def grok_2_vision_latest(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai": "deepseek",
+        "ai": "grok",
         "model_language": "grok-2-vision-latest",
     }
     confirm = await update_user(data)
@@ -926,7 +926,7 @@ async def grok_2_latest(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai": "deepseek",
+        "ai": "grok",
         "model_language": "grok-2-latest",
     }
     confirm = await update_user(data)
@@ -939,7 +939,7 @@ async def grok_beta(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai": "deepseek",
+        "ai": "grok",
         "model_language": "grok-beta",
     }
     confirm = await update_user(data)
