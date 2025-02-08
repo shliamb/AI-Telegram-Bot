@@ -435,7 +435,7 @@ async def main_menu(message: types.Message, submenu="main"):
 
 <b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
 <b>МОДЕЛЬ: {model_language.upper()}</b>
-(наценка на 1 миллион токенов 20%)
+(В цене +20% за поддержку системы)
 
 <b>Модели OpenAI:</b>
     /o1_preview -  90$ 1м ток
@@ -512,7 +512,7 @@ async def main_menu(message: types.Message, submenu="main"):
     
 <b>LANGUAGE AI: {ai.upper()}</b>
 <b>MODEL: {model_language.upper()}</b>
-(the markup on 1 million tokens is 20%)
+(Price +20% system support)
 
 <b>Models OpenAI:</b>
     /o1_preview 🔥 -  90$ 1m tok
