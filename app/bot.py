@@ -338,15 +338,15 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>МОДЕЛЬ: {model_voice_to_text.upper()}</b>
 
 <b>модели openai: {model_voice_to_text.upper()}</b>
-    /whisper_1
+    /whisper_1 - 0.0072$ / минута
 
         
 <b>ГЕНЕРАЦИЯ ГОЛОСА ИИ: {ai_text_to_voice.upper()}</b>
 <b>МОДЕЛЬ: {model_text_to_voice.upper()}:</b>
 
 <b>модель openai: {model_text_to_voice.upper()}</b>
-    /tts_1
-    /tts_1_hd - hd и дороже
+    /tts_1 - 18$ / 1M символ
+    /tts_1_hd - 36$ / 1M символ
 
 <b>стиль голоса: {voice.upper()}</b>
     /nova - женский голос
@@ -361,11 +361,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /speed_1 - 1.0
     /speed_1_25 - 1.25
 
-<b>Цены на аудио модели:</b>
-    tts-1 - 18$ / 1M символ
-    tts-1-hd - 36$ / 1M символ
-    whisper-1 - 0.0072$ / минута
-
 
 /menu - вернуться назад
     '''
@@ -377,15 +372,15 @@ async def main_menu(message: types.Message, submenu="main"):
 <b>MODEL NOW: {model_voice_to_text.upper()}</b>
 
 <b>Models openai: {model_voice_to_text.upper()}</b>
-    /whisper_1
+    /whisper_1 - 0.0072$ / minute
 
         
 <b>VOICE GENERATION AI: {ai_text_to_voice.upper()}</b>
 <b>MODEL NOW: {model_text_to_voice.upper()}:</b>
 
 <b>Model from OpenAI: {model_text_to_voice.upper()}</b>
-    /tts_1
-    /tts_1_hd - hd and more expensive
+    /tts_1 - 18$ / 1M characters
+    /tts_1_hd - 36$ / 1M characters
 
 <b>Voice style: {voice.upper()}</b>
     /nova - a woman's voice
@@ -400,10 +395,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /speed_1 - 1.0
     /speed_1_25 - 1.25
 
-<b>Prices for audio models:</b>
-    tts-1 - 18$ / 1M characters
-    tts-1-hd - 36$ / 1M characters
-    whisper-1 - 0.0072$ / minute
     
 /menu - Go back
     '''
