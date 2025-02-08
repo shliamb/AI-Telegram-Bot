@@ -282,6 +282,14 @@ async def main_menu(message: types.Message, submenu="main"):
     /vivid
     /natural
 
+<b>Цены на одно изображение:</b>
+    dall-e-3-1024 - 0.048$
+    dall-e-3-1792 - 0.096$
+    dall-e-3-hd-1024 - 0.096$
+    dall-e-3-hd-1792 - 0.144$
+    dall-e-2-1024 - 0.024$
+    dall-e-2-512 - 0.0216$
+    dall-e-2-256 - 0.0192$
     
 /menu - вернуться назад
     '''
@@ -308,6 +316,14 @@ async def main_menu(message: types.Message, submenu="main"):
     /vivid
     /natural
 
+<b>Prices per image:</b>
+    dall-e-3-1024 - 0.048$
+    dall-e-3-1792 - 0.096$
+    dall-e-3-hd-1024 - 0.096$
+    dall-e-3-hd-1792 - 0.144$
+    dall-e-2-1024 - 0.024$
+    dall-e-2-512 - 0.0216$
+    dall-e-2-256 - 0.0192$
     
 /menu - Go back
     '''
@@ -345,6 +361,11 @@ async def main_menu(message: types.Message, submenu="main"):
     /speed_1 - 1.0
     /speed_1_25 - 1.25
 
+<b>Цены на аудио модели:</b>
+    tts-1 - 18$ / 1M символ
+    tts-1-hd - 36$ / 1M символ
+    whisper-1 - 0.0072$ / минута
+
 
 /menu - вернуться назад
     '''
@@ -379,6 +400,10 @@ async def main_menu(message: types.Message, submenu="main"):
     /speed_1 - 1.0
     /speed_1_25 - 1.25
 
+<b>Prices for audio models:</b>
+    tts-1 - 18$ / 1M characters
+    tts-1-hd - 36$ / 1M characters
+    whisper-1 - 0.0072$ / minute
     
 /menu - Go back
     '''
