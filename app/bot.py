@@ -459,7 +459,7 @@ async def main_menu(message: types.Message, submenu="main"):
     /claude_3_sonnet - 21.6$ 1м ток
     /claude_3_haiku - 1.8$ 1м ток
 
-<b>Модели Grok:
+<b>Модели Grok:</b>
     /grok_vision_beta - 24$ 1м ток
     /grok_2_vision_latest - 14.4$ 1м ток
     /grok_2_latest 🔥 - 14.4$ 1м ток
@@ -536,7 +536,7 @@ async def main_menu(message: types.Message, submenu="main"):
     /claude_3_sonnet - 21.6$ 1m tok
     /claude_3_haiku - 1.8$ 1m tok 
 
-<b>Models Grok:
+<b>Models Grok:</b>
     /grok_vision_beta - 24$ 1m tok
     /grok_2_vision_latest - 14.4$ 1m tok
     /grok_2_latest 🔥 - 14.4$ 1m tok
