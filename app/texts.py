@@ -8,7 +8,7 @@ start_ru = '''
 - ИИ можно написать вопрос текстом,
 - ИИ можно надиктовать вопрос голосовым сообщением,
 - ИИ может увидеть прикрепленное изображение,
-- Можно переключать языковые модели OpenAI, Google, Anthropic прямо в разговоре, контекст разговора сохраниться,
+- Можно переключать языковые модели OpenAI, Google, Anthropic, Grok, DeepSeek прямо в разговоре, контекст разговора сохраниться,
 - Для сброса истории диалога просто напишите - "забудь" или выберите в быстром меню /reset
 
 Получить ответ ИИ:
@@ -46,7 +46,7 @@ Ask an AI question:
 - AI can write a question in text,
 - AI can dictate a question by voice message,
 - The AI can see the attached image,
-- You can switch the language models of OpenAI, Google, and Anthropic right in the conversation, the context of the conversation will be preserved,
+- You can switch the language models of OpenAI, Google, Anthropic, Grok, DeepSeek right in the conversation, the context of the conversation will be preserved,
 - To reset the dialog history, simply write - "forget" or select /reset in the quick menu.
 
 Get an AI response:

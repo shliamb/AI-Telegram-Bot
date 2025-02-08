@@ -21,11 +21,12 @@ DIALOG_SUM = False
 BACKUP_PATH = "./backup_db/"
 
 # Language models:
-AI_DEFAULT = "gemini" # gemini or openai, anthropic, deepseek
+AI_DEFAULT = "gemini" # gemini, openai, anthropic, deepseek, grok
 AI_DEFAULT_MODEL_GEMINI = "gemini-2.0-flash-exp"
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini"
 AI_DEFAULT_MODEL_CLAUDE = "claude-3-haiku-20240307"
 AI_DEFAULT_MODEL_DEEPSEEK = "deepseek-chat"
+AI_DEFAULT_MODEL_GROK = "grok-2-vision-latest"
 
 # Gen Audio models:
 AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
@@ -99,6 +100,12 @@ PRICE = {
     'gemini-1.5-pro-latest': 15,
     'gemini-1.5-flash-latest': 0.8,
     'gemini-1.5-flash-8b': 0.5,
+
+    # Ilon Mask Grok to 1M tokens:
+    'grok-vision-beta': 24, # Text, Image = 6, Contex 8192, 
+    'grok-2-vision-latest': 14.4, # Text, Image = 2.4, Contex 32768, 
+    'grok-2-latest': 14.4, # Only Text, Contex 131072, 
+    'grok-beta': 24, # Only Text, Contex 131072,
 
     # DeepSeek:
     'deepseek-reasoner': 2.82,

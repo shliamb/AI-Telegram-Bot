@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK
 
 
 import logging
@@ -42,6 +42,7 @@ from mod_claude import mod_claude_chat
 from mod_gemini import mod_gemini_chat
 from mod_openai import mod_openai_chat
 from mod_deepseek import mod_deepseek_chat
+from mod_grok import mod_grok_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
@@ -241,6 +242,8 @@ async def main_menu(message: types.Message, submenu="main"):
         def_model_language = AI_DEFAULT_MODEL_CLAUDE
     elif ai == "deepseek":
         def_model_language = AI_DEFAULT_MODEL_DEEPSEEK
+    elif ai == "grok":
+        def_model_language = AI_DEFAULT_MODEL_GROK
         
     model_language = data["model_language"] if data.get("model_language") is not None else def_model_language
     ai_draw = data["ai_draw"] if data.get("ai_draw") is not None else AI_DRAW
@@ -456,6 +459,12 @@ async def main_menu(message: types.Message, submenu="main"):
     /claude_3_sonnet - 21.6$ 1м ток
     /claude_3_haiku - 1.8$ 1м ток
 
+<b>Модели Grok:
+    /grok_vision_beta - 24$ 1м ток
+    /grok_2_vision_latest - 14.4$ 1м ток
+    /grok_2_latest 🔥 - 14.4$ 1м ток
+    /grok_beta - 24$ 1м ток
+
 <b>Модели DeepSeek:</b>
 (Временные проблемы с оплатой DeepSeek)
     /deepseek_reasoner R1 - 2.82$ 1м ток
@@ -526,6 +535,12 @@ async def main_menu(message: types.Message, submenu="main"):
     /claude_3_opus - 108$ 1m tok
     /claude_3_sonnet - 21.6$ 1m tok
     /claude_3_haiku - 1.8$ 1m tok 
+
+<b>Models Grok:
+    /grok_vision_beta - 24$ 1m tok
+    /grok_2_vision_latest - 14.4$ 1m tok
+    /grok_2_latest 🔥 - 14.4$ 1m tok
+    /grok_beta - 24$ 1m tok
 
 <b>Models DeepSeek:</b>
 (Temporary problems with DeepSeek payment)
@@ -875,6 +890,61 @@ async def gemini_2_0_flash_exp(message: types.Message):
 
 
 
+
+
+
+
+
+# Grok models:
+@dp.message(Command('grok_vision_beta'))
+async def grok_vision_beta(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "deepseek",
+        "model_language": "grok-vision-beta",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('grok_2_vision_latest'))
+async def grok_2_vision_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "deepseek",
+        "model_language": "grok-2-vision-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('grok_2_latest'))
+async def grok_2_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "deepseek",
+        "model_language": "grok-2-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('grok_beta'))
+async def grok_beta(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "deepseek",
+        "model_language": "grok-beta",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
 
 
 
@@ -2517,12 +2587,16 @@ async def try_answer_bot(message, answer, data):
         await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for DeepSeek account.")
 
     # # If Gemini is no money for account.
-    # if "" in answer and data.get("ai") == "gemini":
+    # if "money" in answer and data.get("ai") == "gemini":
     #     await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for Gemini account.")
 
     # # If Anthropic is no money for account.
-    # if "" in answer and data.get("ai") == "anthropic":
+    # if "money" in answer and data.get("ai") == "anthropic":
     #     await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for Anthropic account.")
+
+    # # If Grok is no money for account.
+    # if "money" in answer and data.get("ai") == "grok":
+    #     await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for Grok account.")
         
     # Разбиваем текст на части
     text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
@@ -2670,6 +2744,8 @@ async def mod_tex(data, message):
         answer = await mod_claude_chat(data)
     elif data.get("ai") == "deepseek":
         answer = await mod_deepseek_chat(data)
+    elif data.get("ai") == "grok":
+        answer = await mod_grok_chat(data)
 
     if not answer:
         return
@@ -2719,6 +2795,8 @@ async def add_text_to_photo(message: Message, state: FSMContext):
         answer = await mod_claude_chat(all_data)
     elif all_data.get("ai") == "deepseek":
         answer = await mod_deepseek_chat(all_data)
+    elif all_data.get("ai") == "grok":
+        answer = await mod_grok_chat(all_data)
 
     if not answer:
         return
@@ -2779,6 +2857,8 @@ async def mod_photo(data, message, state: FSMContext):
             answer = await mod_claude_chat(data)
         elif data.get("ai") == "deepseek":
             answer = await mod_deepseek_chat(data)
+        elif data.get("ai") == "grok":
+            answer = await mod_grok_chat(data)
 
         if not answer:
             return
@@ -2862,6 +2942,8 @@ async def mod_documents(data, message, state: FSMContext):
                 answer = await mod_claude_chat(data)
             elif data.get("ai") == "deepseek":
                 answer = await mod_deepseek_chat(data)
+            elif data.get("ai") == "grok":
+                answer = await mod_grok_chat(data)
 
             if not answer:
                 return
@@ -3093,6 +3175,7 @@ async def second_function(message: types.Message, state: FSMContext):
         "gemini": AI_DEFAULT_MODEL_GEMINI,
         "claude": AI_DEFAULT_MODEL_CLAUDE,
         "deepseek": AI_DEFAULT_MODEL_DEEPSEEK,
+        "grok": AI_DEFAULT_MODEL_GROK,
     }
     # Gen Img models:
     default_model_draw = {
