@@ -416,36 +416,37 @@ async def main_menu(message: types.Message, submenu="main"):
 
 <b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
 <b>МОДЕЛЬ: {model_language.upper()}</b>
+(наценка на 1 миллион токенов составляет 20%)
 
 <b>Модели OpenAI:</b>
-    /o1_preview -  150$ 1м ток
-    /o1_mini 🔥 - 11$ 1м ток
-    /gpt_4_turbo - 80$ 1м ток   
-    /chatgpt_4o_latest 🔥 - 40$ 1м ток
-    /gpt_4o_2024_05_13 - 40$ 1м ток
-    /gpt_4o_2024_08_06 - 25$ 1м ток
-    /gpt_4o_mini - 3$ 1м ток
+    /o1_preview -  90$ 1м ток
+    /o1_mini 🔥 - 6.6$ 1м ток
+    /gpt_4_turbo - 48$ 1м ток   
+    /chatgpt_4o_latest 🔥 - 24$ 1м ток
+    /gpt_4o_2024_05_13 - 24$ 1м ток
+    /gpt_4o_2024_08_06 - 15$ 1м ток
+    /gpt_4o_mini 🔥 - 1.8$ 1м ток
 
 
 <b>Модели Google:</b>
-    /gemini_2_0_flash_exp 🔥 - 25$ 1м ток
-    /gemini_1_5_pro - 25$ 1м ток
-    /gemini_1_5_flash - 1.3$ 1м ток
-    /gemini_1_5_flash_8b - 0.8$ 1м ток
+    /gemini_2_0_flash_exp 🔥 - 15$ 1м ток
+    /gemini_1_5_pro - 15$ 1м ток
+    /gemini_1_5_flash - 0.8$ 1м ток
+    /gemini_1_5_flash_8b - 0.5$ 1м ток
+
+
+<b>Модели Anthropic:</b>
+    /claude_3_5_sonnet 🔥 - 21.6$ 1м ток
+    /claude_3_5_haiku - 7.2$ 1м ток
+    /claude_3_opus - 108$ 1м ток
+    /claude_3_sonnet - 21.6$ 1м ток
+    /claude_3_haiku - 1.8$ 1м ток
 
     
 <b>Модели DeepSeek:</b>
 (Временные проблемы с оплатой DeepSeek)
-    /deepseek_reasoner R1 🔥 - 4.7$ 1м ток
-    /deepseek_chat 🔥 - 2.34$ 1м ток
-
-
-<b>Модели Anthropic:</b>
-    /claude_3_5_sonnet - 36$ 1м ток
-    /claude_3_5_haiku - 12$ 1м ток
-    /claude_3_opus - 180$ 1м ток
-    /claude_3_sonnet - 36$ 1м ток
-    /claude_3_haiku - 3$ 1м ток
+    /deepseek_reasoner R1 - 2.82$ 1м ток
+    /deepseek_chat - 1.45$ 1м ток
 
 
 <b>ДОПОЛНИТЕЛЬНО:</b>
@@ -489,36 +490,37 @@ async def main_menu(message: types.Message, submenu="main"):
     
 <b>LANGUAGE AI: {ai.upper()}</b>
 <b>MODEL: {model_language.upper()}</b>
+(the markup on 1 million tokens is 20%)
 
 <b>Models OpenAI:</b>
-    /o1_preview 🔥 -  150$ 1m tok
-    /o1_mini 🔥 - 11$ 1m tok
-    /gpt_4_turbo - 80$ 1m tok
-    /chatgpt_4o_latest 🔥 - 40$ 1m tok
-    /gpt_4o_2024_05_13 - 40$ 1m tok
-    /gpt_4o_2024_08_06 - 25$ 1m tok
-    /gpt_4o_mini - 3$ 1m tok
+    /o1_preview 🔥 -  90$ 1m tok
+    /o1_mini 🔥 - 6.6$ 1m tok
+    /gpt_4_turbo - 48$ 1m tok
+    /chatgpt_4o_latest 🔥 - 24$ 1m tok
+    /gpt_4o_2024_05_13 - 24$ 1m tok
+    /gpt_4o_2024_08_06 - 15$ 1m tok
+    /gpt_4o_mini - 1.8$ 1m tok
     
     
 <b>Models Google:</b>
-    /gemini_2_0_flash_exp 🔥 - 25$ 1m tok
-    /gemini_1_5_pro - 25$ 1m tok
-    /gemini_1_5_flash - 1.2$ 1m tok
-    /gemini_1_5_flash_8b - 0.8$ 1m tok
+    /gemini_2_0_flash_exp 🔥 - 15$ 1m tok
+    /gemini_1_5_pro - 15$ 1m tok
+    /gemini_1_5_flash - 0.8$ 1m tok
+    /gemini_1_5_flash_8b - 0.5$ 1m tok
+
+
+<b>Models Anthropic:</b>
+    /claude_3_5_sonnet 🔥 - 21.6$ 1m tok
+    /claude_3_5_haiku - 7.2$ 1m tok
+    /claude_3_opus - 108$ 1m tok
+    /claude_3_sonnet - 21.6$ 1m tok
+    /claude_3_haiku - 1.8$ 1m tok 
 
     
 <b>Models DeepSeek:</b>
 (Temporary problems with DeepSeek payment)
-    /deepseek_reasoner R1 🔥 - 4.7$ 1m tok
-    /deepseek_chat 🔥 - 2.34$ 1m tok
-
-    
-<b>Models Anthropic:</b>
-    /claude_3_5_sonnet - 36$ 1m tok
-    /claude_3_5_haiku - 12$ 1m tok
-    /claude_3_opus - 180$ 1m tok
-    /claude_3_sonnet - 36$ 1m tok
-    /claude_3_haiku - 3$ 1m tok 
+    /deepseek_reasoner R1 - 2.82$ 1m tok
+    /deepseek_chat - 1.45$ 1m tok
     
 
 <b>ADDITIONALLY:</b>

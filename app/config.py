@@ -82,57 +82,52 @@ NULL_TOKEN = 0
 PRICE = {
     # OpenAI to 1M tokes:
 
-    # 'o1': 150,
-    # 'o3-mini': 11,
-    'o1-preview': 150,
-    'o1-mini': 11,
-    'chatgpt-4o-latest': 40,
-    'gpt-4o': 40,
-    'gpt-4o-2024-05-13': 40,
-    'gpt-4o-2024-08-06': 25,
-    'gpt-4o-mini': 3, # no vision
-    'gpt-4o-mini-2024-07-18': 3, # no vision
-    'gpt-4-turbo-2024-04-09': 80,
-
-    # 'babbage-002': 0.8, # For summarizing texts, the clean price is 0.8 ???
+    # 'o1': 90,
+    # 'o3-mini': 6.6,
+    'o1-preview': 90,
+    'o1-mini': 6.6,
+    'chatgpt-4o-latest': 24,
+    'gpt-4o': 24,
+    'gpt-4o-2024-05-13': 24,
+    'gpt-4o-2024-08-06': 15,
+    'gpt-4o-mini': 1.8, # no vision
+    'gpt-4o-mini-2024-07-18': 1.8, # no vision
+    'gpt-4-turbo-2024-04-09': 48,
 
     # Google Gemini to 1M tokens:
-    'gemini-2.0-flash-exp': 25,
-    'gemini-1.5-pro-latest': 25,
-    'gemini-1.5-flash-latest': 1.2,
-    'gemini-1.5-flash-8b': 0.8,
-    #'gemini-1.0-pro': 4, # Не срабатывает, так как не поддерживает системные инструкции, json режим, выполнение кода, лучше не пользоваться ею
-    # 'text-embedding-004': 0, # Free  хз пока что как ее пользовать
-    # 'aqa': 0,
+    'gemini-2.0-flash-exp': 15,
+    'gemini-1.5-pro-latest': 15,
+    'gemini-1.5-flash-latest': 0.8,
+    'gemini-1.5-flash-8b': 0.5,
 
     # DeepSeek:
-    'deepseek-reasoner': 4.7,
-    'deepseek-chat': 2.34,
+    'deepseek-reasoner': 2.82,
+    'deepseek-chat': 1.45,
 
     # Antropic Claude to 1M tokens:  Context window - 200k, 
     # New:
-    'claude-3-5-sonnet-latest': 36, # output 8192 tokens
-    'claude-3-5-haiku-latest': 12, # no vision and output 8192 tokens
-    'claude-3-opus-latest': 180, # 4096 tokens
+    'claude-3-5-sonnet-latest': 21.6, # output 8192 tokens
+    'claude-3-5-haiku-latest': 7.2, # no vision and output 8192 tokens
+    'claude-3-opus-latest': 108, # 4096 tokens
     # Old:
-    'claude-3-sonnet-20240229': 36, # 4096 tokens
-    'claude-3-haiku-20240307': 3, # 4096 tokens
+    'claude-3-sonnet-20240229': 21.6, # 4096 tokens
+    'claude-3-haiku-20240307': 1.8, # 4096 tokens
 
 
     # Images to one img:
-    'dall-e-3-1024': 0.08,
-    'dall-e-3-1792': 0.16,
+    'dall-e-3-1024': 0.048,
+    'dall-e-3-1792': 0.096,
 
-    'dall-e-3-hd-1024': 0.16,
-    'dall-e-3-hd-1792': 0.24,
+    'dall-e-3-hd-1024': 0.096,
+    'dall-e-3-hd-1792': 0.144,
 
-    'dall-e-2-1024': 0.04,
-    'dall-e-2-512': 0.036,
-    'dall-e-2-256': 0.032,
+    'dall-e-2-1024': 0.024,
+    'dall-e-2-512': 0.0216,
+    'dall-e-2-256': 0.0192,
 
     # Audio to 1M characters:
-    'tts-1': 30, # / 1M characters
-    'tts-1-hd': 60, # / 1M characters
-    'whisper-1': 0.012, # minute (rounded to the nearest second)
+    'tts-1': 18, # / 1M characters
+    'tts-1-hd': 36, # / 1M characters
+    'whisper-1': 0.0072, # minute (rounded to the nearest second)
 
     }
