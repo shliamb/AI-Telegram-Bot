@@ -435,7 +435,7 @@ async def main_menu(message: types.Message, submenu="main"):
 
 <b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
 <b>МОДЕЛЬ: {model_language.upper()}</b>
-(В цене +20% за поддержку системы)
+(Наценка на токены 20% от их ориг. стоимости)
 
 <b>Модели OpenAI:</b>
     /o1_preview -  90$ 1м ток
@@ -466,7 +466,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /grok_beta - 24$ 1м ток
 
 <b>Модели DeepSeek:</b>
-(Временные проблемы с оплатой DeepSeek)
     /deepseek_reasoner R1 - 2.82$ 1м ток
     /deepseek_chat - 1.45$ 1м ток
 
@@ -512,7 +511,7 @@ async def main_menu(message: types.Message, submenu="main"):
     
 <b>LANGUAGE AI: {ai.upper()}</b>
 <b>MODEL: {model_language.upper()}</b>
-(Price +20% system support)
+(The token markup is 20% of their original cost)
 
 <b>Models OpenAI:</b>
     /o1_preview 🔥 -  90$ 1m tok
@@ -543,7 +542,6 @@ async def main_menu(message: types.Message, submenu="main"):
     /grok_beta - 24$ 1m tok
 
 <b>Models DeepSeek:</b>
-(Temporary problems with DeepSeek payment)
     /deepseek_reasoner R1 - 2.82$ 1m tok
     /deepseek_chat - 1.45$ 1m tok
     
