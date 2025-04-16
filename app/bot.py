@@ -438,32 +438,37 @@ async def main_menu(message: types.Message, submenu="main"):
 (Наценка на токены 20% от их ориг. стоимости)
 
 <b>Модели OpenAI:</b>
+    /gpt_4_1 🔥 - 12$ 1м ток
+    /gpt_4_1_mini - 2.4$ 1м ток
+    /gpt_4_1_nano - 0.6$ 1м ток
+    /gpt_4_5_preview - 270$ 1м ток
     /o1_preview -  90$ 1м ток
-    /o1_mini 🔥 - 6.6$ 1м ток
-    /gpt_4_turbo - 48$ 1м ток   
+    /o3_mini - 6.6$ 1м ток
+    /o1_mini - 6.6$ 1м ток
     /chatgpt_4o_latest 🔥 - 24$ 1м ток
-    /gpt_4o_2024_05_13 - 24$ 1м ток
-    /gpt_4o_2024_08_06 - 15$ 1м ток
-    /gpt_4o_mini 🔥 - 1.8$ 1м ток
+    /gpt_4o_mini - 1.8$ 1м ток
 
 <b>Модели Google:</b>
-    /gemini_2_0_flash_exp 🔥 - 15$ 1м ток
-    /gemini_1_5_pro - 15$ 1м ток
-    /gemini_1_5_flash - 0.8$ 1м ток
-    /gemini_1_5_flash_8b - 0.5$ 1м ток
+    /gemini_2_5_pro_preview_03_25 🔥 - 21$ 1м ток
+    /gemini_2_0_flash_exp 🔥 - 0.9$ 1м ток
+    /gemini_2_0_flash_lite_001 - 0.45$ 1м ток
+    /gemini_1_5_flash - 0.225$ 1м ток
 
 <b>Модели Anthropic:</b>
-    /claude_3_5_sonnet 🔥 - 21.6$ 1м ток
-    /claude_3_5_haiku - 7.2$ 1м ток
+    /claude_3_7_sonnet_latest 🔥 - 21.6$ 1м ток
+    /claude_3_5_sonnet - 21.6$ 1м ток
+    /claude_3_5_haiku - 5.76$ 1м ток
     /claude_3_opus - 108$ 1м ток
     /claude_3_sonnet - 21.6$ 1м ток
     /claude_3_haiku - 1.8$ 1м ток
 
 <b>Модели Grok:</b>
-    /grok_vision_beta - 24$ 1м ток
+    /grok_3_latest 🔥 - 21.6$ 1м ток 
+    /grok_3_fast_latest - 36$ 1м ток
+    /grok_3_mini_latest 🔥 - 0.96$ 1м ток
+    /grok_3_mini_fast_latest - 5.52$ 1м ток
     /grok_2_vision_latest - 14.4$ 1м ток
-    /grok_2_latest 🔥 - 14.4$ 1м ток
-    /grok_beta - 24$ 1м ток
+    /grok_2_latest - 14.4$ 1м ток
 
 <b>Модели DeepSeek:</b>
     /deepseek_reasoner R1 - 2.82$ 1м ток
@@ -815,9 +820,70 @@ async def o3_mini(message: types.Message):
         await main_menu(message, "main")
 
 
+@dp.message(Command('gpt_4_1'))
+async def gpt_4_1(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4.1",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gpt_4_1_mini'))
+async def gpt_4_1_mini(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4.1-mini",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gpt_4_1_nano'))
+async def gpt_4_1_nano(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4.1-nano",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
 
 
 
+@dp.message(Command('gpt_4_5_preview'))
+async def gpt_4_5_preview(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-4.5-preview",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('o3_mini'))
+async def o3_mini(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "o3-mini",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
 
 
 
@@ -886,6 +952,37 @@ async def gemini_2_0_flash_exp(message: types.Message):
         await main_menu(message, "main")
 
 
+@dp.message(Command('gemini_2_5_pro_preview_03_25'))
+async def gemini_2_5_pro_preview_03_25(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-2.5-pro-preview-03-25",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gemini_2_0_flash_lite_001'))
+async def gemini_2_0_flash_lite_001(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-2.0-flash-lite-001",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+
+
+
+
+
 
 
 
@@ -943,6 +1040,63 @@ async def grok_beta(message: types.Message):
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "main")
+
+
+@dp.message(Command('grok_3_mini_fast_latest'))
+async def grok_3_mini_fast_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-3-mini-fast-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('grok_3_mini_latest'))
+async def grok_3_mini_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-3-mini-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('grok_3_fast_latest'))
+async def grok_3_fast_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-3-fast-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('grok_3_latest'))
+async def grok_3_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-3-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+
+
+
 
 
 
@@ -1040,6 +1194,29 @@ async def claude_3_haiku(message: types.Message):
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "main")
+
+
+@dp.message(Command('claude_3_7_sonnet_latest'))
+async def claude_3_7_sonnet_latest(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-3-7-sonnet-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+
+
+
+
+
+
+
+
 
 
 # Image generation:

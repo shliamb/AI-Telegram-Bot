@@ -82,11 +82,18 @@ USE_DIGITAL = False
 NULL_TOKEN = 0
 PRICE = {
     # OpenAI to 1M tokes:
-
-    # 'o1': 90,
-    # 'o3-mini': 6.6,
+    'gpt-4.1': 12, # 1 million Contex gpt-4.1-2025-04-14
+    'gpt-4.1-mini': 2.4, # gpt-4.1-mini-2025-04-14
+    'o1-pro': 900, # o1-pro-2025-03-19
+    'gpt-4.1-nano': 0.6, # gpt-4.1-nano-2025-04-14
+    'gpt-4.5-preview': 270, # gpt-4.5-preview-2025-02-27
+    'o1': 90, # o1-2024-12-17
     'o1-preview': 90,
+    'o3-mini': 6.6, # 
     'o1-mini': 6.6,
+    # 'gpt-4o-mini-search-preview': 0.9,
+    # 'gpt-4o-search-preview': 15,
+    # 'computer-use-preview': 18,
     'chatgpt-4o-latest': 24,
     'gpt-4o': 24,
     'gpt-4o-2024-05-13': 24,
@@ -96,16 +103,23 @@ PRICE = {
     'gpt-4-turbo-2024-04-09': 48,
 
     # Google Gemini to 1M tokens:
-    'gemini-2.0-flash-exp': 15,
-    'gemini-1.5-pro-latest': 15,
-    'gemini-1.5-flash-latest': 0.8,
+    'gemini-2.5-pro-preview-03-25': 21,# Maximum input tokens 1,048,576
+    'gemini-2.0-flash-exp': 0.9, # 15,
+    'gemini-2.0-flash-lite-001': 0.45,
+    'gemini-1.5-pro-latest': 3.75, # 15, 
+    'gemini-1.5-flash-latest': 0.225, # 0.8,
     'gemini-1.5-flash-8b': 0.5,
 
     # Ilon Mask Grok to 1M tokens:
+    'grok-3-latest': 21.6, # Contex 131072, 
+    'grok-3-fast-latest': 36, # Contex 131072, 
+    'grok-3-mini-latest': 0.96, # Contex 131072,
+    'grok-3-mini-fast-latest': 5.52, # Contex 131072,
+
     'grok-vision-beta': 24, # Text, Image = 6, Contex 8192, 
     'grok-2-vision-latest': 14.4, # Text, Image = 2.4, Contex 32768, 
     'grok-2-latest': 14.4, # Only Text, Contex 131072, 
-    'grok-beta': 24, # Only Text, Contex 131072,
+    'grok-beta': 24, # Only Text, Contex 131072, 
 
     # DeepSeek:
     'deepseek-reasoner': 2.82,
@@ -113,12 +127,13 @@ PRICE = {
 
     # Antropic Claude to 1M tokens:  Context window - 200k, 
     # New:
+    'claude-3-7-sonnet-latest': 21.6, # 200K context window Most intelligent model, with visible step‑by‑step reasoning claude-3-7-sonnet-20250219
     'claude-3-5-sonnet-latest': 21.6, # output 8192 tokens
-    'claude-3-5-haiku-latest': 7.2, # no vision and output 8192 tokens
+    'claude-3-5-haiku-latest': 5.76, # no vision and output 8192 tokens
     'claude-3-opus-latest': 108, # 4096 tokens
     # Old:
     'claude-3-sonnet-20240229': 21.6, # 4096 tokens
-    'claude-3-haiku-20240307': 1.8, # 4096 tokens
+    'claude-3-haiku-20240307': 1.8, # 200K context window
 
 
     # Images to one img:
