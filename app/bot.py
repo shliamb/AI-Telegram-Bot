@@ -449,13 +449,13 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4o_mini - 1.8$ 1м ток
 
 <b>Модели Google:</b>
-    /gemini_2_5_pro_preview_03_25 🔥 - 21$ 1м ток
+    /gemini_2_5_pro 🔥 - 21$ 1м ток
     /gemini_2_0_flash_exp 🔥 - 0.9$ 1м ток
     /gemini_2_0_flash_lite_001 - 0.45$ 1м ток
     /gemini_1_5_flash - 0.225$ 1м ток
 
 <b>Модели Anthropic:</b>
-    /claude_3_7_sonnet_latest 🔥 - 21.6$ 1м ток
+    /claude_3_7_sonnet 🔥 - 21.6$ 1м ток
     /claude_3_5_sonnet - 21.6$ 1м ток
     /claude_3_5_haiku - 5.76$ 1м ток
     /claude_3_opus - 108$ 1м ток
@@ -519,32 +519,37 @@ async def main_menu(message: types.Message, submenu="main"):
 (The token markup is 20% of their original cost)
 
 <b>Models OpenAI:</b>
-    /o1_preview 🔥 -  90$ 1m tok
-    /o1_mini 🔥 - 6.6$ 1m tok
-    /gpt_4_turbo - 48$ 1m tok
+    /gpt_4_1 🔥 - 12$ 1m tok
+    /gpt_4_1_mini - 2.4$ 1m tok
+    /gpt_4_1_nano - 0.6$ 1m tok
+    /gpt_4_5_preview - 270$ 1m tok
+    /o1_preview -  90$ 1m tok
+    /o3_mini - 6.6$ 1m tok
+    /o1_mini - 6.6$ 1m tok
     /chatgpt_4o_latest 🔥 - 24$ 1m tok
-    /gpt_4o_2024_05_13 - 24$ 1m tok
-    /gpt_4o_2024_08_06 - 15$ 1m tok
     /gpt_4o_mini - 1.8$ 1m tok
     
 <b>Models Google:</b>
-    /gemini_2_0_flash_exp 🔥 - 15$ 1m tok
-    /gemini_1_5_pro - 15$ 1m tok
-    /gemini_1_5_flash - 0.8$ 1m tok
-    /gemini_1_5_flash_8b - 0.5$ 1m tok
+    /gemini_2_5_pro 🔥 - 21$ 1m tok
+    /gemini_2_0_flash_exp 🔥 - 0.9$ 1m tok
+    /gemini_2_0_flash_lite_001 - 0.45$ 1m tok
+    /gemini_1_5_flash - 0.225$ 1m tok
 
 <b>Models Anthropic:</b>
-    /claude_3_5_sonnet 🔥 - 21.6$ 1m tok
-    /claude_3_5_haiku - 7.2$ 1m tok
+    /claude_3_7_sonnet 🔥 - 21.6$ 1m tok
+    /claude_3_5_sonnet - 21.6$ 1m tok
+    /claude_3_5_haiku - 5.76$ 1m tok
     /claude_3_opus - 108$ 1m tok
     /claude_3_sonnet - 21.6$ 1m tok
-    /claude_3_haiku - 1.8$ 1m tok 
+    /claude_3_haiku - 1.8$ 1m tok
 
 <b>Models Grok:</b>
-    /grok_vision_beta - 24$ 1m tok
+    /grok_3_latest 🔥 - 21.6$ 1m tok 
+    /grok_3_fast_latest - 36$ 1m tok
+    /grok_3_mini_latest 🔥 - 0.96$ 1m tok
+    /grok_3_mini_fast_latest - 5.52$ 1m tok
     /grok_2_vision_latest - 14.4$ 1m tok
-    /grok_2_latest 🔥 - 14.4$ 1m tok
-    /grok_beta - 24$ 1m tok
+    /grok_2_latest - 14.4$ 1m tok
 
 <b>Models DeepSeek:</b>
     /deepseek_reasoner R1 - 2.82$ 1m tok
@@ -952,7 +957,7 @@ async def gemini_2_0_flash_exp(message: types.Message):
         await main_menu(message, "main")
 
 
-@dp.message(Command('gemini_2_5_pro_preview_03_25'))
+@dp.message(Command('gemini_2_5_pro'))
 async def gemini_2_5_pro_preview_03_25(message: types.Message):
     id = user_id(message)
     data = {
@@ -1196,7 +1201,7 @@ async def claude_3_haiku(message: types.Message):
         await main_menu(message, "main")
 
 
-@dp.message(Command('claude_3_7_sonnet_latest'))
+@dp.message(Command('claude_3_7_sonnet'))
 async def claude_3_7_sonnet_latest(message: types.Message):
     id = user_id(message)
     data = {
