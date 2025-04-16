@@ -3,10 +3,6 @@ from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEF
 
 
 import logging
-# in terminal:
-# logging.basicConfig(level=logging.INFO)
-# logger = logging.getLogger(__name__)
-# in file:
 logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 logging.basicConfig(level=logging.INFO, filename='./log/bot.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
 import re
@@ -981,10 +977,6 @@ async def gemini_2_0_flash_lite_001(message: types.Message):
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "main")
-
-
-
-
 
 
 
