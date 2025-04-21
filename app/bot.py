@@ -438,7 +438,9 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4_1_mini - 2.4$ 1м ток
     /gpt_4_1_nano - 0.6$ 1м ток
     /gpt_4_5_preview - 270$ 1м ток
+    /o3 - 60$ 1м ток
     /o1_preview -  90$ 1м ток
+    /o4_mini - 6.6$ 1м ток
     /o3_mini - 6.6$ 1м ток
     /o1_mini - 6.6$ 1м ток
     /chatgpt_4o_latest 🔥 - 24$ 1м ток
@@ -519,7 +521,9 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4_1_mini - 2.4$ 1m tok
     /gpt_4_1_nano - 0.6$ 1m tok
     /gpt_4_5_preview - 270$ 1m tok
+    /o3 - 60$ 1m tok
     /o1_preview -  90$ 1m tok
+    /o4_mini - 6.6$ 1m tok
     /o3_mini - 6.6$ 1m tok
     /o1_mini - 6.6$ 1m tok
     /chatgpt_4o_latest 🔥 - 24$ 1m tok
@@ -886,6 +890,31 @@ async def o3_mini(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
+
+@dp.message(Command('o3'))
+async def o3(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "o3",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('o4_mini'))
+async def o4_mini(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "o4-mini",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
 
 
 

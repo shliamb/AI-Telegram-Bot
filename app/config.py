@@ -89,6 +89,8 @@ PRICE = {
     'gpt-4.5-preview': 270, # gpt-4.5-preview-2025-02-27
     'o1': 90, # o1-2024-12-17
     'o1-preview': 90,
+    'o3': 60, # o3-2025-04-16 
+    'o4-mini': 6.6, # o4-mini-2025-04-16
     'o3-mini': 6.6, # 
     'o1-mini': 6.6,
     # 'gpt-4o-mini-search-preview': 0.9,
