@@ -2138,7 +2138,7 @@ async def gemini(message: types.Message):
 
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     # Get method default:
@@ -2187,7 +2187,7 @@ async def get_info_by_users(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     all_data = await read_all_users()
@@ -2228,6 +2228,12 @@ class News(StatesGroup):
 
 @dp.message(Command('sending_news'))
 async def sending_news(message: types.Message, state: FSMContext):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
     await message.answer("News message on RU:", parse_mode="HTML")
     await state.set_state(News.news_ru)
 
@@ -2317,6 +2323,12 @@ async def get_logs_bot(message: types.Message):
 # Admin clear logs /clearlog
 @dp.message(Command("clear_logs"))
 async def admin_clear_logs(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
 
     if os.path.exists("./log/bot.log") and os.path.getsize("./log/bot.log") > 0:
 
@@ -2346,7 +2358,7 @@ async def get_info_a_payments_users(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     data_payments = await read_all_payments()
@@ -2395,7 +2407,7 @@ async def add_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await message.reply("The name of the payment method is short (title method):", parse_mode="Markdown") 
@@ -2465,7 +2477,7 @@ async def select_when_deleted_metod_pay(message: types.Message, state: FSMContex
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     # Get metods pay data:
@@ -2535,7 +2547,7 @@ async def start_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
     
     await state.set_state(Form_change_method.start)
@@ -2674,7 +2686,7 @@ async def backup(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     confirm = await backup_db() # Create Backup DB
@@ -2716,7 +2728,7 @@ async def restore_db_admin(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
     
     await bot.send_message(message.chat.id, "Attach and send the necessary copy of the database for recovery.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
