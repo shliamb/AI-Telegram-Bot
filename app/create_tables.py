@@ -159,6 +159,8 @@ Table statistics:
 id  date  model  tokens  min  img  price  user_id  name
 
 Table discussion:
+
+
 id  date  user_say  model_say  summarization  user_id 
 
 '''
