@@ -3082,10 +3082,11 @@ async def try_answer_bot(message, answer, data):
             "model_language": "gemini-2.0-flash-exp" # "gpt-4.1-nano" # "gemini-2.5-flash-preview-04-17" # gemini-2.0-flash-exp  gemini-1.5-flash-latest    gemini-2.0-flash-lite-001
         }
         
-        await asyncio.sleep(1)
+        # await asyncio.sleep(1)
         zip_answer = await mod_gemini_chat(zip_data) # Сука все на английский переводит, не слушается команд нормально
         # zip_answer = await mod_openai_chat(zip_data) # Как часы, но дороже сука
 
+        print(zip_answer)
         if zip_answer:
             try: 
                 answer = zip_answer.get("response")
