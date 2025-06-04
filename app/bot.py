@@ -3045,10 +3045,11 @@ async def try_answer_bot(message, answer, data):
 
     # Summirization answer:
     dialog_sum = data.get("dialog_sum")
-    #print(dialog_sum)
+    print(dialog_sum)
     original_len = len(answer.encode("utf-8"))
     if dialog_sum and original_len > MAX_SIMBOLS:
         #print(f"\n\n\nReal answer: {answer}")
+        print("ENABLED SUMM")
 
         prompt = '''
         Ты — вспомогательный ИИ. Твоя задача — предельно сжать входной текст, сохранив только критически важную информацию, пригодную для последующей генерации ответов.
@@ -3081,7 +3082,9 @@ async def try_answer_bot(message, answer, data):
             "assist_content": None,
             "model_language": "gemini-1.5-flash-latest" # "gpt-4.1-nano" # "gemini-2.5-flash-preview-04-17" # gemini-2.0-flash-exp  gemini-1.5-flash-latest    gemini-2.0-flash-lite-001
         }
-
+        
+        print(zip_data)
+        await asyncio.sleep(2)
         zip_answer = await mod_gemini_chat(zip_data) # Сука все на английский переводит, не слушается команд нормально
         # zip_answer = await mod_openai_chat(zip_data) # Как часы, но дороже сука
 
@@ -3089,7 +3092,7 @@ async def try_answer_bot(message, answer, data):
             try: 
                 answer = zip_answer.get("response")
                 #logging.info(f"Summarizacion: {answer}")
-                print(f"Summarizacion: {answer}")
+                #print(f"\nSummarizacion: {answer}\n")
             except:
                 answer = {'response': answer, "used_tokens": NULL_TOKEN}
 
@@ -3118,7 +3121,7 @@ async def try_answer_bot(message, answer, data):
             # Помечаю для ИИ что ответ сжат:
             """ Каждый следующий ответ, становится все сжатие, пытаюсь таким образом решить проблему """
             answer = f"[!Don’t let the compressed version affect the style or conciseness of your answer!]\n[START COMPRESSED]\n{answer}\n[END COMPRESSED]"
-            print(f"\n{answer}\n")
+            #print(f"\n{answer}\n")
 
 
         confirm = await calculation(zip_data, "text")
