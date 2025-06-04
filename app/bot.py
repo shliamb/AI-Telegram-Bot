@@ -42,7 +42,7 @@ from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_all_payments, add_payments, read_discussion, add_discussion, clear_discussion_by_id, read_admin_data, add_data_admin, update_admin_data, assist_admin_db_users
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_all_payments, add_payments, read_discussion, add_discussion, clear_discussion_by_id #, read_admin_data, add_data_admin, update_admin_data, assist_admin_db_users
 from texts import start_ru, start_en
 from backupdb import backup_db
 from restore_db import restore_db
