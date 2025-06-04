@@ -1,5 +1,5 @@
-from get_keys import TELEGRAM_BOT_TOKEN, USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI, USER_DB, PASSWORD_DB, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, AUDIO_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK
+from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, DEFAULT_MODEL_ASSIST_OA
 
 
 import logging
@@ -11,7 +11,7 @@ import os
 import asyncio
 import json
 #import requests
-from io import StringIO, BytesIO
+from io import StringIO #, BytesIO
 #import uuid
 from pathlib import Path # Работа с файловыми путями 
 # from datetime import datetime, timezone, timedelta
@@ -20,14 +20,13 @@ from pathlib import Path # Работа с файловыми путями
 import csv
 # import datetime
 # Aiogram
-from aiogram import Bot, Dispatcher, types, F, Router
-from aiogram.enums import ParseMode
+from aiogram import Bot, Dispatcher, types, F#, Router
+# from aiogram.enums import ParseMode
 from aiogram.utils.markdown import hbold
-from aiogram.filters import CommandStart, Command, Filter
-from aiogram.types import (Message, BotCommand, LabeledPrice, ContentType, InputFile, Document, PhotoSize, \
-        ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton)
+from aiogram.filters import CommandStart, Command #, Filter
+from aiogram.types import Message, BotCommand, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton #, ReplyKeyboardMarkup, KeyboardButton, LabeledPrice, ContentType, InputFile, Document, PhotoSize
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.storage.memory import MemoryStorage
+#from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.state import State, StatesGroup
 # from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 # Service
@@ -42,19 +41,20 @@ from mod_grok import mod_grok_chat
 from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
-from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os, unformat_date
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_one_methods_pay_by_id, read_all_payments, add_payments, read_one_methods_pay, read_discussion, add_discussion, clear_discussion_by_id
-from texts import start_ru, start_en, prices_en, prices_ru
+from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_all_payments, add_payments, read_discussion, add_discussion, clear_discussion_by_id, read_admin_data, add_data_admin, update_admin_data, assist_admin_db_users
+from texts import start_ru, start_en
 from backupdb import backup_db
 from restore_db import restore_db
+from create_tables import create_tables_in_db
+from restore_loyal_users import restore_loyal_users_to_db
+# from oa_assist import AssistOpenAI
 
 
 
 
 bot = Bot(TELEGRAM_BOT_TOKEN, parse_mode="markdown") # Initialize Bot instance with a default parse mode which will be passed to all API calls
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
-
-
 
 
 
@@ -67,6 +67,17 @@ def user_id(action) -> int:
 # Show Typing bot
 async def typing(action) -> None:
     await bot.send_chat_action(action.chat.id, action='typing')
+
+# Forced Start:
+async def forced_start(message: types.Message):
+    language_code = message.from_user.language_code
+    if language_code == "ru":
+        await message.answer("Обновлен бот. Для продолжения нажмите /start.  ", parse_mode="HTML")
+    else:
+        await message.answer("Updated the bot. To continue, press /start", parse_mode="HTML")
+
+
+
 
 
 
@@ -196,17 +207,21 @@ async def command_start_handler(message: Message, state: FSMContext):
 async def reset_history(message: types.Message):
     id = user_id(message)
     data = await read_user(id)
+    if not data:
+        await forced_start(message)
+        return
+
     language = data.get("language")
 
     confirm = await clear_discussion_by_id(id)
 
     if not confirm:
-        print("Error: The dialog history has not been cleared.")
+        logging.error("Error: The dialog history has not been cleared.")
 
     if language == "ru":
-        await message.answer("История диалога очищена.", parse_mode="HTML")
+        await message.answer("🗑 История диалога очищена.", parse_mode="HTML")
     else:
-        await message.answer("The dialog history has been cleared.", parse_mode="HTML")
+        await message.answer("🗑 The dialog history has been cleared.", parse_mode="HTML")
 
 
 
@@ -219,6 +234,9 @@ async def main_menu(message: types.Message, submenu="main"):
     logging.info(f"Push menu -  {id}.")
 
     data = await read_user(id)
+    if not data:
+        await forced_start(message)
+        return
 
     language = data["language"] if data.get("language") is not None else LANGUAGE
     ai = data["ai"] if data.get("ai") is not None else AI_DEFAULT
@@ -447,10 +465,10 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4o_mini - 1.8$ 1м ток
 
 <b>Модели Google:</b>
-    /gemini_2_5_pro 🔥 - 21$ 1м ток
+    /gemini_2_5_pro 🔥 - 13.5$ 1м ток
+    /gemini_2_5_flash 🔥 - 0.9$ 1м ток
     /gemini_2_0_flash_exp 🔥 - 0.9$ 1м ток
     /gemini_2_0_flash_lite_001 - 0.45$ 1м ток
-    /gemini_1_5_flash - 0.225$ 1м ток
 
 <b>Модели Anthropic:</b>
     /claude_3_7_sonnet 🔥 - 21.6$ 1м ток
@@ -530,10 +548,10 @@ async def main_menu(message: types.Message, submenu="main"):
     /gpt_4o_mini - 1.8$ 1m tok
     
 <b>Models Google:</b>
-    /gemini_2_5_pro 🔥 - 21$ 1m tok
+    /gemini_2_5_pro 🔥 - 13.5$ 1m tok
+    /gemini_2_5_flash 🔥 - 0.9$ 1m tok
     /gemini_2_0_flash_exp 🔥 - 0.9$ 1m tok
     /gemini_2_0_flash_lite_001 - 0.45$ 1m tok
-    /gemini_1_5_flash - 0.225$ 1m tok
 
 <b>Models Anthropic:</b>
     /claude_3_7_sonnet 🔥 - 21.6$ 1m tok
@@ -988,7 +1006,20 @@ async def gemini_2_5_pro_preview_03_25(message: types.Message):
     data = {
         "user_id": id,
         "ai": "gemini",
-        "model_language": "gemini-2.5-pro-preview-03-25",
+        "model_language": "gemini-2.5-pro-preview-05-06",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gemini_2_5_flash'))
+async def gemini_2_5_flash(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-2.5-flash-preview-04-17",
     }
     confirm = await update_user(data)
     if confirm:
@@ -1609,7 +1640,7 @@ async def get_stat(message: types.Message):
     try:
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
-        print(f"Error sending documentb User stat")
+        logging.error(f"Error sending documentb User stat")
 
 
 
@@ -1655,7 +1686,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     data = callback_query.data.split(':')
 
     if not data:
-        print("Error: dont get data - data_button.")
+        logging.error("Error: dont get data - data_button.")
         await bot.send_message(callback_query.from_user.id, "Error: dont get data - data_button.")
         return
     
@@ -1683,7 +1714,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     
     confirm_pay_stat =  await add_payments(pay_data)
     if not confirm_pay_stat:
-        print("Error: Dont save payments.")
+        logging.error("Error: Dont save payments.")
 
     one_method = await read_one_methods_pay_by_use(use)
     if one_method:
@@ -1695,7 +1726,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
         method_data = {"id": metod_id, "counts": counts}
         confirm_update_met =  await update_methods_pay(method_data)
         if not confirm_update_met:
-            print("Error: Dont update counts pay method.")
+            logging.error("Error: Dont update counts pay method.")
 
     if confirm_save is True:
         # Admin:
@@ -1822,7 +1853,7 @@ Choosing a payment method:
             answer = answer + "/use_digital"
 
     if answer == "":
-        print("Error: not default method pay.")
+        logging.error("Error: not default method pay.")
         if language == "ru":
             await message.reply("Нет способов оплаты, извините.", parse_mode="HTML")
         else:
@@ -1893,7 +1924,7 @@ async def sbp_ru_input(message: types.Message, state: FSMContext):
     try:
         amount = float(message.text)
     except:
-        print(f"This not float input.")
+        logging.error(f"This not float input.")
         await message.reply("This not float input.", parse_mode="Markdown") 
         return
 
@@ -2015,6 +2046,9 @@ async def start(message: types.Message):
 
     id = user_id(message)
     data = await read_user(id)
+    if not data:
+        await forced_start(message)
+        return
     language = data.get("language")
 
     text_button = "📝 Сообщение разработчику" if language == "ru" else "📝 Message to the developer"
@@ -2042,7 +2076,7 @@ async def send_to_admin(callback_query: types.CallbackQuery, state: FSMContext):
     block = data.get("block")
 
     if block:
-        print(f"This dude - {id} is trying to write blocked.")
+        logging.error(f"This dude - {id} is trying to write blocked.")
         if language == "ru":
             await bot.send_message(callback_query.from_user.id, "У вас больше нет попыток написать.", parse_mode="HTML")
         elif language == "en":
@@ -2095,12 +2129,12 @@ async def blocking_dude(callback_query: types.CallbackQuery):
     data = callback_query.data.split(':')
 
     if not data:
-        print("Error: dont get data - data_button.")
+        logging.error("Error: dont get data - data_button.")
         await bot.send_message(callback_query.from_user.id, "Error: dont get data - data_button.")
         return
 
     id = int(data[1])
-    print(id)
+    logging.info(id)
 
     updated_data = {"user_id": id, "block": True}
     confirm_save = await update_user(updated_data)
@@ -2127,13 +2161,12 @@ async def blocking_dude(callback_query: types.CallbackQuery):
 
 
 
-
 #### ADMIN MENU ####
 ####################
 
 # ADMIN: Get menu:
 @dp.message(Command('admin'))
-async def gemini(message: types.Message):
+async def admin_menu(message: types.Message):
     id = user_id(message)
 
 
@@ -2145,40 +2178,182 @@ async def gemini(message: types.Message):
     #data_pay = await read_one_methods_pay_by_use(i)
     #use_pay = data_pay.get("title_method_pay")
 
-    admin = f'''
-<b>ADMIN PANEL:</b>
+    # try:
+    #     admin_data = await read_admin_data(id)
+    #     if not admin_data:
+    #         admin_data = {
+    #             "user_id": id, 
+    #             "operating_mode": False, 
+    #             "model_assist": DEFAULT_MODEL_ASSIST_OA
+    #         }
+    #         if not await add_data_admin(admin_data):
+    #             logging.error("Admin_data write error 13")
 
-<b>INFO:</b>
+    #     mode = "is enabled" if admin_data.get("operating_mode") else "is disabled"
+    # except:
+    #     logging.error("In Table Db dont have admin data")
+    #     mode = "is disabled"
+
+    # print(f"AGENT MODE IS: {mode}")
+
+    # <b>👽 AGENT: {mode.upper()}</b>
+    # /agent - push to on/off
+    # /clear_ag
+
+    admin = f'''
+<b>🎚 ADMIN PANEL:</b>
+
+<b>📈 INFO:</b>
     /get_info_by_users
     /get_info_a_payments
 
-<b>LOGS:</b>
+<b>📝 LOGS:</b>
     /get_logs
 
-<b>BACKUP & RESTORE:</b>  
+<b>🗳 BACKUP & RESTORE:</b>  
     /backup
     /restore_db
+    /create_tables_in_db
+    /restore_loyal_users
 
-<b>STATISTICS:</b>
-    */get_month_pay_stat
-    */get_stat_pay_year
-
-<b>METHODS PAY: </b>
+<b>💳 METHODS PAY: </b>
     /add_metod_pay - add method
     /select_metod_pay - select method
     */use_random_metod_pay  - use random
     /delete_metod
 
-<b>CLEAR:</b>
+<b>🗑 CLEAR:</b>
     /clear_logs
     */clear_table_statistic
     */clear_table_dialog
 
-<b>SENDING NEWS: </b>
+<b>📩 SENDING NEWS: </b>
     /sending_news - start
     '''
 
     await message.answer(admin, parse_mode="HTML")
+
+
+
+# Create Tables in DB:
+@dp.message(Command('create_tables_in_db'))
+async def create_tebles_in_db_admin(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    if create_tables_in_db():
+        await bot.send_message(message.chat.id, "Tables in the DB were created successfully.")
+    else:
+        await bot.send_message(message.chat.id, "Error creating DB tables. Check logs for details.")
+
+
+
+# Resore loyal user to DB:
+@dp.message(Command('restore_loyal_users'))
+async def restore_loyal_users_admin(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    res_update_db = await restore_loyal_users_to_db()
+    await bot.send_message(message.chat.id, f"Results of adding regular clients to DB:\n{res_update_db}")
+
+
+
+
+
+# # ADMIN AI:
+# @dp.message(Command('agent'))
+# async def switch_ask_agent(message: types.Message):
+#     id = user_id(message)
+
+#     if id != ADMIN_ID:
+#         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+#         return
+
+
+#     admin_data = await read_admin_data(id)
+#     operating_mode = admin_data.get("operating_mode")
+
+#     if operating_mode:
+#         answer_bot = "Агент отключен"
+#         admin_data = {"user_id": id, "operating_mode": False}
+#         if not await update_admin_data(admin_data):
+#             print("Admin_data write error 543")
+#     else:
+#         answer_bot = "Агент активирован"
+#         admin_data = {"user_id": id, "operating_mode": True}
+#         if not await update_admin_data(admin_data):
+#             print("Admin_data write error 546")
+
+#     await admin_menu(message)
+#     await message.reply(answer_bot, parse_mode="markdown")
+
+
+
+
+# # Clear Agent Admin:
+# @dp.message(Command('clear_ag'))
+# async def clear_agent_admin(message: types.Message):
+#     id = user_id(message)
+
+#     if id != ADMIN_ID:
+#         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+#         return
+
+#     admin_data = await read_admin_data(id)
+#     assistant_id = admin_data.get("assistant_id")
+#     thread_id = admin_data.get("thread_id")
+
+#     assist = AssistOpenAI()
+
+#     # Delete assistant
+#     if assistant_id:
+#         try:
+#             res = await assist.del_assist_oa(assistant_id)
+#             if not res or res.get("deleted"):
+#                 if not await update_admin_data({"user_id": id, "assistant_id": None}):
+#                     logging.error("DB error while clearing assistant_id")
+#                 await message.reply("Assistant removed", parse_mode="markdown")
+#             else:
+#                 await message.reply("Something went wrong... please try again", parse_mode="markdown")
+#         except Exception as e:
+#             logging.error(f"Assistant delete error: {e}")
+#             await message.reply("Failed to remove Assistant", parse_mode="markdown")
+#     else:
+#         await message.reply("Assistant already missing", parse_mode="markdown")
+
+#     await asyncio.sleep(1)
+
+    # # Delete thread
+    # if thread_id:
+    #     try:
+    #         res = await assist.del_thread_oa(thread_id)
+    #         if not res or res.get("deleted"):
+    #             if not await update_admin_data({"user_id": id, "thread_id": None}):
+    #                 logging.error("DB error while clearing thread_id")
+    #             await message.reply("Thread removed", parse_mode="markdown")
+    #         else:
+    #             await message.reply("Something went wrong... please try again", parse_mode="markdown")
+    #     except Exception as e:
+    #         logging.error(f"Thread delete error: {e}")
+    #         await message.reply("Failed to remove Thread", parse_mode="markdown")
+    # else:
+    #     await message.reply("Thread already missing", parse_mode="markdown")
+
+
+
+
+
+
+
+
+
 
 
 # ADMIN: Get stat by users:
@@ -2211,7 +2386,7 @@ async def get_info_by_users(message: types.Message):
     try:
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
-        print(f"Error sending documentb User stat")
+        logging.error(f"Error sending documentb User stat")
 
 
 
@@ -2265,7 +2440,7 @@ async def confirm_send_news(message: types.Message, state: FSMContext):
         text_news_ru = state_data.get("text_news_ru")
         text_news_en = state_data.get("text_news_en")
 
-        #print(all_users_data)
+        #logging.error(all_users_data)
         for user in all_users_data:
             user_id = user.get("user_id")
             language = user.get("language")
@@ -2305,7 +2480,7 @@ async def get_logs_bot(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     if os.path.exists("./log/bot.log") and os.path.getsize("./log/bot.log") > 0:
@@ -2387,7 +2562,7 @@ async def get_info_a_payments_users(message: types.Message):
     try:
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
-        print(f"Error sending documentb User stat")
+        logging.error(f"Error sending documentb User stat")
 
 
 
@@ -2418,7 +2593,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await state.update_data(title=message.text)
@@ -2430,7 +2605,7 @@ async def add_metod_pay_input_text_ru(message: types.Message, state: FSMContext)
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await state.update_data(text_ru=message.text)
@@ -2443,7 +2618,7 @@ async def add_metod_pay_input_text_en(message: types.Message, state: FSMContext)
     id = user_id(message)
 
     if id != ADMIN_ID:
-        print(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     st_data = await state.get_data()
@@ -2484,7 +2659,7 @@ async def select_when_deleted_metod_pay(message: types.Message, state: FSMContex
     all_metods = await read_all_methods_pay()
 
     if not all_metods:
-        print("Error: Dont have metods pay.")
+        logging.error("Error: Dont have metods pay.")
         await message.reply("*Error*: Dont have metods pay.", parse_mode="Markdown") 
         return
 
@@ -2517,18 +2692,18 @@ async def delete_metod_pay(message: types.Message, state: FSMContext):
     try:
         int_value = int(message.text)
     except:
-        print(f"This not integer id method pay.")
+        logging.error(f"This not integer id method pay.")
         await message.reply("This not integer id method pay.", parse_mode="Markdown") 
         return
     
     if message.text not in count:
-        print(f"There is no such position.")
+        logging.error(f"There is no such position.")
         await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
         return
 
     confirm = await deleted_one_methods_pay(int_value)
     if not confirm:
-        print("Error: Not deleted_methods_pay.")
+        logging.error("Error: Not deleted_methods_pay.")
         return
 
     await message.reply(f"The payment method has been deleted.", parse_mode="HTML")
@@ -2562,7 +2737,7 @@ async def select_metod_pay(message: types.Message, state: FSMContext):
         i = st_data.get("exi")
         place_of_use = st_data.get("place_of_use")
     except:
-        print("Info: First change method pay.")
+        logging.error("Info: First change method pay.")
 
     if not i:
         i = 0
@@ -2591,7 +2766,7 @@ async def select_metod_pay(message: types.Message, state: FSMContext):
     all_metods = await read_all_methods_pay()
 
     if not all_metods:
-        print("Error: Dont have metods pay.")
+        logging.error("Error: Dont have metods pay.")
         await message.reply("*Error*: Dont have metods pay.", parse_mode="Markdown") 
         return
 
@@ -2629,19 +2804,19 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     try:
         int_value = int(message.text)
     except:
-        print(f"This not integer id method pay.")
+        logging.error(f"This not integer id method pay.")
         await message.reply("This not integer id method pay.", parse_mode="Markdown") 
         return
 
     if message.text not in count:
-        print(f"There is no such position.")
+        logging.error(f"There is no such position.")
         await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
         return
     
     try:
         pl_use = place_of_use[i]
     except:
-        print("Error: Get place_of_use.")
+        logging.error("Error: Get place_of_use.")
         return
 
     # Unset default method pay:
@@ -2654,7 +2829,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
         }
         confirm = await update_methods_pay(pay_data)
         if not confirm:
-            print("Error: Not update_methods_pay.")
+            logging.error("Error: Not update_methods_pay.")
             return
 
     # Set default method pay:
@@ -2664,7 +2839,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     }
     confirm = await update_methods_pay(pay_data)
     if not confirm:
-        print("Error: Not update_methods_pay.")
+        logging.error("Error: Not update_methods_pay.")
         return
 
     await message.reply(f"The default payment method in place use {pl_use} has been successfully installed - {int_value}", parse_mode="HTML")
@@ -2811,8 +2986,10 @@ async def try_answer_bot(message, answer, data):
     # if "money" in answer and data.get("ai") == "grok":
     #     await bot.send_message(ADMIN_ID, f"The user {id} tried to make a request. Error: There is no money for Grok account.")
         
+
+
     # Разбиваем текст на части
-    text_parts = [answer[i:i + 4000] for i in range(0, len(answer), 4000)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
+    text_parts = [answer[i:i + MAX_LEN] for i in range(0, len(answer), MAX_LEN)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
 
     # Отправляем сообщения по частям
     for part in text_parts:
@@ -2844,7 +3021,7 @@ async def try_answer_bot(message, answer, data):
         # Calculation voice:
         confirm = await calculation(data, "text_to_voice")
         if not confirm:
-            print("Error: calculation.")
+            logging.error("Error: calculation.")
 
         # Save file answer:
         if os.path.exists(voice_answer_file_path) and os.path.getsize(voice_answer_file_path) > 0:
@@ -2868,33 +3045,86 @@ async def try_answer_bot(message, answer, data):
 
     # Summirization answer:
     dialog_sum = data.get("dialog_sum")
-    if dialog_sum and len(answer) > MAX_SIMBOLS:
-        # #print("dialog_sum:", dialog_sum)
+    #print(dialog_sum)
+    original_len = len(answer.encode("utf-8"))
+    if dialog_sum and original_len > MAX_SIMBOLS:
+        #print(f"\n\n\nReal answer: {answer}")
+
+        prompt = '''
+        Ты — вспомогательный ИИ. Твоя задача — предельно сжать входной текст, сохранив только критически важную информацию, пригодную для последующей генерации ответов.
+
+        Цель — максимальное сокращение:
+
+        - Сохраняй только основные факты, ключевые термины, числа, ссылки и выводы.  
+        - Удаляй всё: пояснения, примеры, рассуждения, вводные конструкции, вежливость.  
+        - Текст должен быть минимален, но логически понятен.  
+        - Если в тексте есть код любого языка программирования — оставь его в неизменном виде.   
+        - Игнорируй читаемость, если это помогает сократить.  
+        - Не меняй язык входа. Никогда не переводить.  
+        - Ничего не добавлять от себя. Никакой переформулировки.  
+
+        Важно:
+
+        - Результат только на оригинальном языке входа.  
+        - Не обосновывай, не комментируй, не оформляй.  
+        - Просто выдай результат без объяснений.
+        '''
+
 
 
         zip_data = {
             "user_id": id,
             "user_content": answer,
-            "system_content": "Максимально сократи текст, сохранив самое важное.",
+            "system_content": prompt,
             "file_path": None,
             "name_file": None,
             "assist_content": None,
-            "model_language": "gemini-1.5-flash-8b" # gemini-1.5-flash-latest
+            "model_language": "gemini-1.5-flash-latest" # "gpt-4.1-nano" # "gemini-2.5-flash-preview-04-17" # gemini-2.0-flash-exp  gemini-1.5-flash-latest    gemini-2.0-flash-lite-001
         }
 
-        zip_answer = await mod_gemini_chat(zip_data)
+        zip_answer = await mod_gemini_chat(zip_data) # Сука все на английский переводит, не слушается команд нормально
+        # zip_answer = await mod_openai_chat(zip_data) # Как часы, но дороже сука
+
         if zip_answer:
             try: 
                 answer = zip_answer.get("response")
+                #logging.info(f"Summarizacion: {answer}")
+                print(f"Summarizacion: {answer}")
             except:
                 answer = {'response': answer, "used_tokens": NULL_TOKEN}
 
             used_tokens = zip_answer.get("used_tokens")
             zip_data["used_tokens"] = used_tokens
 
+            # Вывод в процентах уменьшение ответа в процентах
+            compressed_len = len(answer.encode("utf-8"))
+            reduction_percent = round(100 * (1 - compressed_len / original_len), 1)
+
+            if language == "ru":
+                await message.answer(f"📦 <b>Ответ сжат в историю на {reduction_percent}%:</b>", parse_mode="HTML")
+            else:
+                await message.answer(f"📦 <b>The answer is compressed into a {reduction_percent} story:</b>", parse_mode="Markdown")
+            try:
+                await message.answer(answer, parse_mode="Markdown")
+            except:
+                try:
+                    await message.answer(answer, parse_mode="HTML")
+                except:
+                    escape_text = escape_special_chars(answer)
+                    await message.answer(answer)
+
+
+
+            # Помечаю для ИИ что ответ сжат:
+            """ Каждый следующий ответ, становится все сжатие, пытаюсь таким образом решить проблему """
+            answer = f"[!Don’t let the compressed version affect the style or conciseness of your answer!]\n[START COMPRESSED]\n{answer}\n[END COMPRESSED]"
+            print(f"\n{answer}\n")
+
+
         confirm = await calculation(zip_data, "text")
         if not confirm:
             print("Error: calculation dialog_sum.")
+            logging.error("Error: calculation dialog_sum.")
 
 
 
@@ -2907,12 +3137,9 @@ async def try_answer_bot(message, answer, data):
         "assist_say": answer,
     }
 
-    confirm = await add_discussion(update_history)
-
-    if not confirm:
+    if not await add_discussion(update_history):
         print("Error save history.")
         logging.error("Error save history.")
-
 
     data = {}
     return
@@ -2941,7 +3168,7 @@ async def mod_tex(data, message):
             assist_content.append({"assistant": chunk.get("assist_say")})
 
     elif not history:
-        print("Info: History is empty.")
+        logging.info("Info: History is empty.")
 
     # Add to Data - assist_content:
     if assist_content:
@@ -2949,36 +3176,41 @@ async def mod_tex(data, message):
 
 
     # Select AI:
-    if data.get("ai") == "gemini":
+    get_ai = data.get("ai")
+    if get_ai == "gemini":
         answer = await mod_gemini_chat(data)
-    elif data.get("ai") == "openai":
+    elif get_ai == "openai":
         answer = await mod_openai_chat(data)
-    elif data.get("ai") == "claude":
+    elif get_ai == "claude":
         answer = await mod_claude_chat(data)
-    elif data.get("ai") == "deepseek":
+    elif get_ai == "deepseek":
         answer = await mod_deepseek_chat(data)
-    elif data.get("ai") == "grok":
+    elif get_ai == "grok":
         answer = await mod_grok_chat(data)
 
+    print(answer)
+
     if not answer:
-        return
+        return False
 
-    try: 
-        answer.get("response")
-    except:
-        answer = {'response': answer, "used_tokens": NULL_TOKEN}
+    '''
+    Когда заканчиваются деньги, OpenAI шлет просто str другой структуры
+    '''
+    if isinstance(answer, dict):
+        response = answer.get("response") 
+        used_tokens = answer.get("used_tokens")
+    else:
+        response = answer
+        used_tokens = NULL_TOKEN
 
-    text = answer.get("response")
-    used_tokens = answer.get("used_tokens")
-    data["used_tokens"] = None
     data["used_tokens"] = used_tokens
 
     confirm = await calculation(data, "text")
     if not confirm:
-        print("Error: calculation.")
+        logging.error("Error: calculation.")
 
     # Attempts to give a response to the user:
-    await try_answer_bot(message, text, data)
+    await try_answer_bot(message, response, data)
 
 
 
@@ -3025,7 +3257,7 @@ async def add_text_to_photo(message: Message, state: FSMContext):
 
     confirm = await calculation(all_data, "text")
     if not confirm:
-        print("Error: calculation.")
+        logging.error("Error: calculation.")
 
     # Attempts to give a response to the user:
     await try_answer_bot(message, text, all_data)
@@ -3050,7 +3282,7 @@ async def mod_photo(data, message, state: FSMContext):
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, file_path)
     except:
-        print("Error: Couldn't get a photo.")
+        logging.error("Error: Couldn't get a photo.")
         await message.reply("Error: Couldn't get a photo.", parse_mode="Markdown")
         return
 
@@ -3086,7 +3318,7 @@ async def mod_photo(data, message, state: FSMContext):
 
         confirm = await calculation(data, "text")
         if not confirm:
-            print("Error: calculation.")
+            logging.error("Error: calculation.")
 
 
         # Attempts to give a response to the user:
@@ -3134,7 +3366,7 @@ async def mod_documents(data, message, state: FSMContext):
             file = await bot.get_file(file_id)
             await bot.download_file(file.file_path, file_path)
         except:
-            print("Error: Couldn't get a picture.")
+            logging.error("Error: Couldn't get a picture.")
             await message.reply("Error: Couldn't get a picture.", parse_mode="Markdown")
             return
 
@@ -3174,7 +3406,7 @@ async def mod_documents(data, message, state: FSMContext):
 
             confirm = await calculation(data, "text")
             if not confirm:
-                print("Error: calculation.")
+                logging.error("Error: calculation.")
 
             # Attempts to give a response to the user:
             await try_answer_bot(message, text, data)
@@ -3204,6 +3436,267 @@ async def mod_documents(data, message, state: FSMContext):
 
 
 
+
+
+# @dp.message(Command('geen'))
+# async def geen_say(message: types.Message):
+#     id = user_id(message)
+
+#     if id != ADMIN_ID:
+#         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+#         return
+
+
+#     all_data = await assist_admin_db_users()
+#     if not all_data:
+#         print("Error get data of assist_admin_db_users (546)")
+
+
+#     print(all_data)
+    #await message.reply(all_data, parse_mode="markdown")
+    # all_static, i = [], 1
+    # all_static.append(["№", "User id", "Name", "Full Name", "First Name", "Last Name", "Block", "Last Visit", "Time Zone", "Language", "Paid", "Money $", "Notifications", "Dialog", "Dialog Summarization", "Voise answer", "Ai", "Model Language", "Ai draw", "Model Draw", "System Content"])
+    # for data in all_data:
+    #     all_static.append([i, data.get("user_id"), data.get("name"), data.get("full_name"), data.get("first_name"), data.get("last_name"), data.get("block"), data.get("last_visit"), data.get("time_zone"), data.get("language"), data.get("paid"), data.get("money"), data.get("notifications"), data.get("dialog"), data.get("dialog_sum"), data.get("voice_answer"), data.get("system_content")])
+    #     i += 1
+
+
+
+    # # Create csv file
+    # output = StringIO()
+    # writer = csv.writer(output)
+    # for row in all_static:
+    #     writer.writerow(row)
+    # csv_data = output.getvalue()
+    # output.close()
+
+
+    # # csv file to download
+    # file_name = f"Users-admin-{random_name_2X()}.csv"
+    # buffered_input_file = types.input_file.BufferedInputFile(file=csv_data.encode(), filename=file_name)
+    # try:
+    #     await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
+    # except:
+    #     logging.error(f"Error sending documentb User stat")
+
+
+
+
+#### Admin AI: ####
+###################
+
+
+# # Запрос Ассистенту OpenAI:
+# async def admin_ai(question, message):
+#     id = user_id(message)
+
+#     admin_data = await read_admin_data(id)
+#     if not admin_data:
+#         return False
+#     elif not admin_data.get("operating_mode"):
+#         return False
+    
+#     assist = AssistOpenAI()
+#     thread_id = admin_data.get("thread_id")
+#     assistant_id = admin_data.get("assistant_id")
+#     new_assist = not thread_id or not assistant_id # new_assist = True if not thread_id or not assistant_id else False
+#     instructions = """
+#     Ты — внутренний ассистент для управления и аналитики Telegram ИИ-бота.
+
+#     1. Твои задачи:
+
+#     Пояснять свое назначение и возможности.
+#     Предоставлять статистику.
+#     Анализировать данные.
+
+#     2. Ограничения:
+#     Не отвечаешь на вопросы не по теме.
+
+#     Смена режима:
+#     По запросу администратора можешь переключиться в обычный режим ИИ после подтверждения:
+#     «Перейти в обычный режим ИИ? Подтвердите, пожалуйста.»
+
+#     Получение данных из базы:
+#     По запросу администратора можешь получить данные из базы данных после подтверждения:
+#     «Загрузить данные из базы? Подтвердите, пожалуйста.»
+
+#     """
+#     model = admin_data.get("model_assist")
+#     user_content = question 
+#     tools = [
+#         {
+#             "type": "function",
+#             "function": {
+#                 "name": "close",
+#                 "description": "выйти из режима и придумать короткий прощальный эпичный текст", 
+#                 "parameters": {
+#                     "type": "object",
+#                     "properties": {
+#                         "text": {"type": "string"},
+#                     },
+#                     "required": ["text"]
+#                 }
+#             }
+#         },
+#         {
+#             "type": "function",
+#             "function": {
+#                 "name": "statistic",
+#                 "description": "получить статистику из базы данных телеграмм бота", 
+#                 "parameters": {
+#                     "type": "object",
+#                     "properties": {}
+#                 }
+#             }
+#         }
+#     ]
+
+#     # Создание и запуск Ассистента или создание или запуск:
+#     asist_data = await assist.run_custom_assist_0525_oa(
+#         thread_id, assistant_id, instructions, model, user_content, tools
+#     )
+
+#     if new_assist:
+#         thread_id = asist_data.get("thread_id")
+#         assistant_id = asist_data.get("assistant_id")
+#         new_assist_data = {
+#             "thread_id": thread_id,
+#             "assistant_id": assistant_id,
+#             "user_id": id
+#         }
+
+#         if not await update_admin_data(new_assist_data):
+#             logging.error("Failed to update admin data (5404)")
+
+
+#     # Получение id запущенного Асистента:
+#     run_id = asist_data.get("run_id")
+#     if not run_id:
+#         logging.error("Error, note have run_id 4432")
+#         await message.reply("Something went wrong... please try again", parse_mode="markdown")
+#         return True
+
+
+
+
+#     # Цикл ожидания ответа ассистента:
+#     while True:
+#         '''
+#         Цикл для получения статуса выполнения (status) от OpenAI Assistant.
+#         Ограничения API требуют сделать задержки между запросами, иначе блокируется.
+        
+#         Возможные статусы:
+#         - queued (в очереди)
+#         - in_progress (в процессе)
+#         - requires_action (требуется действие)
+#         - completed (завершено)
+#         '''
+#         response = await assist.get_retrieve_oa(thread_id, run_id)
+#         if not response:
+#             continue
+
+#         status = response.get("status")
+
+#         # print(f"Status from Assist OpenAI: {status}")
+#         # logging.info(f"Status from Assist OpenAI: {status}")
+
+#         # Обработка текстового ответа:
+#         if status == "completed":
+#             assistant_reply = response.get("message")
+#             if assistant_reply:
+#                 # TRY TRANSFER ANSWER TO TELERAM:
+#                 try:
+#                     await message.reply(assistant_reply, parse_mode="markdown")
+#                 except:
+#                     try:
+#                         await message.reply(assistant_reply, parse_mode="HTML")
+#                     except:
+#                         escape_text = escape_special_chars(assistant_reply)
+#                         await message.reply(escape_text)
+#                 return True
+
+#         # Если ассистент требует внешнее действие:
+#         elif status == "requires_action":
+#             tool_calls = response.get("tool_calls")
+#             break
+        
+#         # Если нет статуса – считаем, что произошла ошибка:
+#         elif status == None:
+#             print("Error: Missing status in response from get_retrieve_oa()")
+#             logging.error("Error: Missing status in response from get_retrieve_oa()")
+#             return True
+
+#         # Задержка для избежания ограничения по частоте:
+#         await asyncio.sleep(2)
+
+
+
+#     # Ассистент запускает команды:
+#     tool_outputs = []
+
+#     for tool_call in tool_calls:
+
+#         # Extract function name and arguments from assistant's tool_call:
+#         func_name = tool_call['function']['name']
+#         arguments = json.loads(tool_call['function']['arguments'])
+
+#         if func_name == "close":
+#             # Update admin state (deactivate):
+#             admin_data = {"user_id": id, "operating_mode": False}
+#             if not await update_admin_data(admin_data):
+#                 logging.error("Admin update failed (code 4543)")
+
+#             # Get response text and send message (отправка текста пользователю)
+#             response_text = arguments["text"]
+#             await message.reply(response_text, parse_mode="markdown")
+
+
+#         if func_name == "statistic":
+
+#             response_text = await assist_admin_db_users()
+#             if not response_text:
+#                 logging.error("Error get data of assist_admin_db_users (546) or not have data")
+#             else:
+#                 await message.reply("Данные получены. Вы можете уточнить вопрос по данным..", parse_mode="markdown")
+
+
+#         else:
+#             # Unknown function handler (обработка неизвестной команды)
+#             response_text = "Неизвестная функция (Unknown function)"
+
+#         # Append result for assistant output return
+#         tool_outputs.append({
+#             "tool_call_id": tool_call["id"],  # id вызова инструмента
+#             "output": response_text
+#         })
+
+#     # Send back full result to assistant (ответ ассистенту)
+#     final_output = await assist.returning_result_assist_oa(thread_id, run_id, tool_outputs)
+
+#     return True
+
+
+
+
+
+
+
+
+
+
+
+# Проблема в том, что ты пытаешься отправить tool output (вывод инструмента) в run, у которого статус "expired" (истекший).
+
+# Когда status = "expired", run больше не принимает никакие данные — он как бы завершен по времени или по таймауту. Запрос больше невалиден (invalid).
+
+# Просто:
+
+# - Либо создай новый run,
+# - Либо следи за его статусом перед тем, как что-то слать (run['status'] должен быть "in_progress").
+
+
+
+
 #### AUDIO input: Есть сомнения в востребованности данной функции, позже подумаю еще..
 
 # Две кнопки, одна - перевод на анг, другая - транскрипция!!!
@@ -3224,10 +3717,21 @@ async def mod_documents(data, message, state: FSMContext):
     # await try_answer_bot(message, answer, voice_answer)
 
 
+async def forget_history(question, message):
+    forget_words = {"забудь", "forget"}
+    question_words = set(re.sub(r'[^\w\s]', '', question.lower()).split())
+    if forget_words & question_words:
+        await reset_history(message)
+        return True
+    return False
+
 
 
 #### VOICE input to TEXT and send AI:
 async def mod_voice_to_text(data, message):
+
+    id = user_id(message)
+    language = data.get("language")
 
     voice = message.voice
     file_id = voice.file_id
@@ -3238,7 +3742,7 @@ async def mod_voice_to_text(data, message):
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, file_path)
     except:
-        print("Error: Voice transmission error.")
+        logging.error("Error: Voice transmission error.")
         await message.reply("Error: Voice transmission error.", parse_mode="Markdown")
         return
 
@@ -3249,30 +3753,48 @@ async def mod_voice_to_text(data, message):
         convert_answer = await get_text_openai(data)
     # elif data.get("ai_voice_to_text") == "gemini":
     #     convert_answer = await get_text_openai(data)
+
+    print(f"\n{convert_answer}\n")
     
     if DEL_VOICE == True:
         await remove_file_os(file_path)
 
     if not convert_answer:
-        print("Error: Convet voice to text.")
+        logging.error("Error: Convet voice to text.")
+        await message.reply("Error: Convet voice to text.", parse_mode="Markdown")
         return
 
-    data["user_content"] = convert_answer.get("response")
+    question = convert_answer.get("response")
+
+    data["user_content"] = question
     data["file_path"] = None
     data["name_file"] = None
     data["used_tokens"] = None
     data["min"] = convert_answer.get("minutes")
 
-    confirm = await calculation(data, "voice_to_text")
-
-    if not confirm:
-        print("Error: calculation tokens voice to text.")
+    if not await calculation(data, "voice_to_text"):
+        logging.error("Error: calculation tokens voice to text.")
         return
 
     data["min"] = None
 
+    if language == "ru":
+        await message.answer(f"📎 <b>Из вашего голосового:</b>\n", parse_mode="HTML")
+    else:
+        await message.answer(f"📎 <b>From your voicemail:</b>\n", parse_mode="HTML")
+    for i in range(0, len(question), MAX_LEN):
+        await message.answer(question[i:i+MAX_LEN], parse_mode="HTML")
+
+    # Check forgot - забыть историю
+    if await forget_history(question, message):
+        return
+
+#    # Check Admin AI
+#     if await admin_ai(question, message):
+#         return
+
     await mod_tex(data, message) # there is also a calculation of statistics
-    return
+
  
 
 
@@ -3314,10 +3836,10 @@ async def process_draw(message: types.Message, state: FSMContext):
     #     answer = await mod_openai_dall_e(all_data) # Sorry)))
 
     if not answer:
-        print("Error: Generation image.")
+        logging.error("Error: Generation image.")
         return
 
-    print(answer)
+    logging.info(answer)
     # Response to the user:
     await bot.send_message(message.chat.id, answer.get("response"))
 
@@ -3334,7 +3856,7 @@ async def process_draw(message: types.Message, state: FSMContext):
     confirm = await calculation(all_data, "gen_img")
 
     if not confirm:
-        print("Error: calculation tokens draw.")
+        logging.error("Error: calculation tokens draw.")
         return
 
     await state.clear()
@@ -3414,6 +3936,9 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Getting the user's system data from the database:
     data_from_db = await read_user(id)
+    if not data_from_db:
+        await forced_start(message)
+        return
     #language = data_from_db.get("language")
 
 
@@ -3515,6 +4040,7 @@ async def second_function(message: types.Message, state: FSMContext):
             await message.reply(f"Fortunately, you're blocked...", parse_mode="Markdown")
         return
 
+
     # Checking the text for a DRAWING request:
     if typecontent == "text":
         drawing_request = await check_request_drawing(question)
@@ -3522,11 +4048,13 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Checking the text for a CLEAR HISTORY:
     if typecontent == "text":
-        draw_words = {"забудь", "forget"}
-        question_words = set(question.lower().split())
-        if draw_words & question_words:
-            await reset_history(message)
+        if await forget_history(question, message):
             return
+        
+    # # Checking ADMIN AI:
+    # if typecontent == "text" and id == ADMIN_ID:
+    #     if await admin_ai(question, message):
+    #         return
 
     # Data collection to API:
     data = {

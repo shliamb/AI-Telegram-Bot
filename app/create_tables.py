@@ -1,13 +1,15 @@
-from get_keys import USER_DB, PASSWORD_DB
+from get_keys import USER_DB, PASSWORD_DB, DB_NAME
 import psycopg2
+import logging
+logging.basicConfig(format='%(message)s', level=logging.INFO, filename='./log/db.log')
 
 
 # Create TABLES:
 def create_tables_in_db():
 
     try:
-        # Conect to db:                   имя контейнера
-        connection = psycopg2.connect(host="localhost", database="my_database", user=USER_DB, password=PASSWORD_DB)
+        # Conect to db:                   имя контейнера app_postgres or localhost
+        connection = psycopg2.connect(host="app_postgres", database=DB_NAME, user=USER_DB, password=PASSWORD_DB)
         
         cursor = connection.cursor()
         
@@ -57,6 +59,7 @@ def create_tables_in_db():
         cursor.execute(create_table_users)
 
 
+        # !!!! Как-то надо её чистить, боюсь представить сколько там записей..
         create_table_statistics = '''
         CREATE TABLE IF NOT EXISTS statistics (
             id SERIAL PRIMARY KEY,
@@ -121,12 +124,32 @@ def create_tables_in_db():
         cursor.execute(create_table_payments)
 
 
+        # create_table_admin_data = '''
+        # CREATE TABLE IF NOT EXISTS admin_data (
+        #     id SERIAL PRIMARY KEY,
+        #     date TIMESTAMP,
+        #     thread_id VARCHAR(100),
+        #     assistant_id VARCHAR(100),
+        #     model_assist VARCHAR(50),                                   --(Модель OpenAI для Ассистента-Админ)
+        #     operating_mode BOOLEAN,                                     --(Режим работы в админке. Admin AI or Normal)                 
+        #     user_id BIGINT NOT NULL UNIQUE,                             --(id_user admin)
+        #     FOREIGN KEY (user_id) REFERENCES users(user_id)
+        # );
+        # '''
+        # cursor.execute(create_table_admin_data)
+
+
         # Saving changes:
         connection.commit()
+        logging.info("Adding tables is done!")
         print("Adding tables is done!")
+        return True
 
     except Exception as error:
-        print("Error:", error)
+        logging.error(f"Error Create Tables in DB: {error}")
+        print("Error Create Tables in DB:", error)
+        return False
+
     finally:
 
         # Closing the cursor and database connection
@@ -139,7 +162,7 @@ def create_tables_in_db():
 
 
 
-create_tables_in_db()
+# create_tables_in_db()
 
 
 
@@ -159,8 +182,6 @@ Table statistics:
 id  date  model  tokens  min  img  price  user_id  name
 
 Table discussion:
-
-
 id  date  user_say  model_say  summarization  user_id 
 
 '''

@@ -12,13 +12,14 @@ LIMIT_STAT = 500 # CSV file last 500
 GIFT = 0.1 # $ The amount on the account at the beginning
 VOICE_THE_ANSWER = True # False or True
 HISTORY_LINE_LIMIT = 15 # The number of rows in the history table that will be used   ----- 10 25 30 50 !!! Сделать в настройках изменяемые..
-MAX_SIMBOLS = 500 # Maximum number of characters of text to compress  
+MAX_SIMBOLS = 1000 # Maximum number of characters of text to compress  
 DIALOG = True # History dialog
 DIALOG_SUM = False # AI compress history dialog
 LANGUAGE = "en"
 NOTIFICATIONS = True
 DIALOG_SUM = False
 BACKUP_PATH = "./backup_db/"
+MAX_LEN = 4000 #4096
 
 # Language models:
 AI_DEFAULT = "gemini" # gemini, openai, anthropic, deepseek, grok
@@ -78,6 +79,17 @@ USE_TELEGRAM = False
 USE_DIGITAL = False
 
 
+# # Assistent OpenAI END-POINT:
+# LIST_ASSIST_OA = "/api/oa-assist-list/"
+# DEL_ASSIST_OA = "/api/oa-assist-del/"
+# DEL_THREAD_OA = "/api/oa-thread-del/"
+# RETRIEVE_OA = "/api/oa-assist-retrieve/"
+# RETUEN_RESULT_OA = "/api/oa-return-result-assist/"
+# RUN_ASSIST_CUSTOM_0525 = "/api/oa-assist-custom-0525/"
+
+# DEFAULT_MODEL_ASSIST_OA = "gpt-4o"
+
+
 # Prices per 1M tokens models:
 NULL_TOKEN = 0
 PRICE = {
@@ -105,7 +117,8 @@ PRICE = {
     'gpt-4-turbo-2024-04-09': 48,
 
     # Google Gemini to 1M tokens:
-    'gemini-2.5-pro-preview-03-25': 21,# Maximum input tokens 1,048,576
+    'gemini-2.5-pro-preview-05-06': 13.5, # Maximum input tokens 1,048,576
+    'gemini-2.5-flash-preview-04-17': 0.9, # $3.50  - Text output (thinking- response and reasoning)
     'gemini-2.0-flash-exp': 0.9, # 15,
     'gemini-2.0-flash-lite-001': 0.45,
     'gemini-1.5-pro-latest': 3.75, # 15, 
