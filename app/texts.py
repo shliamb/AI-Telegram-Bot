@@ -14,24 +14,24 @@ start_ru = '''
 Получить ответ ИИ:
 - ИИ отвечает текстом,
 - ИИ может отвечать текст + аудио,
-- ИИ может сгенирировать изображение (Dall-e 3) /gen_draw
+- ИИ может сгенирировать изображение (Dall-e 3) /genDraw
 
 
 Настройки:
 - Выбор языка /en /ru
-- Включение уведомлений бота /notif_on /notif_off
+- Включение уведомлений бота /notON /notOFF
     Для того, что бы новости от бота не беспокоили вас, вы можете просто их отключить. В редких новостях, обычно, описываются новые возможности или добавление языковых моделей.
-- Включение истории диалога /dialog_on /dialog_off
+- Включение истории диалога /diON /diOFF
     ИИ помнит последние 15 итераций вопрос - ответ. Если вы отклдючите историю, каждый вопрос к ИИ будет первым в контексте для нее. Чем больше история, тем больше оплата за токены. Очистка памяти поможет вам с экономить.
-- Включение сжатия истории /sum_on /sum_off
+- Включение сжатия истории /sumON /sumOFF
     Если эта функция включена, то каждый ответ от ИИ, проверяется на длину. Сообщение больше 500 символов, автоматически будет сжато без потери смысла самой дешевой языковой моделью и сохранено сжатым в историю, экономя ваши деньги. Вы же, получите полный ответ.
-- Включение аудио ответа /audio_on /audio_on
+- Включение аудио ответа /audON /audOFF
     ИИ будет выдавать вам после текстового ответа аудиофайл, который вы можете прослушать. Иногда бывает удобнее и проще послушать, чем читать. В настройках ниже, вы можете так же выбрать голос озвучки, качество, скорость. 
-- Задать системные инструкции ИИ /system_content
+- Задать системные инструкции ИИ /addSYS
     Системные инструкции помогают модели понять, как она должна взаимодействовать с пользователем. Пример: "Ты личный асистент по имени Алиса молодой девушки 17 лет по имени Лола. Ты даешь сжатые, но полные ответы на ее вопросы."
-- Пополнить финансовый баланс счета /add_money
+- Пополнить финансовый баланс счета /pay
     Для нового пользователя придусмотренна проверочная сумма на счете. Далее, вы можете пополнить счет для дальнейшей работы.
-- Скачать CSV файл последних 50 трат /get_stat
+- Скачать CSV файл последних 50 трат /getStat
 
 От разработчика: "Эта программа сейчас на стадии тестирования. Никаких гарантий, никаких обязательств, никакой ответственности – вообще ничего! Используя её, ты полностью соглашаешься с этим беспределом. Но, между нами, надеюсь, тебе понравится 😉"
 
@@ -52,24 +52,24 @@ Ask an AI question:
 Get an AI response:
 - The AI responds with text,
 - AI can respond with text + audio,
-- AI can generate an image (Dall-e 3) /gen_draw
+- AI can generate an image (Dall-e 3) /genDraw
 
 
 Settings:
 - Language selection /en /ru
-- Enabling bot notifications /notif_on /notif_off
+- Enabling bot notifications /notON /notOFF
     In order for the news from the bot not to bother you, you can simply turn it off. Rare news reports usually describe new features or the addition of language models.
-- Enabling dialog history /dialog_on /dialog_off
+- Enabling dialog history /diON /diOFF
     The AI remembers the last 15 iterations of the question and answer. If you tell the story, every question to the AI will be the first in the context for it. The longer the story, the higher the payment for tokens. Clearing your memory will help you save money.
-- Enabling history compression /sum_on /sum_off
+- Enabling history compression /sumON /sumOFF
     If this feature is enabled, then each response from the AI is checked for length. A message with more than 500 characters will be automatically compressed without loss of meaning using the cheapest language model and saved compressed into history, saving you money. You will get a complete answer.
-- Enabling audio response /audio_on /audio_on
+- Enabling audio response /audON /audOFF
     The AI will give you an audio file after the text response, which you can listen to. Sometimes it is more convenient and easier to listen than to read. In the settings below, you can also select the voiceover voice, quality, and speed. 
-- Set system instructions and /system_content
+- Set system instructions and /addSYS
     The system instructions help the model understand how it should interact with the user. Example: "You are the personal assistant named Alice of a 17-year-old young girl named Lola. You give concise but complete answers to her questions."
-- Top up your financial account balance /add_money
+- Top up your financial account balance /pay
     The verification amount on the account is provided for the new user. Next, you can add funds to your account for further work.
-- Download the CSV file of the last 50 expenses /get_stat
+- Download the CSV file of the last 50 expenses /getStat
 
 From the developer: "This program is currently under testing. No guarantees, no obligations, no responsibilities – nothing at all! By using it, you completely agree with this lawlessness. But just between you and me, I hope you like it. 😉"
 

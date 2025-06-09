@@ -1,13 +1,13 @@
 from worker_db import add_statistics, read_user, update_user
-from config import PRICE
-from datetime import datetime, timezone, timedelta
-from config import TIME_CORRECTION
+from config import PRICE, LOG_CONFIG_BOT, TIME_CORRECTION
 import logging
+logging.basicConfig(**LOG_CONFIG_BOT)
+from datetime import datetime, timezone, timedelta
 import random
 import string
 import tiktoken
 import os
-import re
+# import re
 import base64
 import aiofiles
 import asyncio

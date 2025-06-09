@@ -1,19 +1,17 @@
+from get_keys import USER_DB, PASSWORD_DB, DB_NAME
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB
 import logging
-logging.basicConfig(level=logging.INFO, filename='./log/db.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
-
-
-from get_keys import USER_DB, PASSWORD_DB
-from config import HISTORY_LINE_LIMIT, LIMIT_STAT
+logging.basicConfig(**LOG_CONFIG_DB)
 import asyncpg
-import asyncio
+# import asyncio
 
 
 
 # Asinc onnection to DB:
 async def get_connection():
     connection = await asyncpg.connect(
-        host="app_postgres", # app_postgres  localhost  имя контейнера
-        database="my_database",
+        host=HOST,
+        database=DB_NAME,
         user=USER_DB,
         password=PASSWORD_DB
     )

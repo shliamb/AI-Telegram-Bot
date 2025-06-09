@@ -1,8 +1,9 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import BACKUP_PATH, TIME_CORRECTION
+from config import BACKUP_PATH, TIME_CORRECTION, LOG_CONFIG_DB, HOST
+import logging
+logging.basicConfig(**LOG_CONFIG_DB)
 from general_functions import day_utcnow, unformat_date
 import subprocess
-import logging
 #import asyncio
 
 
@@ -13,7 +14,7 @@ async def backup_db():
     dict_date = await unformat_date(date)
 
     backup_filename = f'Db_backup_{dict_date.get("day")}_{dict_date.get("time")}.sql'                                           
-    pg_dump_command = f'PGPASSWORD={PASSWORD_DB} pg_dump -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} -F c -f {BACKUP_PATH}{backup_filename}' # В бинарный формат # postgres  localhost
+    pg_dump_command = f'PGPASSWORD={PASSWORD_DB} pg_dump -h {HOST} -p 5432 -U {USER_DB} -d {DB_NAME} -F c -f {BACKUP_PATH}{backup_filename}'
 
 
     try:

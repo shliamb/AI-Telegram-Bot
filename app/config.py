@@ -1,9 +1,21 @@
-
+import logging
 
 #### BASIC CONFIG ####
 
 # System:
 NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
+HOST = "app_postgres"  # app_postgres or localhost
+LOG_CONFIG_DB = {
+    'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s',
+    'level': logging.INFO,
+    'filename': './log/db.log'
+}
+LOG_CONFIG_BOT = {
+    'level': logging.INFO, 
+    'filename': './log/bot.log', 
+    'filemode': 'a', 
+    'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
+}
 URL = "http://137.184.87.156:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay

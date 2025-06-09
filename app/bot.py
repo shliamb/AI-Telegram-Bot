@@ -1,15 +1,14 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN #, DEFAULT_MODEL_ASSIST_OA
-
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT #, DEFAULT_MODEL_ASSIST_OA
 
 import logging
 logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
-logging.basicConfig(level=logging.INFO, filename='./log/bot.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
+logging.basicConfig(**LOG_CONFIG_BOT)
 import re
 import random
 import os
 import asyncio
-import json
+#import json
 #import requests
 from io import StringIO #, BytesIO
 #import uuid
@@ -171,7 +170,7 @@ async def command_start_handler(message: Message, state: FSMContext):
     bot_commands = [
         BotCommand(command="/reset", description="CLEAR MEMORY"), # clear memory
         BotCommand(command="/menu", description="MENU"),
-        BotCommand(command="/gen_draw", description="GEN DRAW"),
+        BotCommand(command="/genDraw", description="GEN DRAW"),
         # BotCommand(command="/prices", description="PRICES"),
         BotCommand(command="/help", description="GUIDE"),
     ]
@@ -277,309 +276,246 @@ async def main_menu(message: types.Message, submenu="main"):
 
 
 
-    img_menu_ru = f'''
-<b>⚙️ НАСТРОЙКИ ГЕН. ИЗО.:</b>
-
-<b>ГЕНЕРАЦИЯ КАРТИНОК ИИ: {ai_draw.upper()}</b>
-<b>МОДЕЛЬ СЕЙЧАС: {model_draw.upper()}</b>
-
-<b>Модели openai:</b>
-    {"/dall_e_2" if model_draw == "dall-e-3" else "/dall_e_3"}
-
-<b>Размер изо: {img_size.upper()}</b>
-    /1792x1024
-    /1024x1792
-    /1024x1024
-
-<b>Качество изо: {img_quality.upper()}</b>
-    /standard
-    /hd
-
-<b>Стиль изо: {img_style.upper()}</b>
-    /vivid
-    /natural
-
-<b>Цены на одно изображение:</b>
-    dall-e-3-1024 - 0.048$
-    dall-e-3-1792 - 0.096$
-    dall-e-3-hd-1024 - 0.096$
-    dall-e-3-hd-1792 - 0.144$
-    dall-e-2-1024 - 0.024$
-    dall-e-2-512 - 0.0216$
-    dall-e-2-256 - 0.0192$
-    
-/menu - вернуться назад
-    '''
-
-    img_menu_en = f'''
-<b>⚙️ IMAGE GEN. SETTINGS:</b>
-
-<b>IMAGE GENERATION AI: {ai_draw.upper()}</b>
-<b>MODEL NOW: {model_draw.upper()}</b>
-
-<b>Models openai:</b>
-    {"/dall_e_2" if model_draw == "dall-e-3" else "/dall_e_3"}
-
-<b>img size: {img_size.upper()}</b>
-    /1792x1024
-    /1024x1792
-    /1024x1024
-
-<b>img quality: {img_quality.upper()}</b>
-    /standard
-    /hd
-
-<b>img style: {img_style.upper()}</b>
-    /vivid
-    /natural
-
-<b>Prices per image:</b>
-    dall-e-3-1024 - 0.048$
-    dall-e-3-1792 - 0.096$
-    dall-e-3-hd-1024 - 0.096$
-    dall-e-3-hd-1792 - 0.144$
-    dall-e-2-1024 - 0.024$
-    dall-e-2-512 - 0.0216$
-    dall-e-2-256 - 0.0192$
-    
-/menu - Go back
-    '''
+    img_menu_ru = (
+        f"<b>🎛 НАСТРОЙКИ ГЕН. ИЗО.:</b>\n\n"
+        f"<b>ГЕНЕРАЦИЯ КАРТИНОК ИИ: {ai_draw.upper()}</b>\n"
+        f"<b>МОДЕЛЬ СЕЙЧАС: {model_draw.upper()}</b>\n\n"
+        f"<b>Модели openai:</b>\n"
+        f"        {'/dall_e_2' if model_draw == 'dall-e-3' else '/dall_e_3'}\n\n"
+        f"<b>Размер изо: {img_size.upper()}</b>\n"
+        f"        /1792x1024\n"
+        f"        /1024x1792\n"
+        f"        /1024x1024\n\n"
+        f"<b>Качество изо: {img_quality.upper()}</b>\n"
+        f"        /standard\n"
+        f"        /hd\n\n"
+        f"<b>Стиль изо: {img_style.upper()}</b>\n"
+        f"        /vivid\n"
+        f"        /natural\n\n"
+        f"<b>Цены на одно изображение:</b>\n"
+        f"        dall-e-3-1024 - 0.048$\n"
+        f"        dall-e-3-1792 - 0.096$\n"
+        f"        dall-e-3-hd-1024 - 0.096$\n"
+        f"        dall-e-3-hd-1792 - 0.144$\n"
+        f"        dall-e-2-1024 - 0.024$\n"
+        f"        dall-e-2-512 - 0.0216$\n"
+        f"        dall-e-2-256 - 0.0192$\n\n\n"
+        f"/menu - вернуться назад\n"
+    )
+
+
+
+    img_menu_en = (
+        f"<b>🎛 IMAGE GEN. SETTINGS:</b>\n\n"
+        f"<b>IMAGE GENERATION AI: {ai_draw.upper()}</b>\n"
+        f"<b>MODEL NOW: {model_draw.upper()}</b>\n\n"
+        f"<b>Models openai:</b>\n"
+        f"        {'/dall_e_2' if model_draw == 'dall-e-3' else '/dall_e_3'}\n\n"
+        f"<b>Img size: {img_size.upper()}</b>\n"
+        f"        /1792x1024\n"
+        f"        /1024x1792\n"
+        f"        /1024x1024\n\n"
+        f"<b>Img quality: {img_quality.upper()}</b>\n"
+        f"        /standard\n"
+        f"        /hd\n\n"
+        f"<b>Img style: {img_style.upper()}</b>\n"
+        f"        /vivid\n"
+        f"        /natural\n\n"
+        f"<b>Prices per image:</b>\n"
+        f"        dall-e-3-1024 - 0.048$\n"
+        f"        dall-e-3-1792 - 0.096$\n"
+        f"        dall-e-3-hd-1024 - 0.096$\n"
+        f"        dall-e-3-hd-1792 - 0.144$\n"
+        f"        dall-e-2-1024 - 0.024$\n"
+        f"        dall-e-2-512 - 0.0216$\n"
+        f"        dall-e-2-256 - 0.0192$\n\n\n"
+        f"/menu - Go back\n"
+    )
+
+
+    voice_menu_ru = (
+        f"<b>🎛 НАСТРОЙКИ ГОЛОСА:</b>\n\n"
+        f"<b>РАСПОЗ. ГОЛОСА ИИ: {ai_voice_to_text.upper()}</b>\n"
+        f"<b>МОДЕЛЬ: {model_voice_to_text.upper()}</b>\n\n"
+        f"<b>Модели openai: {model_voice_to_text.upper()}</b>\n"
+        f"<b>        /whisper_1 - 0.0072$ / минута</b>\n\n\n"
+        f"<b>ГЕНЕРАЦИЯ ГОЛОСА ИИ: {ai_text_to_voice.upper()}</b>\n"
+        f"<b>МОДЕЛЬ: {model_text_to_voice.upper()}:</b>\n\n"
+        f"<b>Модель openai: {model_text_to_voice.upper()}</b>\n"
+        f"        /tts_1 - 18$ / 1M символ\n"
+        f"        /tts_1_hd - 36$ / 1M символ\n\n"
+        f"<b>Стиль голоса:  {voice.upper()}</b>\n"
+        f"        /nova - женский голос\n"
+        f"        /alloy\n"
+        f"        /echo\n"
+        f"        /fable\n"
+        f"        /onyx\n"
+        f"        /shimmer\n\n"
+        f"<b>Скорость голоса: {voice_speed}</b>\n"
+        f"        /speed_0_75 - 0.75\n"
+        f"        /speed_1 - 1.0\n"
+        f"        /speed_1_25 - 1.25\n\n\n"
+        f"/menu - вернуться назад\n"
+    )
+
+
+
+
+    voice_menu_en = (
+        f"<b>🎛 VOICE SETTINGS:</b>\n\n"
+        f"<b>VOICE RECOGNITION AI: {ai_voice_to_text.upper()}</b>\n"
+        f"<b>MODEL NOW: {model_voice_to_text.upper()}</b>\n\n"
+        f"<b>Models openai: {model_voice_to_text.upper()}</b>\n"
+        f"<b>        /whisper_1 - 0.0072$ / minute</b>\n\n\n"
+        f"<b>VOICE GENERATION AI: {ai_text_to_voice.upper()}</b>\n"
+        f"<b>MODEL NOW: {model_text_to_voice.upper()}:</b>\n\n"
+        f"<b>Model from OpenAI: {model_text_to_voice.upper()}</b>\n"
+        f"        /tts_1 - 18$ / 1M characters\n"
+        f"        /tts_1_hd - 36$ / 1M characters\n\n"
+        f"<b>Voice style: {voice.upper()}</b>\n"
+        f"        /nova - a woman's voice\n"
+        f"        /alloy\n"
+        f"        /echo\n"
+        f"        /fable\n"
+        f"        /onyx\n"
+        f"        /shimmer\n\n"
+        f"<b>The speed of the voice: {voice_speed}</b>\n"
+        f"        /speed_0_75 - 0.75\n"
+        f"        /speed_1 - 1.0\n"
+        f"        /speed_1_25 - 1.25\n\n\n"
+        f"/menu - Go back\n"
+    )
+
+
+
+
+    menu_ru = (
+        f"<b>🎛 НАСТРОЙКИ:</b>\n\n"
+        f"<b>🇷🇺 ЯЗЫК: {language.upper()}</b>\n"
+        f"        На англ. – /en\n\n" # 🇺🇸
+        f"<b>🔅 УВЕДОМЛЕНИЯ: {notifications}</b>\n"
+        f"        {'Выкл. увед. - /notOFF' if notifications == 'ВКЛЮЧЕНО' else 'Вкл. увед. - /notON'}\n\n"
+        f"<b>📖 ИСТОРИЯ ДИАЛОГА: {dialog}</b>\n"
+        f"        {'Выкл. диалог - /diOFF' if dialog == 'ВКЛЮЧЕНО' else 'Вкл. диалог - /diON'}\n\n"
+        f"<b>🗜 СЖАТИЕ ИСТОРИИ: {dialog_sum}</b>\n"
+        f"        {'Выкл. сжатие диалога - /sumOFF' if dialog_sum == 'ВКЛЮЧЕНО' else 'Вкл. сжатие диалога - /sumON'}\n\n"
+        f"<b>🎙 АУДИО ОТВЕТА: {voice_answer}</b>\n"
+        f"        {'Выкл. аудио ответ - /audOFF' if voice_answer == 'ВКЛЮЧЕНО' else 'Вкл. аудио ответ - /audON'}\n\n"
+        f"<b>🔖 ИНСТРУКЦИИ ДЛЯ ИИ: {system_content}</b>\n"
+        f"        Добавить - /addSYS\n"
+        f"        Посмотреть - /getSYS\n\n"
+        f"<b>💳 БАЛАНС СЧЕТА: {money} $</b>\n"
+        f"        Пополнить - /pay\n\n"
+        f"<b>💵 ФИН. ОТЧЕТ:</b>\n"
+        f"        Скачать в .CSV - /getStat\n\n\n"
+        f"<b>🚩 ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>\n"
+        f"<b>МОДЕЛЬ: {model_language.upper()}</b>\n"
+        f"(Наценка на токены 20% от их ориг. стоимости)\n\n"
+        f"<b>💡 Модели OpenAI:</b>\n"
+        f"        /gpt_4_1 🔥 - 12$ 1м ток\n"
+        f"        /gpt_4_1_mini - 2.4$ 1м ток\n"
+        f"        /gpt_4_1_nano - 0.6$ 1м ток\n"
+        f"        /gpt_4_5_preview - 270$ 1м ток\n"
+        f"        /o3 - 60$ 1м ток\n"
+        f"        /o1_preview -  90$ 1м ток\n"
+        f"        /o4_mini - 6.6$ 1м ток\n"
+        f"        /o3_mini - 6.6$ 1м ток\n"
+        f"        /o1_mini - 6.6$ 1м ток\n"
+        f"        /chatgpt_4o_latest 🔥 - 24$ 1м ток\n"
+        f"        /gpt_4o_mini - 1.8$ 1м ток\n\n"
+        f"<b>💡 Модели Google:</b>\n"
+        f"        /gemini_2_5_pro 🔥 - 13.5$ 1м ток\n"
+        f"        /gemini_2_5_flash 🔥 - 0.9$ 1м ток\n"
+        f"        /gemini_2_0_flash_exp 🔥 - 0.9$ 1м ток\n"
+        f"        /gemini_2_0_flash_lite_001 - 0.45$ 1м ток\n\n"
+        f"<b>💡 Модели Anthropic:</b>\n"
+        f"        /claude_3_7_sonnet 🔥 - 21.6$ 1м ток\n"
+        f"        /claude_3_5_sonnet - 21.6$ 1м ток\n"
+        f"        /claude_3_5_haiku - 5.76$ 1м ток\n"
+        f"        /claude_3_opus - 108$ 1м ток\n"
+        f"        /claude_3_sonnet - 21.6$ 1м ток\n"
+        f"        /claude_3_haiku - 1.8$ 1м ток\n\n"
+        f"<b>💡 Модели Grok:</b>\n"
+        f"        /grok_3_latest 🔥 - 21.6$ 1м ток\n"
+        f"        /grok_3_fast_latest - 36$ 1м ток\n"
+        f"        /grok_3_mini_latest 🔥 - 0.96$ 1м ток\n"
+        f"        /grok_3_mini_fast_latest - 5.52$ 1м ток\n"
+        f"        /grok_2_vision_latest - 14.4$ 1м ток\n"
+        f"        /grok_2_latest - 14.4$ 1м ток\n\n"
+        f"<b>💡 Модели DeepSeek:</b>\n"
+        f"        /deepseek_reasoner R1 - 2.82$ 1м ток\n"
+        f"        /deepseek_chat - 1.45$ 1м ток\n\n\n"
+        f"<b>🎚 ДОПОЛНИТЕЛЬНО:</b>\n"
+        f"        Параметры ген. изо. - /imgMenu\n"
+        f"        Параметры голоса - /voiceMenu\n"
+
+    )
+
+
+
+    menu_en = (
+        f"<b>🎛 SETTINGS:</b>\n\n"
+        f"<b>🇺🇸 LANGUAGE: {language.upper()}</b>\n"
+        f"        Russian – /ru\n\n"
+        f"<b>🔅 NOTIFICATIONS: {notifications}</b>\n"
+        f"        {'Enab. notif. - /notON' if notifications == 'OFF' else 'Dis. notif. - /notOFF'}\n\n"
+        f"<b>📖 HISTORY OF DIALOGUE: {dialog}</b>\n"
+        f"        {'Enab. history - /diON' if dialog == 'OFF' else 'Dis. history - /diOFF'}\n\n"
+        f"<b>🗜 HISTORY COMPRESSION: {dialog_sum}</b>\n"
+        f"        {'Dis. compres. - /sumOFF' if dialog_sum == 'ON' else 'Enab. compres. - /sumON'}\n\n"
+        f"<b>🎙 AUDIO RESPONSE: {voice_answer}</b>\n"
+        f"        {'Dis. audio res. - /audOFF' if voice_answer == 'ON' else 'Enab. audio res. - /audON'}\n\n"
+        f"<b>🔖 SYSTEM CONTENT AI: {system_content}</b>\n"
+        f"        Add - /addSYS\n"
+        f"        View text - /getSYS\n\n"
+        f"<b>💳 ACCOUNT BALANS: {money} $</b>\n"
+        f"        Pay - /pay\n\n"
+        f"<b>💵 FINANCIAL REPORTS:</b>\n"
+        f"        Download in .CSV - /getStat\n\n\n"
+        f"<b>🚩 LANGUAGE AI: {ai.upper()}</b>\n"
+        f"<b>MODEL: {model_language.upper()}</b>\n"
+        f"(The token markup is 20% of their original cost)\n\n"
+        f"<b>💡 Models OpenAI:</b>\n"
+        f"        /gpt_4_1 🔥 - 12$ 1m tok\n"
+        f"        /gpt_4_1_mini - 2.4$ 1m tok\n"
+        f"        /gpt_4_1_nano - 0.6$ 1m tok\n"
+        f"        /gpt_4_5_preview - 270$ 1m tok\n"
+        f"        /o3 - 60$ 1m tok\n"
+        f"        /o1_preview -  90$ 1m tok\n"
+        f"        /o4_mini - 6.6$ 1m tok\n"
+        f"        /o3_mini - 6.6$ 1m tok\n"
+        f"        /o1_mini - 6.6$ 1m tok\n"
+        f"        /chatgpt_4o_latest 🔥 - 24$ 1m tok\n"
+        f"        /gpt_4o_mini - 1.8$ 1m tok\n\n"
+        f"<b>💡 Models Google:</b>\n"
+        f"        /gemini_2_5_pro 🔥 - 13.5$ 1m tok\n"
+        f"        /gemini_2_5_flash 🔥 - 0.9$ 1m tok\n"
+        f"        /gemini_2_0_flash_exp 🔥 - 0.9$ 1m tok\n"
+        f"        /gemini_2_0_flash_lite_001 - 0.45$ 1m tok\n\n"
+        f"<b>💡 Models Anthropic:</b>\n"
+        f"        /claude_3_7_sonnet 🔥 - 21.6$ 1m tok\n"
+        f"        /claude_3_5_sonnet - 21.6$ 1m tok\n"
+        f"        /claude_3_5_haiku - 5.76$ 1m tok\n"
+        f"        /claude_3_opus - 108$ 1m tok\n"
+        f"        /claude_3_sonnet - 21.6$ 1m tok\n"
+        f"        /claude_3_haiku - 1.8$ 1m tok\n\n"
+        f"<b>💡 Models Grok:</b>\n"
+        f"        /grok_3_latest 🔥 - 21.6$ 1m tok\n"
+        f"        /grok_3_fast_latest - 36$ 1m tok\n"
+        f"        /grok_3_mini_latest 🔥 - 0.96$ 1m tok\n"
+        f"        /grok_3_mini_fast_latest - 5.52$ 1m tok\n"
+        f"        /grok_2_vision_latest - 14.4$ 1m tok\n"
+        f"        /grok_2_latest - 14.4$ 1m tok\n\n"
+        f"<b>💡 Models DeepSeek:</b>\n"
+        f"        /deepseek_reasoner R1 - 2.82$ 1m tok\n"
+        f"        /deepseek_chat - 1.45$ 1m tok\n\n\n"
+        f"<b>🎚 ADDITIONALLY:</b>\n"
+        f"        Image gen. param. - /imgMenu\n"
+        f"        Voice param. - /voiceMenu\n"
+
+    )
 
 
-
-
-    voice_menu_ru = f'''
-<b>⚙️ НАСТРОЙКИ ГОЛОСА:</b>
-    
-<b>РАСПОЗ. ГОЛОСА ИИ: {ai_voice_to_text.upper()}</b>
-<b>МОДЕЛЬ: {model_voice_to_text.upper()}</b>
-
-<b>модели openai: {model_voice_to_text.upper()}</b>
-    /whisper_1 - 0.0072$ / минута
-
-        
-<b>ГЕНЕРАЦИЯ ГОЛОСА ИИ: {ai_text_to_voice.upper()}</b>
-<b>МОДЕЛЬ: {model_text_to_voice.upper()}:</b>
-
-<b>модель openai: {model_text_to_voice.upper()}</b>
-    /tts_1 - 18$ / 1M символ
-    /tts_1_hd - 36$ / 1M символ
-
-<b>стиль голоса: {voice.upper()}</b>
-    /nova - женский голос
-    /alloy
-    /echo
-    /fable
-    /onyx
-    /shimmer
-
-<b>скорость голоса: {voice_speed}</b>
-    /speed_0_75 - 0.75
-    /speed_1 - 1.0
-    /speed_1_25 - 1.25
-
-
-/menu - вернуться назад
-    '''
-
-    voice_menu_en = f'''
-<b>⚙️ VOICE SETTINGS:</b>
-    
-<b>VOICE RECOGNITION AI: {ai_voice_to_text.upper()}</b>
-<b>MODEL NOW: {model_voice_to_text.upper()}</b>
-
-<b>Models openai: {model_voice_to_text.upper()}</b>
-    /whisper_1 - 0.0072$ / minute
-
-        
-<b>VOICE GENERATION AI: {ai_text_to_voice.upper()}</b>
-<b>MODEL NOW: {model_text_to_voice.upper()}:</b>
-
-<b>Model from OpenAI: {model_text_to_voice.upper()}</b>
-    /tts_1 - 18$ / 1M characters
-    /tts_1_hd - 36$ / 1M characters
-
-<b>Voice style: {voice.upper()}</b>
-    /nova - a woman's voice
-    /alloy
-    /echo
-    /fable
-    /onyx
-    /shimmer
-
-<b>The speed of the voice: {voice_speed}</b>
-    /speed_0_75 - 0.75
-    /speed_1 - 1.0
-    /speed_1_25 - 1.25
-
-    
-/menu - Go back
-    '''
-
-
-
-    menu_ru = f'''
-<b>⚙️ НАСТРОЙКИ:</b>
-
-<b>ЯЗЫК: {language.upper()}</b>
-    /en - английский
-
-<b>УВЕДОМЛЕНИЯ: {notifications}</b>
-    {"/notif_off - выкл. уведомления" if notifications == "ВКЛЮЧЕНО" else "/notif_on - вкл. уведомления"}
-
-<b>ИСТОРИЯ ДИАЛОГА: {dialog}</b>
-    {"/dialog_off - выкл. диалог" if dialog == "ВКЛЮЧЕНО" else "/dialog_on - вкл. диалог"}
-
-<b>СЖАТИЕ ИСТОРИИ: {dialog_sum}</b>
-    {"/sum_off - выкл. сжатие диалога" if dialog_sum == "ВКЛЮЧЕНО" else "/sum_on - вкл. сжатие диалога"}
-
-<b>АУДИО ОТВЕТА: {voice_answer}</b>
-    {"/audio_off - выкл. аудио ответ" if voice_answer == "ВКЛЮЧЕНО" else "/audio_on - вкл. аудио ответ"}
-
-<b>ИНСТРУКЦИИ ДЛЯ ИИ: {system_content}</b>
-    /system_content - добавить
-    /get_sys_content - посмотреть
-
-<b>БАЛАНС СЧЕТА: {money} $</b>
-    /add_money - пополнить
-
-<b>ФИН. ОТЧЕТЫ:</b>
-    /get_stat - скачать в .CSV 
-
-
-<b>ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>
-<b>МОДЕЛЬ: {model_language.upper()}</b>
-(Наценка на токены 20% от их ориг. стоимости)
-
-<b>Модели OpenAI:</b>
-    /gpt_4_1 🔥 - 12$ 1м ток
-    /gpt_4_1_mini - 2.4$ 1м ток
-    /gpt_4_1_nano - 0.6$ 1м ток
-    /gpt_4_5_preview - 270$ 1м ток
-    /o3 - 60$ 1м ток
-    /o1_preview -  90$ 1м ток
-    /o4_mini - 6.6$ 1м ток
-    /o3_mini - 6.6$ 1м ток
-    /o1_mini - 6.6$ 1м ток
-    /chatgpt_4o_latest 🔥 - 24$ 1м ток
-    /gpt_4o_mini - 1.8$ 1м ток
-
-<b>Модели Google:</b>
-    /gemini_2_5_pro 🔥 - 13.5$ 1м ток
-    /gemini_2_5_flash 🔥 - 0.9$ 1м ток
-    /gemini_2_0_flash_exp 🔥 - 0.9$ 1м ток
-    /gemini_2_0_flash_lite_001 - 0.45$ 1м ток
-
-<b>Модели Anthropic:</b>
-    /claude_3_7_sonnet 🔥 - 21.6$ 1м ток
-    /claude_3_5_sonnet - 21.6$ 1м ток
-    /claude_3_5_haiku - 5.76$ 1м ток
-    /claude_3_opus - 108$ 1м ток
-    /claude_3_sonnet - 21.6$ 1м ток
-    /claude_3_haiku - 1.8$ 1м ток
-
-<b>Модели Grok:</b>
-    /grok_3_latest 🔥 - 21.6$ 1м ток 
-    /grok_3_fast_latest - 36$ 1м ток
-    /grok_3_mini_latest 🔥 - 0.96$ 1м ток
-    /grok_3_mini_fast_latest - 5.52$ 1м ток
-    /grok_2_vision_latest - 14.4$ 1м ток
-    /grok_2_latest - 14.4$ 1м ток
-
-<b>Модели DeepSeek:</b>
-    /deepseek_reasoner R1 - 2.82$ 1м ток
-    /deepseek_chat - 1.45$ 1м ток
-
-
-<b>ДОПОЛНИТЕЛЬНО:</b>
-    /img_menu - параметры ген. изо.
-    /voice_menu - параметры голоса  
-
-
-    '''
-
-
-
-
-    menu_en = f'''
-<b>⚙️ Settings:</b>
-
-<b>LANGUAGE: {language.upper()}</b>
-    /ru - russian
-
-<b>NOTIFICATIONS: {notifications}</b>
-    {"/notif_on - on notifications" if notifications == "OFF" else "/notif_off - off notifications"}
-
-<b>HISTORY OF DIALOGUE: {dialog}</b>
-    {"/dialog_on - on the dialog" if dialog == "OFF" else "/dialog_off - off the dialog"}
-
-<b>HISTORY COMPRESSION: {dialog_sum}</b>
-    {"/sum_off - off compression" if dialog_sum == "ON" else "/sum_on - on compression"}
-
-<b>AUDIO RESPONSE: {voice_answer}</b>
-    {"/audio_off - off audio response" if voice_answer == "ON" else "/audio_on - on audio response"}
-
-<b>SYSTEM CONTENT: {system_content}</b>
-    /system_content - add text
-    /get_sys_content - watch
-
-<b>ACCOUNT BALANS: {money} $</b>
-    /add_money - replenish
-
-<b>FINANCIAL REPORTS:</b>
-    /get_stat - download in .CSV
-
-    
-<b>LANGUAGE AI: {ai.upper()}</b>
-<b>MODEL: {model_language.upper()}</b>
-(The token markup is 20% of their original cost)
-
-<b>Models OpenAI:</b>
-    /gpt_4_1 🔥 - 12$ 1m tok
-    /gpt_4_1_mini - 2.4$ 1m tok
-    /gpt_4_1_nano - 0.6$ 1m tok
-    /gpt_4_5_preview - 270$ 1m tok
-    /o3 - 60$ 1m tok
-    /o1_preview -  90$ 1m tok
-    /o4_mini - 6.6$ 1m tok
-    /o3_mini - 6.6$ 1m tok
-    /o1_mini - 6.6$ 1m tok
-    /chatgpt_4o_latest 🔥 - 24$ 1m tok
-    /gpt_4o_mini - 1.8$ 1m tok
-    
-<b>Models Google:</b>
-    /gemini_2_5_pro 🔥 - 13.5$ 1m tok
-    /gemini_2_5_flash 🔥 - 0.9$ 1m tok
-    /gemini_2_0_flash_exp 🔥 - 0.9$ 1m tok
-    /gemini_2_0_flash_lite_001 - 0.45$ 1m tok
-
-<b>Models Anthropic:</b>
-    /claude_3_7_sonnet 🔥 - 21.6$ 1m tok
-    /claude_3_5_sonnet - 21.6$ 1m tok
-    /claude_3_5_haiku - 5.76$ 1m tok
-    /claude_3_opus - 108$ 1m tok
-    /claude_3_sonnet - 21.6$ 1m tok
-    /claude_3_haiku - 1.8$ 1m tok
-
-<b>Models Grok:</b>
-    /grok_3_latest 🔥 - 21.6$ 1m tok 
-    /grok_3_fast_latest - 36$ 1m tok
-    /grok_3_mini_latest 🔥 - 0.96$ 1m tok
-    /grok_3_mini_fast_latest - 5.52$ 1m tok
-    /grok_2_vision_latest - 14.4$ 1m tok
-    /grok_2_latest - 14.4$ 1m tok
-
-<b>Models DeepSeek:</b>
-    /deepseek_reasoner R1 - 2.82$ 1m tok
-    /deepseek_chat - 1.45$ 1m tok
-    
-
-<b>ADDITIONALLY:</b>
-    /img_menu - image generation parameters
-    /voice_menu - voice parameters 
-
-
-    '''
 
     if language == "ru" and submenu == "main":
         await message.answer(f"{menu_ru}", parse_mode="HTML")
@@ -604,12 +540,12 @@ async def main_menu(message: types.Message, submenu="main"):
 
 
 # SUB MENU IMG:
-@dp.message(Command('img_menu'))
+@dp.message(Command('imgMenu'))
 async def en(message: types.Message):
     await main_menu(message, "img_menu")
 
 # SUB MENU VOICE:
-@dp.message(Command('voice_menu'))
+@dp.message(Command('voiceMenu'))
 async def en(message: types.Message):
     await main_menu(message, "voice_menu")
 
@@ -637,7 +573,7 @@ async def ru(message: types.Message):
         await main_menu(message, "main")
 
 # Notifications:
-@dp.message(Command('notif_on'))
+@dp.message(Command('notON'))
 async def notif_on(message: types.Message):
     id = user_id(message)
     data = {
@@ -648,7 +584,7 @@ async def notif_on(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
-@dp.message(Command('notif_off'))
+@dp.message(Command('notOFF'))
 async def notif_off(message: types.Message):
     id = user_id(message)
     data = {
@@ -660,7 +596,7 @@ async def notif_off(message: types.Message):
         await main_menu(message, "main")
 
 # History:
-@dp.message(Command('dialog_on'))
+@dp.message(Command('diON'))
 async def dialog_on(message: types.Message):
     id = user_id(message)
     data = {
@@ -671,7 +607,7 @@ async def dialog_on(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
-@dp.message(Command('dialog_off'))
+@dp.message(Command('diOFF'))
 async def dialog_off(message: types.Message):
     id = user_id(message)
     data = {
@@ -684,7 +620,7 @@ async def dialog_off(message: types.Message):
 
 
 # History Compression:
-@dp.message(Command('sum_on'))
+@dp.message(Command('sumON'))
 async def sum_on(message: types.Message):
     id = user_id(message)
     data = {
@@ -695,7 +631,7 @@ async def sum_on(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
-@dp.message(Command('sum_off'))
+@dp.message(Command('sumOFF'))
 async def sum_off(message: types.Message):
     id = user_id(message)
     data = {
@@ -708,7 +644,7 @@ async def sum_off(message: types.Message):
 
 
 # Audio response:
-@dp.message(Command('audio_on'))
+@dp.message(Command('audON'))
 async def audio_on(message: types.Message):
     id = user_id(message)
     data = {
@@ -719,7 +655,7 @@ async def audio_on(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
-@dp.message(Command('audio_off'))
+@dp.message(Command('audOFF'))
 async def audio_off(message: types.Message):
     id = user_id(message)
     data = {
@@ -1558,7 +1494,7 @@ async def speed_1_25(message: types.Message):
 class Form_system(StatesGroup):
     content = State()
 
-@dp.message(Command('system_content'))
+@dp.message(Command('addSYS'))
 async def system_content(message: types.Message, state: FSMContext):
     id = user_id(message)    
     is_user_to_db = await read_user(id)
@@ -1593,7 +1529,7 @@ async def system_content_get_text(message: types.Message, state: FSMContext):
 
     await state.clear()
 
-@dp.message(Command('get_sys_content'))
+@dp.message(Command('getSYS'))
 async def get_sys_content(message: types.Message):
     id = user_id(message)
     data = await read_user(id)
@@ -1605,7 +1541,7 @@ async def get_sys_content(message: types.Message):
 
 
 # User statistic:
-@dp.message(Command('get_stat'))
+@dp.message(Command('getStat'))
 async def get_stat(message: types.Message):
     id = user_id(message)
     all_data = await read_statistics(id)
@@ -1782,7 +1718,7 @@ class Form_my_pay(StatesGroup):
     #admin_confirm = State()
 
 # 1 Select method pay:
-@dp.message(Command("add_money"))
+@dp.message(Command("pay"))
 async def add_money(message: types.Message, state: FSMContext):
 
     id = user_id(message)
@@ -2200,43 +2136,39 @@ async def admin_menu(message: types.Message):
     # /agent - push to on/off
     # /clear_ag
 
-    admin = f'''
-<b>🎚 ADMIN PANEL:</b>
 
-<b>📈 INFO:</b>
-    /get_info_by_users
-    /get_info_a_payments
+    admin_menu_text = (
+        f"<b>🎛 ADMIN MENU:</b>\n\n"
+        f"<b>📊 STATISTICS:</b>\n"
+        f"        Info Users – /allUs\n"
+        f"        Info Payers – /allPay\n\n"
+        f"<b>📝 LOGS:</b>\n"
+        f"        Get logs – /logs\n\n"
+        f"<b>🗳 BACKUP & RESTORE:</b>\n"
+        f"        Backup DB – /bupDb\n"
+        f"        Restore DB – /resDb\n"
+        f"        Create Tab DB – /crTabDb\n"
+        f"        Down users – /dnlUsers!\n"
+        f"        Restore Users – /resUs\n\n"
+        f"<b>💳 METHODS PAY:</b>\n"
+        f"        Add Metod – /addMe\n"
+        f"        Select Met – /selMet\n"
+        f"        Delete Met – /delMe\n\n"
+        f"<b>🗑 CLEAR:</b>\n"
+        f"        Stat Tab DB – /dStat!\n"
+        f"        Logs – /dLogs\n\n"
+        f"<b>📩 SENDING NEWS:</b>\n"
+        f"        Mailing – /sendN\n\n"
+        f"<b>🧪 SPECIAL:</b>\n"
+        f"        Paranoi mode – /blok!\n"
+    )
 
-<b>📝 LOGS:</b>
-    /get_logs
-
-<b>🗳 BACKUP & RESTORE:</b>  
-    /backup
-    /restore_db
-    /create_tables_in_db
-    /restore_loyal_users
-
-<b>💳 METHODS PAY: </b>
-    /add_metod_pay - add method
-    /select_metod_pay - select method
-    */use_random_metod_pay  - use random
-    /delete_metod
-
-<b>🗑 CLEAR:</b>
-    /clear_logs
-    */clear_table_statistic
-    */clear_table_dialog
-
-<b>📩 SENDING NEWS: </b>
-    /sending_news - start
-    '''
-
-    await message.answer(admin, parse_mode="HTML")
+    await message.answer(admin_menu_text, parse_mode="HTML")
 
 
 
 # Create Tables in DB:
-@dp.message(Command('create_tables_in_db'))
+@dp.message(Command('crTabDb'))
 async def create_tebles_in_db_admin(message: types.Message):
     id = user_id(message)
 
@@ -2252,7 +2184,7 @@ async def create_tebles_in_db_admin(message: types.Message):
 
 
 # Resore loyal user to DB:
-@dp.message(Command('restore_loyal_users'))
+@dp.message(Command('resUs'))
 async def restore_loyal_users_admin(message: types.Message):
     id = user_id(message)
 
@@ -2357,7 +2289,7 @@ async def restore_loyal_users_admin(message: types.Message):
 
 
 # ADMIN: Get stat by users:
-@dp.message(Command('get_info_by_users'))
+@dp.message(Command('allUs'))
 async def get_info_by_users(message: types.Message):
     id = user_id(message)
 
@@ -2401,7 +2333,7 @@ class News(StatesGroup):
     news_en = State()
     confirm_send_news = State()
 
-@dp.message(Command('sending_news'))
+@dp.message(Command('sendN'))
 async def sending_news(message: types.Message, state: FSMContext):
     id = user_id(message)
 
@@ -2475,7 +2407,7 @@ async def confirm_send_news(message: types.Message, state: FSMContext):
 
 
 # ADMIN: Get Info a Payments:
-@dp.message(Command('get_logs'))
+@dp.message(Command('logs'))
 async def get_logs_bot(message: types.Message):
     id = user_id(message)
 
@@ -2496,7 +2428,7 @@ async def get_logs_bot(message: types.Message):
 
 
 # Admin clear logs /clearlog
-@dp.message(Command("clear_logs"))
+@dp.message(Command("dLogs"))
 async def admin_clear_logs(message: types.Message):
     id = user_id(message)
 
@@ -2528,7 +2460,7 @@ async def admin_clear_logs(message: types.Message):
 
 
 # ADMIN: Get Info a Payments:
-@dp.message(Command('get_info_a_payments'))
+@dp.message(Command('allPay'))
 async def get_info_a_payments_users(message: types.Message):
     id = user_id(message)
 
@@ -2577,7 +2509,7 @@ class Form_method_pay(StatesGroup):
     text_pay_ru = State()
     text_pay_en = State()
 
-@dp.message(Command('add_metod_pay'))
+@dp.message(Command('addMe'))
 async def add_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
@@ -2647,7 +2579,7 @@ class Form_delete_method(StatesGroup):
     num = State()
 
 
-@dp.message(Command('delete_metod'))
+@dp.message(Command('delMe'))
 async def select_when_deleted_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
@@ -2717,7 +2649,7 @@ class Form_change_method(StatesGroup):
     num = State()
 
 
-@dp.message(Command('select_metod_pay'))
+@dp.message(Command('selMet'))
 async def start_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
@@ -2856,7 +2788,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
 
 
 # ADMIN: Backup:
-@dp.message(Command('backup'))
+@dp.message(Command('bupDb'))
 async def backup(message: types.Message):
     id = user_id(message)
 
@@ -2898,7 +2830,7 @@ class Restor_db(StatesGroup):
     #restor_db = State()
 
 #Push button - restore
-@dp.message(Command('restore_db'))
+@dp.message(Command('resDb'))
 async def restore_db_admin(message: types.Message, state: FSMContext):
     id = user_id(message)
 
@@ -3889,7 +3821,7 @@ async def mod_gen_img(data, message, state: FSMContext):
 async def check_request_drawing(question):
     typecontent = None
 
-    draw_words = {"/gen_draw"}
+    draw_words = {"/genDraw"}
     question_words = set(question.lower().split())
     if draw_words & question_words:
         typecontent = "draw"

@@ -1,9 +1,10 @@
 # Base:
 # import asyncio
+from config import LOG_CONFIG_BOT
+import logging
+logging.basicConfig(**LOG_CONFIG_BOT)
 import json
 import datetime
-import logging
-logging.basicConfig(format='%(message)s', level=logging.INFO, filename='./log/db.log')
 # System:
 from worker_db import add_user, update_user, add_methods_pay
 

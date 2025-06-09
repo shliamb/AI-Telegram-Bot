@@ -1,7 +1,7 @@
 from get_keys import KEY_API_DEEPSEEK
 from config import NULL_TOKEN
 from general_functions import encode_file
-import logging
+# import logging
 from openai import AsyncOpenAI, RateLimitError, OpenAIError
 
 

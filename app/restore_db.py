@@ -1,34 +1,73 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import BACKUP_PATH, TIME_CORRECTION
-from general_functions import day_utcnow, unformat_date
-import subprocess
+from config import LOG_CONFIG_DB, HOST
 import logging
+logging.basicConfig(**LOG_CONFIG_DB)
+# from general_functions import day_utcnow, unformat_date
+import subprocess
+import os
 # import asyncio
 
 
 
 async def restore_db(file_path):
-                                                            # localhost  app_postgres
-    terminate_command = f'PGPASSWORD={PASSWORD_DB} psql -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname=\'{DB_NAME}\';"'
-
-    clear_command = f'PGPASSWORD={PASSWORD_DB} psql -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
-
-    pg_restore_command = f'PGPASSWORD={PASSWORD_DB} pg_restore -h app_postgres -p 5432 -U {USER_DB} -d {DB_NAME} {file_path}'
+    # 1. Используем правильное имя хоста (то же, что в terminate_command)
+    db_host = HOST  # Используем тот же хост, что и для psql
+    
+    # Команда для завершения подключений (кроме текущего)
+    terminate_command = [
+        'psql',
+        '-h', db_host,
+        '-p', '5432',
+        '-U', USER_DB,
+        '-d', 'postgres',  # Подключаемся к системной БД
+        '-c', f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='{DB_NAME}' AND pid <> pg_backend_pid();"
+    ]
+    
+    # Команда для очистки БД
+    clear_command = [
+        'psql',
+        '-h', db_host,
+        '-p', '5432',
+        '-U', USER_DB,
+        '-d', DB_NAME,
+        '-c', "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+    ]
+    
+    # Команда для восстановления
+    pg_restore_command = [
+        'pg_restore',
+        '-h', db_host,  # Используем тот же хост
+        '-p', '5432',
+        '-U', USER_DB,
+        '-d', DB_NAME,
+        '-Fc',  # Указываем формат (custom)
+        file_path
+    ]
     
     try:
-        subprocess.run(terminate_command, shell=True) # Формирование команды для завершения активных сеансов
-
-        subprocess.run(clear_command, shell=True) # Формирование команды для удаления базы данных
-
-        subprocess.run(pg_restore_command, shell=True) # Восстановления базы данных из резервной копии с помощью pg_restore, выполнение команды через subprocess
+        env = {**os.environ, 'PGPASSWORD': PASSWORD_DB}
         
-        logging.info("Database restore completed successfully.")
+        # 1. Завершаем подключения
+        print("Terminating existing connections...")
+        result = subprocess.run(terminate_command, env=env, capture_output=True, text=True)
+        print(result.stdout)
+        
+        # 2. Очищаем БД
+        print("Clearing database...")
+        subprocess.run(clear_command, env=env, check=True)
+        
+        # 3. Восстанавливаем из бэкапа
+        print("Restoring database...")
+        subprocess.run(pg_restore_command, env=env, check=True)
+        
         print("Database restore completed successfully.")
         return True
     
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed: {e}\nOutput: {e.stdout}\nError: {e.stderr}")
+        return False
     except Exception as e:
-        logging.info(f"An error occurred: {e}")
-        print(f"An error occurred: {e}")
+        print(f"An error occurred: {str(e)}")
         return False
 
 

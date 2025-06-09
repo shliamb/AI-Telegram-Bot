@@ -1,7 +1,7 @@
 # Base:
 import aiohttp
 import logging
-logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO)
+# logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO)
 import json
 from typing import Dict, Optional, Any, List
 # import asyncio
