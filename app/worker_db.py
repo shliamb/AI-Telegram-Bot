@@ -1,9 +1,9 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, MIN_PAY
 import logging
 logging.basicConfig(**LOG_CONFIG_DB)
 import asyncpg
-# import asyncio
+import asyncio
 
 
 
@@ -927,6 +927,50 @@ async def read_all_users():
 
 # for user in data_all_users:
 #     print(user.get("user_id"), user.get("name"), user.get("money"))
+
+
+
+
+
+# Read all users whu pay and have money:
+async def json_old_users():
+    connection = None
+    try:
+        connection = await get_connection()
+        result = await connection.fetch(
+            '''
+                SELECT * FROM users WHERE paid > $1 OR money > $2;
+            ''',
+            0, MIN_PAY
+        )
+
+        if not result:
+            return False
+
+        data = []
+        for record in result:
+            data.append(dict(record))
+
+        return data
+    
+    except Exception as e:
+        logging.error(f"Error json_old_users: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
+
+
+# print(asyncio.run(json_old_users()))
+
+
+
+
+
+
+
+
+
 
 # from datetime import datetime, timezone, timedelta
 

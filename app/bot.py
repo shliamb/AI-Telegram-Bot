@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT #, DEFAULT_MODEL_ASSIST_OA
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY #, DEFAULT_MODEL_ASSIST_OA
 
 import logging
 logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
@@ -31,7 +31,7 @@ from aiogram.fsm.state import State, StatesGroup
 # Service
 # from worker_db import get_user_by_id, get_user_by_username, update_user, adding_user, get_all_data_user_by_username, get_last_statistics
 # from general_functions import day_utcnow, unformat_date
-# from config import money_to_start, my_app_key, time_correction, min_pay
+
 from mod_claude import mod_claude_chat
 from mod_gemini import mod_gemini_chat
 from mod_openai import mod_openai_chat
@@ -47,6 +47,7 @@ from backupdb import backup_db
 from restore_db import restore_db
 from create_tables import create_tables_in_db
 from restore_loyal_users import restore_loyal_users_to_db
+from get_json_old_users import get_json_old_users_to_db
 # from oa_assist import AssistOpenAI
 
 
@@ -411,40 +412,40 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>🚩 ЯЗЫКОВАЯ ИИ: {ai.upper()}</b>\n"
         f"<b>МОДЕЛЬ: {model_language.upper()}</b>\n"
         f"(Наценка на токены 20% от их ориг. стоимости)\n\n"
-        f"<b>💡 Модели OpenAI:</b>\n"
-        f"        /gpt_4_1 🔥 - 12$ 1м ток\n"
-        f"        /gpt_4_1_mini - 2.4$ 1м ток\n"
-        f"        /gpt_4_1_nano - 0.6$ 1м ток\n"
-        f"        /gpt_4_5_preview - 270$ 1м ток\n"
-        f"        /o3 - 60$ 1м ток\n"
-        f"        /o1_preview -  90$ 1м ток\n"
-        f"        /o4_mini - 6.6$ 1м ток\n"
-        f"        /o3_mini - 6.6$ 1м ток\n"
-        f"        /o1_mini - 6.6$ 1м ток\n"
-        f"        /chatgpt_4o_latest 🔥 - 24$ 1м ток\n"
-        f"        /gpt_4o_mini - 1.8$ 1м ток\n\n"
-        f"<b>💡 Модели Google:</b>\n"
-        f"        /gemini_2_5_pro 🔥 - 13.5$ 1м ток\n"
-        f"        /gemini_2_5_flash 🔥 - 0.9$ 1м ток\n"
-        f"        /gemini_2_0_flash_exp 🔥 - 0.9$ 1м ток\n"
-        f"        /gemini_2_0_flash_lite_001 - 0.45$ 1м ток\n\n"
-        f"<b>💡 Модели Anthropic:</b>\n"
-        f"        /claude_3_7_sonnet 🔥 - 21.6$ 1м ток\n"
-        f"        /claude_3_5_sonnet - 21.6$ 1м ток\n"
-        f"        /claude_3_5_haiku - 5.76$ 1м ток\n"
-        f"        /claude_3_opus - 108$ 1м ток\n"
-        f"        /claude_3_sonnet - 21.6$ 1м ток\n"
-        f"        /claude_3_haiku - 1.8$ 1м ток\n\n"
-        f"<b>💡 Модели Grok:</b>\n"
-        f"        /grok_3_latest 🔥 - 21.6$ 1м ток\n"
-        f"        /grok_3_fast_latest - 36$ 1м ток\n"
-        f"        /grok_3_mini_latest 🔥 - 0.96$ 1м ток\n"
-        f"        /grok_3_mini_fast_latest - 5.52$ 1м ток\n"
-        f"        /grok_2_vision_latest - 14.4$ 1м ток\n"
-        f"        /grok_2_latest - 14.4$ 1м ток\n\n"
-        f"<b>💡 Модели DeepSeek:</b>\n"
-        f"        /deepseek_reasoner R1 - 2.82$ 1м ток\n"
-        f"        /deepseek_chat - 1.45$ 1м ток\n\n\n"
+        f"<b>💡 Модели OpenAI 1м ток:</b>\n"
+        f"        /gpt_4_1 🔥 - 12$\n"
+        f"        /gpt_4_1_mini - 2.4$\n"
+        f"        /gpt_4_1_nano - 0.6$\n"
+        f"        /gpt_4_5_preview - 270$\n"
+        f"        /o3 - 60$\n"
+        f"        /o1_preview -  90$\n"
+        f"        /o4_mini - 6.6$\n"
+        f"        /o3_mini - 6.6$\n"
+        f"        /o1_mini - 6.6$\n"
+        f"        /chatgpt_4o_latest 🔥 - 24$\n"
+        f"        /gpt_4o_mini - 1.8$\n\n"
+        f"<b>💡 Модели Google 1м ток:</b>\n"
+        f"        /gemini_2_5_pro 🔥 - 13.5$\n"
+        f"        /gemini_2_5_flash 🔥 - 0.9$\n"
+        f"        /gemini_2_0_flash_exp 🔥 - 0.9$\n"
+        f"        /gemini_2_0_flash_lite_001 - 0.45$\n\n"
+        f"<b>💡 Модели Anthropic 1м ток:</b>\n"
+        f"        /claude_3_7_sonnet 🔥 - 21.6$\n"
+        f"        /claude_3_5_sonnet - 21.6$\n"
+        f"        /claude_3_5_haiku - 5.76$\n"
+        f"        /claude_3_opus - 108$\n"
+        f"        /claude_3_sonnet - 21.6$\n"
+        f"        /claude_3_haiku - 1.8$\n\n"
+        f"<b>💡 Модели Grok 1м ток:</b>\n"
+        f"        /grok_3_latest 🔥 - 21.6$\n"
+        f"        /grok_3_fast_latest - 36$\n"
+        f"        /grok_3_mini_latest 🔥 - 0.96$\n"
+        f"        /grok_3_mini_fast_latest - 5.52$\n"
+        f"        /grok_2_vision_latest - 14.4$\n"
+        f"        /grok_2_latest - 14.4$\n\n"
+        f"<b>💡 Модели DeepSeek 1м ток:</b>\n"
+        f"        /deepseek_reasoner R1 - 2.82$\n"
+        f"        /deepseek_chat - 1.45$\n\n\n"
         f"<b>🎚 ДОПОЛНИТЕЛЬНО:</b>\n"
         f"        Параметры ген. изо. - /imgMenu\n"
         f"        Параметры голоса - /voiceMenu\n"
@@ -475,40 +476,40 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>🚩 LANGUAGE AI: {ai.upper()}</b>\n"
         f"<b>MODEL: {model_language.upper()}</b>\n"
         f"(The token markup is 20% of their original cost)\n\n"
-        f"<b>💡 Models OpenAI:</b>\n"
-        f"        /gpt_4_1 🔥 - 12$ 1m tok\n"
-        f"        /gpt_4_1_mini - 2.4$ 1m tok\n"
-        f"        /gpt_4_1_nano - 0.6$ 1m tok\n"
-        f"        /gpt_4_5_preview - 270$ 1m tok\n"
-        f"        /o3 - 60$ 1m tok\n"
-        f"        /o1_preview -  90$ 1m tok\n"
-        f"        /o4_mini - 6.6$ 1m tok\n"
-        f"        /o3_mini - 6.6$ 1m tok\n"
-        f"        /o1_mini - 6.6$ 1m tok\n"
-        f"        /chatgpt_4o_latest 🔥 - 24$ 1m tok\n"
-        f"        /gpt_4o_mini - 1.8$ 1m tok\n\n"
-        f"<b>💡 Models Google:</b>\n"
-        f"        /gemini_2_5_pro 🔥 - 13.5$ 1m tok\n"
-        f"        /gemini_2_5_flash 🔥 - 0.9$ 1m tok\n"
-        f"        /gemini_2_0_flash_exp 🔥 - 0.9$ 1m tok\n"
-        f"        /gemini_2_0_flash_lite_001 - 0.45$ 1m tok\n\n"
-        f"<b>💡 Models Anthropic:</b>\n"
-        f"        /claude_3_7_sonnet 🔥 - 21.6$ 1m tok\n"
-        f"        /claude_3_5_sonnet - 21.6$ 1m tok\n"
-        f"        /claude_3_5_haiku - 5.76$ 1m tok\n"
-        f"        /claude_3_opus - 108$ 1m tok\n"
-        f"        /claude_3_sonnet - 21.6$ 1m tok\n"
-        f"        /claude_3_haiku - 1.8$ 1m tok\n\n"
-        f"<b>💡 Models Grok:</b>\n"
-        f"        /grok_3_latest 🔥 - 21.6$ 1m tok\n"
-        f"        /grok_3_fast_latest - 36$ 1m tok\n"
-        f"        /grok_3_mini_latest 🔥 - 0.96$ 1m tok\n"
-        f"        /grok_3_mini_fast_latest - 5.52$ 1m tok\n"
-        f"        /grok_2_vision_latest - 14.4$ 1m tok\n"
-        f"        /grok_2_latest - 14.4$ 1m tok\n\n"
-        f"<b>💡 Models DeepSeek:</b>\n"
-        f"        /deepseek_reasoner R1 - 2.82$ 1m tok\n"
-        f"        /deepseek_chat - 1.45$ 1m tok\n\n\n"
+        f"<b>💡 Models OpenAI 1m tok:</b>\n"
+        f"        /gpt_4_1 🔥 - 12$\n"
+        f"        /gpt_4_1_mini - 2.4$\n"
+        f"        /gpt_4_1_nano - 0.6$\n"
+        f"        /gpt_4_5_preview - 270$\n"
+        f"        /o3 - 60$\n"
+        f"        /o1_preview -  90$\n"
+        f"        /o4_mini - 6.6$\n"
+        f"        /o3_mini - 6.6$\n"
+        f"        /o1_mini - 6.6$\n"
+        f"        /chatgpt_4o_latest 🔥 - 24$\n"
+        f"        /gpt_4o_mini - 1.8$\n\n"
+        f"<b>💡 Models Google 1m tok:</b>\n"
+        f"        /gemini_2_5_pro 🔥 - 13.5$\n"
+        f"        /gemini_2_5_flash 🔥 - 0.9$\n"
+        f"        /gemini_2_0_flash_exp 🔥 - 0.9$\n"
+        f"        /gemini_2_0_flash_lite_001 - 0.45$\n\n"
+        f"<b>💡 Models Anthropic 1m tok:</b>\n"
+        f"        /claude_3_7_sonnet 🔥 - 21.6$\n"
+        f"        /claude_3_5_sonnet - 21.6$\n"
+        f"        /claude_3_5_haiku - 5.76$\n"
+        f"        /claude_3_opus - 108$\n"
+        f"        /claude_3_sonnet - 21.6$\n"
+        f"        /claude_3_haiku - 1.8$\n\n"
+        f"<b>💡 Models Grok 1m tok:</b>\n"
+        f"        /grok_3_latest 🔥 - 21.6$\n"
+        f"        /grok_3_fast_latest - 36$\n"
+        f"        /grok_3_mini_latest 🔥 - 0.96$\n"
+        f"        /grok_3_mini_fast_latest - 5.52$\n"
+        f"        /grok_2_vision_latest - 14.4$\n"
+        f"        /grok_2_latest - 14.4$\n\n"
+        f"<b>💡 Models DeepSeek 1m tok:</b>\n"
+        f"        /deepseek_reasoner R1 - 2.82$\n"
+        f"        /deepseek_chat - 1.45$\n\n\n"
         f"<b>🎚 ADDITIONALLY:</b>\n"
         f"        Image gen. param. - /imgMenu\n"
         f"        Voice param. - /voiceMenu\n"
@@ -2148,7 +2149,7 @@ async def admin_menu(message: types.Message):
         f"        Backup DB – /bupDb\n"
         f"        Restore DB – /resDb\n"
         f"        Create Tab DB – /crTabDb\n"
-        f"        Down users – /dnlUsers!\n"
+        f"        Down users – /dnlUsers\n"
         f"        Restore Users – /resUs\n\n"
         f"<b>💳 METHODS PAY:</b>\n"
         f"        Add Metod – /addMe\n"
@@ -2183,17 +2184,154 @@ async def create_tebles_in_db_admin(message: types.Message):
 
 
 
-# Resore loyal user to DB:
-@dp.message(Command('resUs'))
-async def restore_loyal_users_admin(message: types.Message):
+
+
+
+# Get_on_json_old_users:
+@dp.message(Command('dnlUsers'))
+async def get_on_json_old_users(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
-    res_update_db = await restore_loyal_users_to_db()
-    await bot.send_message(message.chat.id, f"Results of adding regular clients to DB:\n{res_update_db}")
+    name_file = await get_json_old_users_to_db()
+    if not name_file:
+        await message.answer(f"No users found with money > {MIN_PAY}$ or one more pay")
+        return
+
+    if os.path.exists(name_file) and os.path.getsize(name_file) > 0:
+        await bot.send_document(message.chat.id, document=types.input_file.FSInputFile(name_file))
+    else:
+        await bot.send_message(message.chat.id, "File (name_file) is empty or missing.")  
+
+
+
+
+
+
+# # Admin Restore DB
+# class Restor_db(StatesGroup):
+#     load_db = State()
+
+
+# # Push button - restore
+# @dp.message(Command('resDb'))
+# async def restore_db_admin(message: types.Message, state: FSMContext):
+#     await typing(message)
+#     id = user_id(message)
+
+#     if id != IS_ADMIN:
+#         return
+    
+#     await bot.send_message(message.chat.id, "Attach and send the necessary copy of the database for recovery.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
+#     await state.set_state(Restor_db.load_db)
+
+
+
+# @dp.message(Restor_db.load_db)
+# async def load_a_base(message: Message, state: FSMContext):
+
+#     await typing(message)
+#     id = user_id(message)
+
+#     if id != IS_ADMIN:
+#         return
+
+#     if not isinstance(message.document, types.Document):
+#         await message.answer("Вы передали не документ.")
+#         return
+
+#     file_extension = message.document.file_name.split('.')[-1]
+#     allowed_extensions = ['sql']
+
+#     if file_extension not in allowed_extensions:
+#         await message.answer("Вы передали файл не sql расширения.")
+#         return    
+
+#     file_name = f"uploaded-db-restore.sql"
+#     file_path = f"{DOWNLOAD}{file_name}"
+#     await bot.download(message.document, file_path) # То что прикрепили и отправили, скачивается в папку с новым именем
+
+#     await bot.session.close()
+#     await dp.storage.close()
+
+#     confirmation = restore_db(file_path) # Восстановелние базы
+
+#     if confirmation == True:
+#         await message.answer("Восстановление базы данных прошло успешно.")
+#     else:
+#         await message.answer("При восстановлении базы данных, что то пошло не так.")
+
+#     await state.clear()
+
+
+
+
+
+
+# # Admin Restore Users to DB in Json
+# class Restore_json(StatesGroup):
+#     load_json = State()
+
+# # Resore OLD users to DB:
+# @dp.message(Command('resUs'))
+# async def restore_old_users_admin(message: types.Message, state: FSMContext):
+#     await typing(message)
+#     id = user_id(message)
+
+#     if id != IS_ADMIN:
+#         return
+
+#     await bot.send_message(message.chat.id, "Attach and send the necessary json file for recovery Users to DB.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
+#     await state.set_state(Restore_json.load_json)
+
+
+# @dp.message(Restore_json.load_json)
+# async def load_json_users_to_db(message: Message, state: FSMContext):
+#     await typing(message)
+#     id = user_id(message)
+    
+#     if not isinstance(message.document, types.Document):
+#         await message.answer("It's not a documents")
+#         return
+
+#     file_extension = message.document.file_name.split('.')[-1]
+#     allowed_extensions = ['json']
+
+#     if file_extension not in allowed_extensions:
+#         await message.answer("You have sent a non-json extension file.")
+#         return 
+
+#     file_name = f"uploaded-json-restore-users.json"
+#     file_path = f"{DOWNLOAD}{file_name}"
+#     await bot.download(message.document, file_path)
+
+#     await bot.session.close()
+#     await dp.storage.close()
+
+
+#     res_update_db = await restore_users_to_db(file_path)
+
+#     if res_update_db:
+#         await message.answer(f"Results of adding regular Users to DB:\n{res_update_db}")
+#     else:
+#         await message.answer(f"Error of adding regular Users to DB:\n{res_update_db}")
+
+#     await state.clear()
+
+# # Resore loyal user to DB:
+# @dp.message(Command('resUs'))
+# async def restore_loyal_users_admin(message: types.Message):
+#     id = user_id(message)
+
+#     if id != ADMIN_ID:
+#         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+#         return
+
+#     res_update_db = await restore_loyal_users_to_db()
+#     await bot.send_message(message.chat.id, f"Results of adding regular clients to DB:\n{res_update_db}")
 
 
 

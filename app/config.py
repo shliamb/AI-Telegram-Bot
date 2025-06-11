@@ -4,7 +4,7 @@ import logging
 
 # System:
 NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
-HOST = "app_postgres"  # app_postgres or localhost
+HOST = "localhost"  # app_postgres or localhost
 LOG_CONFIG_DB = {
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s',
     'level': logging.INFO,
@@ -67,6 +67,7 @@ DOWNLOADS_FOLDER = "./downloads/"
 UPLOADS_FOLDER = "./uploads/"
 AUDIO_FOLDER = "./audio/"
 VOICE_FOLDER = "./voice/"
+PATH_JSON_USERS = "./json/"
 
 # Delete files:
 DEL_DOWNLOADS = True
