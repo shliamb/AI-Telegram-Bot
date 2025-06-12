@@ -4,15 +4,16 @@ from config import LOG_CONFIG_BOT
 import logging
 logging.basicConfig(**LOG_CONFIG_BOT)
 import json
-import datetime
+#import uuid
+from datetime import datetime
 # System:
-from worker_db import add_user, update_user, add_methods_pay
+from worker_db import add_user, add_methods_pay #, update_user
 
 
 
 metods_pay = [
     {
-        'date': datetime.datetime(2024, 10, 14, 0, 8, 38), 
+        'date': datetime(2024, 10, 14, 0, 8, 38), 
         'counts': 0, 
         'use_sbp_transfer': None, 
         'use_mastercard': None, 
@@ -28,7 +29,7 @@ metods_pay = [
         'method_pay_en': "Transfer to the OZON Bank card by card number 2204 2402 7076 3321 from your bank's application. In the name of Alexander V. the amount entered earlier."
     },  
     {
-        'date': datetime.datetime(2024, 10, 14, 0, 9, 11), 
+        'date': datetime(2024, 10, 14, 0, 9, 11), 
         'counts': 0, 
         'use_sbp_transfer': None, 
         'use_mastercard': True, 
@@ -47,7 +48,16 @@ metods_pay = [
 
 
 
-async def restore_loyal_users_to_db():
+def datetime_to_db(value):
+    '''to  datetime.datetime(2024, 10, 14, 0, 8, 38)'''
+    try:
+        return datetime.fromisoformat(value)  # Пробуем распарсить
+    except ValueError:
+        return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")  # Если не ISO-формат, пробуем другой формат
+
+
+
+async def restore_loyal_users_to_db(file_path):
 
     """Импортирует постоянных клиентов из JSON, добавляет или обновляет в БД."""
 
@@ -57,45 +67,56 @@ async def restore_loyal_users_to_db():
     qty_met_pay = 0
     err_met_pay = 0
 
-    try:
-
-        # Add Loyalti Users:
-        with open("./json/loyal_users.json", "r") as file:
-            users_json = json.load(file) # В dict
-
-        for user_id, user_data in users_json.items():
-            data = {**user_data, "user_id": int(user_id)}
-
-            try:
-                if await add_user(data):
-                    qty_add_usr += 1
-            except Exception:
-                try:
-                    if await update_user(data):
-                        qty_add_usr += 1
-                except Exception as err:
-                    logging.error(f"Fail update user_id: {user_id}, reason: {err}")
-                    err_add_usr += 1
-
-        # Metods Pay:
-        for metod in metods_pay:
-            try:
-                if await add_methods_pay(metod):
-                    qty_met_pay += 1
-            except Exception as err:
-                logging.error(f"Fail update metod pay: {metod}, reason: {err}")
-                err_met_pay += 1
 
 
-        return {"status": "good", "added users": qty_add_usr, "errors users": err_add_usr, "added metods": qty_met_pay, "errors metods": err_met_pay}
+    # Открытие файла и в файл:
+    with open(file_path, "r") as file:
+
+        if not file:
+            return False
+
+        users_json = json.load(file) # В dict
+
+    # Списки для обработки данных:
+    list_keys_date = ["last_visit"]
+
+    # Users Table:
+    for user_records in users_json.values():
+
+        try:
+            # Сереализация..
+            clear_data_user = {} 
+            for key, value in user_records.items():
+                if key in list_keys_date:
+                    clear_data_user[key] = datetime_to_db(value)
+                else:
+                    clear_data_user[key] = value
+
+            if await add_user(clear_data_user):
+                qty_add_usr += 1
+
+        except Exception as err:
+            err_add_usr += 1
+            logging.error(f"Fail update user_id: {clear_data_user.get('user_id')}, reason: {err}")
+        
+
+
+    # Metods_pay Table:
+    for metod in metods_pay:
+        try:
+            if await add_methods_pay(metod):
+                qty_met_pay += 1
+        except Exception as err:
+            logging.error(f"Fail update metod pay: {metod}, reason: {err}")
+            err_met_pay += 1
+
+
+    return {"status": "good", "added users": qty_add_usr, "errors users": err_add_usr, "added metods pay": qty_met_pay, "errors metods pay": err_met_pay}
     
-    except Exception as err:
-        logging.critical(f"Fail open or handle file: {err}")
-        return {"status": f"bad: {err}", "added users": qty_add_usr, "errors users": err_add_usr, "added metods": qty_met_pay, "errors metods": err_met_pay}
-
 
     
 
 
 
 # asyncio.run(restore_loyal_users_to_db())
+#print(asyncio.run(restore_loyal_users_to_db("./json/user_best.json")))

@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY #, DEFAULT_MODEL_ASSIST_OA
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS #, DEFAULT_MODEL_ASSIST_OA
 
 import logging
 logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
@@ -41,7 +41,7 @@ from mod_get_voice_in_text_openai import get_voice_openai
 from mod_get_text_in_voice_openai import get_text_openai
 from mod_dall_e import mod_openai_dall_e
 from general_functions import escape_special_chars, random_name_2X, day_utcnow, bool_to_str, calculation, tiktroken, set_model_dalle, get_use_met_all, remove_file_os
-from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_all_payments, add_payments, read_discussion, add_discussion, clear_discussion_by_id #, read_admin_data, add_data_admin, update_admin_data, assist_admin_db_users
+from worker_db import add_user, read_user, update_user, read_statistics, read_all_users, add_methods_pay, read_all_methods_pay, update_methods_pay, read_one_methods_pay_by_use, deleted_one_methods_pay, read_all_payments, add_payments, read_discussion, add_discussion, clear_discussion_by_id, fast_delete_statistics_tab, drop_all_tables_and_reset_schema #, read_admin_data, add_data_admin, update_admin_data, assist_admin_db_users
 from texts import start_ru, start_en
 from backupdb import backup_db
 from restore_db import restore_db
@@ -171,7 +171,7 @@ async def command_start_handler(message: Message, state: FSMContext):
     bot_commands = [
         BotCommand(command="/reset", description="CLEAR MEMORY"), # clear memory
         BotCommand(command="/menu", description="MENU"),
-        BotCommand(command="/genDraw", description="GEN DRAW"),
+        BotCommand(command="/gen_draw", description="GEN DRAW"), # genDraw
         # BotCommand(command="/prices", description="PRICES"),
         BotCommand(command="/help", description="GUIDE"),
     ]
@@ -2156,7 +2156,8 @@ async def admin_menu(message: types.Message):
         f"        Select Met – /selMet\n"
         f"        Delete Met – /delMe\n\n"
         f"<b>🗑 CLEAR:</b>\n"
-        f"        Stat Tab DB – /dStat!\n"
+        f"        Stat Tab DB – /dStat\n"
+        f"        All Tabs DB – /allDel\n"
         f"        Logs – /dLogs\n\n"
         f"<b>📩 SENDING NEWS:</b>\n"
         f"        Mailing – /sendN\n\n"
@@ -2165,6 +2166,8 @@ async def admin_menu(message: types.Message):
     )
 
     await message.answer(admin_menu_text, parse_mode="HTML")
+
+
 
 
 
@@ -2177,10 +2180,45 @@ async def create_tebles_in_db_admin(message: types.Message):
         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
-    if create_tables_in_db():
+    if create_tables_in_db(): # Синхронная
         await bot.send_message(message.chat.id, "Tables in the DB were created successfully.")
     else:
         await bot.send_message(message.chat.id, "Error creating DB tables. Check logs for details.")
+
+
+
+
+
+# Fast Delete Table Statistic in DB:
+@dp.message(Command('dStat'))
+async def fast_delete_statistic_table_in_db_admin(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    if await fast_delete_statistics_tab():
+        await bot.send_message(message.chat.id, "The Statistical table has been successfully deleted.")
+    else:
+        await bot.send_message(message.chat.id, "Error deleting the Statistical Table.")
+
+
+
+
+# Fast Delete All Tables in DB:
+@dp.message(Command('allDel'))
+async def delete_all_tables_in_db_admin(message: types.Message):
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    if await drop_all_tables_and_reset_schema():
+        await bot.send_message(message.chat.id, "All tables have been deleted successfully.")
+    else:
+        await bot.send_message(message.chat.id, "Error deleting all tables.")
 
 
 
@@ -2211,127 +2249,60 @@ async def get_on_json_old_users(message: types.Message):
 
 
 
-# # Admin Restore DB
-# class Restor_db(StatesGroup):
-#     load_db = State()
 
 
-# # Push button - restore
-# @dp.message(Command('resDb'))
-# async def restore_db_admin(message: types.Message, state: FSMContext):
-#     await typing(message)
-#     id = user_id(message)
 
-#     if id != IS_ADMIN:
-#         return
+# Admin Restore Users to DB in Json
+class Restore_json(StatesGroup):
+    load_json = State()
+
+# Resore OLD users to DB:
+@dp.message(Command('resUs'))
+async def restore_old_users_admin(message: types.Message, state: FSMContext):
+    await typing(message)
+    id = user_id(message)
+
+    if id != ADMIN_ID:
+        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        return
+
+    await bot.send_message(message.chat.id, "Attach and send the necessary json file for recovery Users to DB.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
+    await state.set_state(Restore_json.load_json)
+
+
+@dp.message(Restore_json.load_json)
+async def load_json_users_to_db(message: Message, state: FSMContext):
+    await typing(message)
+    id = user_id(message)
     
-#     await bot.send_message(message.chat.id, "Attach and send the necessary copy of the database for recovery.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
-#     await state.set_state(Restor_db.load_db)
+    if not isinstance(message.document, types.Document):
+        await message.answer("It's not a documents")
+        return
+
+    file_extension = message.document.file_name.split('.')[-1]
+    allowed_extensions = ['json']
+
+    if file_extension not in allowed_extensions:
+        await message.answer("You have sent a non-json extension file.")
+        return 
+
+    file_name = f"uploaded-json-restore-users.json"
+    file_path = f"{PATH_JSON_USERS}{file_name}"
+    await bot.download(message.document, file_path)
+
+    await bot.session.close()
+    await dp.storage.close()
 
 
+    res_update_db = await restore_loyal_users_to_db(file_path)
 
-# @dp.message(Restor_db.load_db)
-# async def load_a_base(message: Message, state: FSMContext):
+    if res_update_db:
+        await message.answer(f"Results of adding regular Users to DB:\n{res_update_db}")
+    else:
+        await message.answer(f"Error of adding regular Users to DB:\n{res_update_db}")
 
-#     await typing(message)
-#     id = user_id(message)
+    await state.clear()
 
-#     if id != IS_ADMIN:
-#         return
-
-#     if not isinstance(message.document, types.Document):
-#         await message.answer("Вы передали не документ.")
-#         return
-
-#     file_extension = message.document.file_name.split('.')[-1]
-#     allowed_extensions = ['sql']
-
-#     if file_extension not in allowed_extensions:
-#         await message.answer("Вы передали файл не sql расширения.")
-#         return    
-
-#     file_name = f"uploaded-db-restore.sql"
-#     file_path = f"{DOWNLOAD}{file_name}"
-#     await bot.download(message.document, file_path) # То что прикрепили и отправили, скачивается в папку с новым именем
-
-#     await bot.session.close()
-#     await dp.storage.close()
-
-#     confirmation = restore_db(file_path) # Восстановелние базы
-
-#     if confirmation == True:
-#         await message.answer("Восстановление базы данных прошло успешно.")
-#     else:
-#         await message.answer("При восстановлении базы данных, что то пошло не так.")
-
-#     await state.clear()
-
-
-
-
-
-
-# # Admin Restore Users to DB in Json
-# class Restore_json(StatesGroup):
-#     load_json = State()
-
-# # Resore OLD users to DB:
-# @dp.message(Command('resUs'))
-# async def restore_old_users_admin(message: types.Message, state: FSMContext):
-#     await typing(message)
-#     id = user_id(message)
-
-#     if id != IS_ADMIN:
-#         return
-
-#     await bot.send_message(message.chat.id, "Attach and send the necessary json file for recovery Users to DB.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
-#     await state.set_state(Restore_json.load_json)
-
-
-# @dp.message(Restore_json.load_json)
-# async def load_json_users_to_db(message: Message, state: FSMContext):
-#     await typing(message)
-#     id = user_id(message)
-    
-#     if not isinstance(message.document, types.Document):
-#         await message.answer("It's not a documents")
-#         return
-
-#     file_extension = message.document.file_name.split('.')[-1]
-#     allowed_extensions = ['json']
-
-#     if file_extension not in allowed_extensions:
-#         await message.answer("You have sent a non-json extension file.")
-#         return 
-
-#     file_name = f"uploaded-json-restore-users.json"
-#     file_path = f"{DOWNLOAD}{file_name}"
-#     await bot.download(message.document, file_path)
-
-#     await bot.session.close()
-#     await dp.storage.close()
-
-
-#     res_update_db = await restore_users_to_db(file_path)
-
-#     if res_update_db:
-#         await message.answer(f"Results of adding regular Users to DB:\n{res_update_db}")
-#     else:
-#         await message.answer(f"Error of adding regular Users to DB:\n{res_update_db}")
-
-#     await state.clear()
-
-# # Resore loyal user to DB:
-# @dp.message(Command('resUs'))
-# async def restore_loyal_users_admin(message: types.Message):
-#     id = user_id(message)
-
-#     if id != ADMIN_ID:
-#         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
-#         return
-
-#     res_update_db = await restore_loyal_users_to_db()
-#     await bot.send_message(message.chat.id, f"Results of adding regular clients to DB:\n{res_update_db}")
 
 
 
@@ -3959,7 +3930,7 @@ async def mod_gen_img(data, message, state: FSMContext):
 async def check_request_drawing(question):
     typecontent = None
 
-    draw_words = {"/genDraw"}
+    draw_words = {"/gen_draw"}
     question_words = set(question.lower().split())
     if draw_words & question_words:
         typecontent = "draw"

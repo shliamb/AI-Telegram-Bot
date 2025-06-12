@@ -4,7 +4,7 @@ import logging
 
 # System:
 NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
-HOST = "localhost"  # app_postgres or localhost
+HOST = "app_postgres"  # app_postgres or localhost
 LOG_CONFIG_DB = {
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s',
     'level': logging.INFO,

@@ -1,5 +1,5 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, MIN_PAY
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, GIFT
 import logging
 logging.basicConfig(**LOG_CONFIG_DB)
 import asyncpg
@@ -288,7 +288,27 @@ async def clear_statistics():
 
 
 
+# Fast delete Tab Statistic:
+async def fast_delete_statistics_tab():
 
+    connection = False
+
+    try:
+        connection = await get_connection()
+        await connection.execute(
+            f'''
+            TRUNCATE TABLE statistics;
+            ''', 
+        )
+        return True
+    
+    except Exception as e:
+        logging.error(f"Error fast_delete_statistics_tab {e}")
+        return False
+    
+    finally:
+        if connection is not None:
+            await connection.close()
 
 
 
@@ -941,7 +961,7 @@ async def json_old_users():
             '''
                 SELECT * FROM users WHERE paid > $1 OR money > $2;
             ''',
-            0, MIN_PAY
+            0, GIFT
         )
 
         if not result:
@@ -967,6 +987,26 @@ async def json_old_users():
 
 
 
+
+
+
+# Fast delete ALL Tabs:
+async def drop_all_tables_and_reset_schema():
+    connection = None
+    try:
+        connection = await get_connection()
+        # Удаляем схему public со всеми объектами и создаём её заново
+        await connection.execute("DROP SCHEMA public CASCADE;")
+        await connection.execute("CREATE SCHEMA public;")
+        # Возвращаем стандартные права (без указания конкретной роли)
+        await connection.execute("GRANT ALL ON SCHEMA public TO PUBLIC;")
+        return True
+    except Exception as e:
+        logging.error(f"Error in drop_all_tables_and_reset_schema: {e}")
+        return False
+    finally:
+        if connection is not None:
+            await connection.close()
 
 
 
