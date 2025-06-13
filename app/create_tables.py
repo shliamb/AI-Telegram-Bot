@@ -9,7 +9,6 @@ logging.basicConfig(**LOG_CONFIG_DB)
 def create_tables_in_db():
 
     try:
-        logging.error("Ho")
         # Conect to db:                   имя контейнера app_postgres or localhost
         connection = psycopg2.connect(host=HOST, database=DB_NAME, user=USER_DB, password=PASSWORD_DB)
         
