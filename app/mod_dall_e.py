@@ -1,5 +1,5 @@
 from config import URL, NULL_TOKEN
-from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
+from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
 import aiohttp
 
 
@@ -13,10 +13,10 @@ async def mod_openai_dall_e(data):
     size = data.get("img_size")
     n = data.get("n_number")
 
-    url = f"{URL}/api/gen-dall-e/"
+    url = f"{URL}/api/openai-img/"
 
     data = {
-            "username": USERNAME_API_AI,
+            "access_id": ACCESS_ID,
             "model": model,
             "user_content": prompt,
             "size": size,

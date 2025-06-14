@@ -1,4 +1,4 @@
-from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
+from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
 from config import URL, AI_DEFAULT_MODEL_VOICE_TO_TEXT, NULL_TOKEN
 import aiohttp
 import aiofiles
@@ -14,10 +14,10 @@ async def get_text_openai(data):
     file_path = data.get("file_path")
     name_file = data.get("name_file")
 
-    url = f"{URL}/api/transcription-openai/"
+    url = f"{URL}/api/openai-voice-to-text/"
 
     data = {
-            "username": USERNAME_API_AI,
+            "access_id": ACCESS_ID,
             "model": model,
     }
 
@@ -30,8 +30,8 @@ async def get_text_openai(data):
                 async with aiofiles.open(file_path, 'rb') as f:
                     form = aiohttp.FormData()
                     content = await f.read()
-                    form.add_field('audio', content, filename=name_file)
-                    form.add_field('username', USERNAME_API_AI)
+                    form.add_field('file', content, filename=name_file)
+                    form.add_field('access_id', ACCESS_ID)
                     form.add_field('model', model)
                     if language:
                         form.add_field('language', language)

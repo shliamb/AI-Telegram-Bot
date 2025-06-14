@@ -1,4 +1,4 @@
-from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
+from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
 from config import URL, NULL_TOKEN
 import aiohttp
 import aiofiles
@@ -35,7 +35,7 @@ async def mod_gemini_chat(data):
                 form = aiohttp.FormData()
                 content = await f.read()
                 form.add_field('file', content, filename=name_file)
-                form.add_field('username', USERNAME_API_AI)
+                form.add_field('access_id', ACCESS_ID)
                 form.add_field('model', model)
                 if system_content:
                     form.add_field('system_content', system_content)
@@ -55,7 +55,7 @@ async def mod_gemini_chat(data):
 
         else:
             form = aiohttp.FormData()
-            form.add_field('username', USERNAME_API_AI)
+            form.add_field('access_id', ACCESS_ID)
             form.add_field('model', model)
             if system_content:
                 form.add_field('system_content', system_content)

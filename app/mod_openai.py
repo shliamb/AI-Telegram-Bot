@@ -33,7 +33,7 @@ async def mod_openai_chat(data):
                 async with aiofiles.open(file_path, 'rb') as f:
                     form = aiohttp.FormData()
                     content = await f.read()
-                    form.add_field('image', content, filename=name_file)
+                    form.add_field('file', content, filename=name_file)
                     form.add_field('access_id', ACCESS_ID)
                     form.add_field('model', model)
                     form.add_field('user_content', user_content)

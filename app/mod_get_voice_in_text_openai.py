@@ -1,4 +1,4 @@
-from get_keys import USERNAME_API_AI, KEY_API_AI, VALUE_KEY_API_AI
+from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
 from config import URL, AUDIO_FOLDER
 from general_functions import random_name_2X #, encode_file
 import aiohttp
@@ -16,10 +16,10 @@ async def get_voice_openai(data):
     voice = data.get("voice") # alloy, echo, fable, onyx, nova, and shimmer
     speed = data.get("voice_speed") # 0.25 to 4.0 
 
-    url = f"{URL}/api/speech-to-audio-openai/"
+    url = f"{URL}/api/openai-text-to-voice/"
 
     data = {
-            "username": USERNAME_API_AI,                                 
+            "access_id": ACCESS_ID,                                 
             "user_content": user_content,
             "voice": voice,
             "model": model,
