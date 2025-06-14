@@ -16,7 +16,7 @@ LOG_CONFIG_BOT = {
     'filemode': 'a', 
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
 }
-URL = "http://165.232.175.27:8000"
+URL = "http://167.99.210.245:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
 RUBTOUSD = 100 # The internal exchange rate

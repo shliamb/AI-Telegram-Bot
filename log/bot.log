@@ -1,0 +1,340 @@
+INFO - 2025-06-09 16:07:57,307 - root - Database restore completed successfully.
+INFO - 2025-06-09 16:09:57,765 - root - Push menu -  1666495.
+ERROR - 2025-06-09 16:09:57,850 - root - Error read_user: relation "users" does not exist
+INFO - 2025-06-09 16:10:22,391 - root - Database restore completed successfully.
+ERROR - 2025-06-09 16:13:01,669 - root - Command failed: Command '['pg_restore', '-h', 'app_postgres', '-p', '5432', '-U', 'San2', '-d', 'my_database', './backup_db/Uploaded-db-D33-D14.sql']' returned non-zero exit status 1.
+INFO - 2025-06-09 16:13:19,815 - root - Push menu -  1666495.
+ERROR - 2025-06-09 16:13:19,874 - root - Error read_user: relation "users" does not exist
+INFO - 2025-06-09 16:14:21,193 - root - Push menu -  1666495.
+INFO - 2025-06-09 16:15:55,502 - root - info: Getting the day and time from the server
+INFO - 2025-06-09 16:15:55,810 - root - Backup Data Base is Completed.
+INFO - 2025-06-09 16:15:56,472 - root - Remove all file DB, saved 3 latest files.
+INFO - 2025-06-09 16:15:56,472 - root - Download last DB file.
+INFO - 2025-06-09 23:16:50,754 - root - info: Getting the day and time from the server
+INFO - 2025-06-09 23:16:51,143 - root - Backup Data Base is Completed.
+INFO - 2025-06-09 23:16:51,822 - root - Remove all file DB, saved 3 latest files.
+INFO - 2025-06-09 23:16:51,822 - root - Download last DB file.
+INFO - 2025-06-09 23:18:58,392 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:28:39,965 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:31:12,546 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:31:38,247 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:31:43,895 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:39:12,996 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:40:23,200 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:47:51,231 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:48:38,124 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:48:58,780 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:49:28,587 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:49:50,997 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:52:41,607 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:55:42,674 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:56:22,000 - root - Push menu -  1666495.
+INFO - 2025-06-09 23:59:32,944 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:02:05,478 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:05:23,382 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:06:06,895 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:07:32,775 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:09:31,255 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:14:14,500 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:14:49,715 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:14:54,817 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:14:56,115 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:15:03,358 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:15:09,771 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:15:28,015 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:14,658 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:22,431 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:27,095 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:43,455 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:47,338 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:52,299 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:26:55,402 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:27:31,634 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:27:35,209 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:27:36,687 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:27:38,413 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:33:40,045 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:33:45,472 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:33:52,928 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:48:39,119 - root - Push menu -  1666495.
+INFO - 2025-06-10 00:49:29,676 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:10,112 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:17,345 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:20,208 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:43,344 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:46,894 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:49,428 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:02:52,039 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:37,560 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:40,475 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:44,819 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:49,064 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:50,906 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:55,902 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:07:59,551 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:08:01,297 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:08:03,518 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:15:55,666 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:16:00,222 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:16:08,274 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:16:12,536 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:16:14,784 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:16:44,548 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:17:19,671 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:17:25,953 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:17:28,848 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:17:30,603 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:17:35,034 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:38,928 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:44,044 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:46,069 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:47,193 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:49,785 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:52,992 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:54,530 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:56,552 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:57,669 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:20:59,031 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:21:02,937 - root - Push menu -  1666495.
+INFO - 2025-06-10 01:33:58,838 - root - Push menu -  1666495.
+INFO - 2025-06-11 19:39:13,855 - root - Push menu -  1666495.
+ERROR - 2025-06-11 19:39:13,858 - root - Error read_user: [Errno 111] Connect call failed ('127.0.0.1', 5432)
+INFO - 2025-06-11 19:40:00,916 - root - Push menu -  1666495.
+INFO - 2025-06-11 19:40:45,999 - root - Push menu -  1666495.
+INFO - 2025-06-11 19:47:14,768 - root - Push menu -  1666495.
+INFO - 2025-06-11 19:47:33,538 - root - Push menu -  1666495.
+ERROR - 2025-06-11 20:04:07,537 - root - Error json_old_users: the server expects 2 arguments for this query, 0 were passed
+HINT:  Check the query against the passed list of arguments.
+INFO - 2025-06-11 21:14:14,582 - root - Push menu -  1666495.
+INFO - 2025-06-11 21:26:08,810 - root - Info: History is empty.
+INFO - 2025-06-11 21:26:19,686 - root - info: Getting the day and time from the server
+INFO - 2025-06-11 21:26:19,813 - root - info: Getting the day and time from the server
+INFO - 2025-06-11 21:26:19,950 - root - User: 905675840, Say: Отрезки AB и CD пересекаются в середине M отрезка AB, причем AC=BD=AM. Докажите , что M - середина отрезка CD
+INFO - 2025-06-11 21:29:07,473 - root - Info: History is empty.
+INFO - 2025-06-11 21:29:15,155 - root - info: Getting the day and time from the server
+INFO - 2025-06-11 21:29:15,293 - root - info: Getting the day and time from the server
+INFO - 2025-06-11 21:29:15,511 - root - User: 905675840, Say: Но угол BMD не находиться между сторонами MB и BD
+ERROR - 2025-06-11 22:54:59,043 - root - Error json_old_users: the server expects 1 argument for this query, 0 were passed
+HINT:  Check the query against the passed list of arguments.
+ERROR - 2025-06-11 22:54:59,596 - root - Error json_old_users: the server expects 1 argument for this query, 0 were passed
+HINT:  Check the query against the passed list of arguments.
+INFO - 2025-06-12 11:11:44,049 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:11:44,110 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 11:12:25,862 - root - Error json_old_users: relation "users" does not exist
+ERROR - 2025-06-12 11:12:32,517 - root - Ho
+INFO - 2025-06-12 11:12:32,608 - root - Adding tables is done!
+INFO - 2025-06-12 11:30:19,905 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:30:57,462 - root - Ho
+ERROR - 2025-06-12 11:30:57,476 - root - Error Create Tables in DB: relation "idx_ai" already exists
+
+ERROR - 2025-06-12 11:31:28,234 - root - Ho
+INFO - 2025-06-12 11:31:28,308 - root - Adding tables is done!
+INFO - 2025-06-12 11:31:58,575 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:33:45,476 - root - Ho
+ERROR - 2025-06-12 11:33:45,486 - root - Error Create Tables in DB: relation "idx_ai" already exists
+
+ERROR - 2025-06-12 11:34:27,616 - root - Ho
+INFO - 2025-06-12 11:34:27,700 - root - Adding tables is done!
+INFO - 2025-06-12 11:34:31,997 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:35:29,375 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:35:39,312 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:35:47,052 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:42:33,328 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:44:46,099 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:45:12,167 - root - Error in drop_all_tables_and_reset_schema: role "postgres" does not exist
+INFO - 2025-06-12 11:46:49,342 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:46:49,394 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 11:46:55,968 - root - Error read_user: relation "users" does not exist
+INFO - 2025-06-12 11:46:55,975 - root - info: Getting the day and time from the server
+ERROR - 2025-06-12 11:46:56,033 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 11:47:19,613 - root - Ho
+INFO - 2025-06-12 11:47:19,695 - root - Adding tables is done!
+INFO - 2025-06-12 11:47:22,193 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:47:24,476 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 11:47:24,797 - root - New registration - 1666495.
+INFO - 2025-06-12 11:47:30,428 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:48:54,962 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:49:10,728 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:49:10,791 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 11:49:18,603 - root - Ho
+INFO - 2025-06-12 11:49:18,689 - root - Adding tables is done!
+INFO - 2025-06-12 11:49:45,569 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:51:27,396 - root - Push menu -  1666495.
+INFO - 2025-06-12 11:59:58,285 - root - Push menu -  1666495.
+ERROR - 2025-06-12 11:59:58,370 - root - Error read_user: relation "users" does not exist
+INFO - 2025-06-12 12:00:12,330 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:00:12,386 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 12:02:37,242 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:02:37,243 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,906 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,906 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,906 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:13,907 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,656 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,656 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,656 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,656 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,656 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,656 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,657 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,657 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,657 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,657 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,657 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:33,912 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,417 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,418 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,418 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,418 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:03:36,418 - root - Fail update user_id: None, reason: 'str' object has no attribute 'items'
+ERROR - 2025-06-12 12:05:32,210 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,261 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,310 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,360 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,411 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,462 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,512 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,561 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,612 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,665 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:32,715 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,639 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,691 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,747 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,801 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,858 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,916 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:56,971 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:57,024 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:57,076 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:57,130 - root - Error add_user: relation "users" does not exist
+ERROR - 2025-06-12 12:05:57,182 - root - Error add_user: relation "users" does not exist
+INFO - 2025-06-12 12:06:00,267 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:06:00,319 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 12:06:11,937 - root - Ho
+INFO - 2025-06-12 12:06:12,021 - root - Adding tables is done!
+ERROR - 2025-06-12 12:06:56,225 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(794468301) already exists.
+ERROR - 2025-06-12 12:06:56,279 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(1377063199) already exists.
+ERROR - 2025-06-12 12:06:56,335 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(6674458591) already exists.
+ERROR - 2025-06-12 12:06:56,385 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(6296279146) already exists.
+ERROR - 2025-06-12 12:06:56,438 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(2002439189) already exists.
+ERROR - 2025-06-12 12:06:56,495 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(1948264429) already exists.
+ERROR - 2025-06-12 12:06:56,549 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(654581055) already exists.
+ERROR - 2025-06-12 12:06:56,602 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(176513890) already exists.
+ERROR - 2025-06-12 12:06:56,653 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(905675840) already exists.
+ERROR - 2025-06-12 12:06:56,706 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(1666495) already exists.
+ERROR - 2025-06-12 12:06:56,762 - root - Error add_user: duplicate key value violates unique constraint "users_pkey"
+DETAIL:  Key (user_id)=(948283435) already exists.
+INFO - 2025-06-12 12:06:57,241 - root - Push menu -  1666495.
+INFO - 2025-06-12 12:07:46,756 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:07:46,832 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 12:07:52,136 - root - Ho
+INFO - 2025-06-12 12:07:52,209 - root - Adding tables is done!
+INFO - 2025-06-12 12:08:26,378 - root - Push menu -  1666495.
+INFO - 2025-06-12 12:10:48,008 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:10:51,914 - root - Error: not default method pay.
+INFO - 2025-06-12 12:15:57,083 - root - Push menu -  1666495.
+INFO - 2025-06-12 12:16:08,813 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:16:08,876 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 12:16:52,803 - root - Ho
+INFO - 2025-06-12 12:16:52,883 - root - Adding tables is done!
+ERROR - 2025-06-12 12:17:03,358 - root - Ho
+ERROR - 2025-06-12 12:17:03,368 - root - Error Create Tables in DB: relation "idx_ai" already exists
+
+INFO - 2025-06-12 12:17:25,934 - root - Push menu -  1666495.
+INFO - 2025-06-12 12:23:20,324 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:23:20,384 - root - Error read_user: relation "users" does not exist
+ERROR - 2025-06-12 12:23:26,085 - root - Ho
+INFO - 2025-06-12 12:23:26,168 - root - Adding tables is done!
+INFO - 2025-06-12 12:24:11,504 - root - Push menu -  1666495.
+ERROR - 2025-06-12 12:24:27,813 - root - This not float input.
+INFO - 2025-06-12 12:24:43,655 - root - Adding funds to your account - 1666495.
+INFO - 2025-06-12 12:24:43,657 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 12:25:59,673 - root - Push menu -  1666495.
+INFO - 2025-06-12 12:44:52,372 - root - Push menu -  1666495.
+INFO - 2025-06-12 13:37:19,293 - root - Push menu -  1666495.
+INFO - 2025-06-12 13:37:21,272 - root - Push menu -  1666495.
+INFO - 2025-06-12 13:38:14,612 - root - Info: History is empty.
+INFO - 2025-06-12 13:38:15,439 - httpx - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+INFO - 2025-06-12 13:38:30,183 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:38:30,312 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:38:30,767 - root - User: 1666495, Say: я хочу сделать телеграмм мини апп, мне ведь не обязателен домен типа site.com, я ведь могу установить на сервере и использовать ip
+INFO - 2025-06-12 13:38:30,870 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:39:49,001 - httpx - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+INFO - 2025-06-12 13:40:05,235 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:40:05,356 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:40:05,648 - root - User: 1666495, Say: а как связанно seo и телеграмм мини аппс
+INFO - 2025-06-12 13:40:05,810 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:42:21,630 - root - Info: History is empty.
+INFO - 2025-06-12 13:42:22,067 - httpx - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+INFO - 2025-06-12 13:42:33,160 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:42:33,314 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:42:33,491 - root - User: 1666495, Say: по всюду рекламируют n8n , а он меня ужасно бесит.. что со мной не так. В этот сервис дольше вникать чем в python
+INFO - 2025-06-12 13:42:33,650 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:49:40,081 - root - Info: History is empty.
+INFO - 2025-06-12 13:49:40,552 - httpx - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+INFO - 2025-06-12 13:49:44,740 - root - Info: History is empty.
+INFO - 2025-06-12 13:49:45,756 - httpx - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+INFO - 2025-06-12 13:50:00,463 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:50:00,582 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:50:00,867 - root - User: 1666495, Say: что можно сделать, что бы работал второй вариант закоментированный. Видимо сделать класс и вызывать метод, но что если я хочу абстрактно, для любой dict
+
+data = {"name": "Shliamb", "age": 40}
+
+#1 name_1 = data.get("name")
+
+#2 name_2 = data.name
+INFO - 2025-06-12 13:50:01,001 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:50:05,631 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:50:05,771 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 13:50:05,945 - root - User: 1666495, Say: что можно сделать, что бы работал второй вариант закоментированный. Видимо сделать класс и вызывать метод, но что если я хочу абстрактно, для любой dict
+
+data = {"name": "Shliamb", "age": 40}
+
+#1 name_1 = data.get("name")
+
+#2 name_2 = data.name
+INFO - 2025-06-12 13:50:06,098 - root - info: Getting the day and time from the server
+INFO - 2025-06-12 16:39:05,445 - root - Push menu -  1666495.
