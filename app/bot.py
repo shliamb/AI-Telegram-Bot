@@ -1349,8 +1349,8 @@ async def whisper_1(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
-        "ai_text_to_voice": "openai",
-        "model_text_to_voice": "whisper-1",
+        "ai_voice_to_text": "openai",
+        "model_voice_to_text": "whisper-1",
     }
     confirm = await update_user(data)
     if confirm:
