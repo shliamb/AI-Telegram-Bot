@@ -1,9 +1,13 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER #, DEFAULT_MODEL_ASSIST_OA
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER, setup_logger #, DEFAULT_MODEL_ASSIST_OA
 
-import logging
-# logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
-logging.basicConfig(**LOG_CONFIG_BOT)
+# import logging
+# # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
+# logging.basicConfig(**LOG_CONFIG_BOT)
+
+
+logger_bot = setup_logger('bot', LOG_CONFIG_BOT)
+
 import re
 import random
 import os
@@ -56,7 +60,7 @@ from get_json_old_users import get_json_old_users_to_db
 bot = Bot(TELEGRAM_BOT_TOKEN, parse_mode="markdown") # Initialize Bot instance with a default parse mode which will be passed to all API calls
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
 
-logging.info("INFO: bot.py is here")
+logger_bot.info("INFO: bot.py is here")
 
 
 #########
@@ -117,7 +121,7 @@ async def select_en_in_start(callback_query: types.CallbackQuery, state: FSMCont
 
         if confirm:
             await bot.send_message(callback_query.from_user.id, f"Hello, {about}! {start_en}")
-            logging.info(f"New registration - {id}.")
+            logger_bot.info(f"New registration - {id}.")
             await bot.answer_callback_query(callback_query.id)
             await state.clear()
 
@@ -156,7 +160,7 @@ async def select_ru_in_start(callback_query: types.CallbackQuery, state: FSMCont
 
         if confirm:
             await bot.send_message(callback_query.from_user.id, f"Здравствуйте, {about}! {start_ru}")
-            logging.info(f"New registration - {id}.")
+            logger_bot.info(f"New registration - {id}.")
             await bot.answer_callback_query(callback_query.id)
             await state.clear()
 
@@ -216,7 +220,7 @@ async def reset_history(message: types.Message):
     confirm = await clear_discussion_by_id(id)
 
     if not confirm:
-        logging.error("Error: The dialog history has not been cleared.")
+        logger_bot.error("Error: The dialog history has not been cleared.")
 
     if language == "ru":
         await message.answer("🗑 История диалога очищена.", parse_mode="HTML")
@@ -231,7 +235,7 @@ async def reset_history(message: types.Message):
 async def main_menu(message: types.Message, submenu="main"):
 
     id = user_id(message)
-    logging.info(f"Push menu -  {id}.")
+    logger_bot.info(f"Push menu -  {id}.")
 
     data = await read_user(id)
     if not data:
@@ -1577,7 +1581,7 @@ async def get_stat(message: types.Message):
     try:
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
-        logging.error(f"Error sending documentb User stat")
+        logger_bot.error(f"Error sending documentb User stat")
 
 
 
@@ -1623,7 +1627,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     data = callback_query.data.split(':')
 
     if not data:
-        logging.error("Error: dont get data - data_button.")
+        logger_bot.error("Error: dont get data - data_button.")
         await bot.send_message(callback_query.from_user.id, "Error: dont get data - data_button.")
         return
     
@@ -1640,7 +1644,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     updated_data = {"user_id": id, "money": new_money, "paid": new_paid, "block": False}
     confirm_save = await update_user(updated_data)
 
-    logging.info(f"Adding funds to your account - {id}.")
+    logger_bot.info(f"Adding funds to your account - {id}.")
 
     pay_data = {
         "date": await day_utcnow(),
@@ -1651,7 +1655,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
     
     confirm_pay_stat =  await add_payments(pay_data)
     if not confirm_pay_stat:
-        logging.error("Error: Dont save payments.")
+        logger_bot.error("Error: Dont save payments.")
 
     one_method = await read_one_methods_pay_by_use(use)
     if one_method:
@@ -1663,7 +1667,7 @@ async def confirm_callback(callback_query: types.CallbackQuery):
         method_data = {"id": metod_id, "counts": counts}
         confirm_update_met =  await update_methods_pay(method_data)
         if not confirm_update_met:
-            logging.error("Error: Dont update counts pay method.")
+            logger_bot.error("Error: Dont update counts pay method.")
 
     if confirm_save is True:
         # Admin:
@@ -1790,7 +1794,7 @@ Choosing a payment method:
             answer = answer + "/use_digital"
 
     if answer == "":
-        logging.error("Error: not default method pay.")
+        logger_bot.error("Error: not default method pay.")
         if language == "ru":
             await message.reply("Нет способов оплаты, извините.", parse_mode="HTML")
         else:
@@ -1861,7 +1865,7 @@ async def sbp_ru_input(message: types.Message, state: FSMContext):
     try:
         amount = float(message.text)
     except:
-        logging.error(f"This not float input.")
+        logger_bot.error(f"This not float input.")
         await message.reply("This not float input.", parse_mode="Markdown") 
         return
 
@@ -2013,7 +2017,7 @@ async def send_to_admin(callback_query: types.CallbackQuery, state: FSMContext):
     block = data.get("block")
 
     if block:
-        logging.error(f"This dude - {id} is trying to write blocked.")
+        logger_bot.error(f"This dude - {id} is trying to write blocked.")
         if language == "ru":
             await bot.send_message(callback_query.from_user.id, "У вас больше нет попыток написать.", parse_mode="HTML")
         elif language == "en":
@@ -2066,16 +2070,16 @@ async def blocking_dude(callback_query: types.CallbackQuery):
     data = callback_query.data.split(':')
 
     if not data:
-        logging.error("Error: dont get data - data_button.")
+        logger_bot.error("Error: dont get data - data_button.")
         await bot.send_message(callback_query.from_user.id, "Error: dont get data - data_button.")
         return
 
     id = int(data[1])
-    logging.info(id)
+    logger_bot.info(id)
 
     updated_data = {"user_id": id, "block": True}
     confirm_save = await update_user(updated_data)
-    logging.info(f"The user is blocked - {id}.")
+    logger_bot.info(f"The user is blocked - {id}.")
 
     if confirm_save is True:
         # to Admin:
@@ -2108,7 +2112,7 @@ async def admin_menu(message: types.Message):
 
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     # Get method default:
@@ -2124,11 +2128,11 @@ async def admin_menu(message: types.Message):
     #             "model_assist": DEFAULT_MODEL_ASSIST_OA
     #         }
     #         if not await add_data_admin(admin_data):
-    #             logging.error("Admin_data write error 13")
+    #             logger_bot.error("Admin_data write error 13")
 
     #     mode = "is enabled" if admin_data.get("operating_mode") else "is disabled"
     # except:
-    #     logging.error("In Table Db dont have admin data")
+    #     logger_bot.error("In Table Db dont have admin data")
     #     mode = "is disabled"
 
     # print(f"AGENT MODE IS: {mode}")
@@ -2177,7 +2181,7 @@ async def create_tebles_in_db_admin(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     if create_tables_in_db(): # Синхронная
@@ -2195,7 +2199,7 @@ async def fast_delete_statistic_table_in_db_admin(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     if await fast_delete_statistics_tab():
@@ -2212,7 +2216,7 @@ async def delete_all_tables_in_db_admin(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     if await drop_all_tables_and_reset_schema():
@@ -2231,7 +2235,7 @@ async def get_on_json_old_users(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     name_file = await get_json_old_users_to_db()
@@ -2263,7 +2267,7 @@ async def restore_old_users_admin(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await bot.send_message(message.chat.id, "Attach and send the necessary json file for recovery Users to DB.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
@@ -2314,7 +2318,7 @@ async def load_json_users_to_db(message: Message, state: FSMContext):
 #     id = user_id(message)
 
 #     if id != ADMIN_ID:
-#         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+#         logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
 #         return
 
 
@@ -2403,7 +2407,7 @@ async def get_info_by_users(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     all_data = await read_all_users()
@@ -2427,7 +2431,7 @@ async def get_info_by_users(message: types.Message):
     try:
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
-        logging.error(f"Error sending documentb User stat")
+        logger_bot.error(f"Error sending documentb User stat")
 
 
 
@@ -2447,7 +2451,7 @@ async def sending_news(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await message.answer("News message on RU:", parse_mode="HTML")
@@ -2524,7 +2528,7 @@ async def get_logs_bot(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     data_folder = Path(LOGS_FOLDER)
@@ -2540,7 +2544,7 @@ async def get_logs_bot(message: types.Message):
                 empts = False
                 await asyncio.sleep(0.5)
             except Exception as e:
-                logging.error(f"Error sending file log: {file_path}: {e}")
+                logger_bot.error(f"Error sending file log: {file_path}: {e}")
     if empts:
         await bot.send_message(message.chat.id, "There are no logging files or they are empty")
 
@@ -2555,7 +2559,7 @@ async def admin_clear_logs(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
 
@@ -2569,7 +2573,7 @@ async def admin_clear_logs(message: types.Message):
                 await bot.send_message(message.chat.id, f"The '{file_path}' file has been clearing.")
                 await asyncio.sleep(0.5)
             except Exception as e:
-                logging.error(f"Error clearing file log: {file_path}: {e}")
+                logger_bot.error(f"Error clearing file log: {file_path}: {e}")
 
 
 
@@ -2582,7 +2586,7 @@ async def get_info_a_payments_users(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     data_payments = await read_all_payments()
@@ -2611,7 +2615,7 @@ async def get_info_a_payments_users(message: types.Message):
     try:
         await bot.send_document(chat_id=message.chat.id, document=buffered_input_file)
     except:
-        logging.error(f"Error sending documentb User stat")
+        logger_bot.error(f"Error sending documentb User stat")
 
 
 
@@ -2631,7 +2635,7 @@ async def add_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await message.reply("The name of the payment method is short (title method):", parse_mode="Markdown") 
@@ -2642,7 +2646,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await state.update_data(title=message.text)
@@ -2654,7 +2658,7 @@ async def add_metod_pay_input_text_ru(message: types.Message, state: FSMContext)
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     await state.update_data(text_ru=message.text)
@@ -2667,7 +2671,7 @@ async def add_metod_pay_input_text_en(message: types.Message, state: FSMContext)
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     st_data = await state.get_data()
@@ -2701,14 +2705,14 @@ async def select_when_deleted_metod_pay(message: types.Message, state: FSMContex
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     # Get metods pay data:
     all_metods = await read_all_methods_pay()
 
     if not all_metods:
-        logging.error("Error: Dont have metods pay.")
+        logger_bot.error("Error: Dont have metods pay.")
         await message.reply("*Error*: Dont have metods pay.", parse_mode="Markdown") 
         return
 
@@ -2741,18 +2745,18 @@ async def delete_metod_pay(message: types.Message, state: FSMContext):
     try:
         int_value = int(message.text)
     except:
-        logging.error(f"This not integer id method pay.")
+        logger_bot.error(f"This not integer id method pay.")
         await message.reply("This not integer id method pay.", parse_mode="Markdown") 
         return
     
     if message.text not in count:
-        logging.error(f"There is no such position.")
+        logger_bot.error(f"There is no such position.")
         await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
         return
 
     confirm = await deleted_one_methods_pay(int_value)
     if not confirm:
-        logging.error("Error: Not deleted_methods_pay.")
+        logger_bot.error("Error: Not deleted_methods_pay.")
         return
 
     await message.reply(f"The payment method has been deleted.", parse_mode="HTML")
@@ -2771,7 +2775,7 @@ async def start_metod_pay(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
     
     await state.set_state(Form_change_method.start)
@@ -2786,7 +2790,7 @@ async def select_metod_pay(message: types.Message, state: FSMContext):
         i = st_data.get("exi")
         place_of_use = st_data.get("place_of_use")
     except:
-        logging.error("Info: First change method pay.")
+        logger_bot.error("Info: First change method pay.")
 
     if not i:
         i = 0
@@ -2815,7 +2819,7 @@ async def select_metod_pay(message: types.Message, state: FSMContext):
     all_metods = await read_all_methods_pay()
 
     if not all_metods:
-        logging.error("Error: Dont have metods pay.")
+        logger_bot.error("Error: Dont have metods pay.")
         await message.reply("*Error*: Dont have metods pay.", parse_mode="Markdown") 
         return
 
@@ -2853,19 +2857,19 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     try:
         int_value = int(message.text)
     except:
-        logging.error(f"This not integer id method pay.")
+        logger_bot.error(f"This not integer id method pay.")
         await message.reply("This not integer id method pay.", parse_mode="Markdown") 
         return
 
     if message.text not in count:
-        logging.error(f"There is no such position.")
+        logger_bot.error(f"There is no such position.")
         await message.reply(f"There is no item - {int_value}.", parse_mode="Markdown") 
         return
     
     try:
         pl_use = place_of_use[i]
     except:
-        logging.error("Error: Get place_of_use.")
+        logger_bot.error("Error: Get place_of_use.")
         return
 
     # Unset default method pay:
@@ -2878,7 +2882,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
         }
         confirm = await update_methods_pay(pay_data)
         if not confirm:
-            logging.error("Error: Not update_methods_pay.")
+            logger_bot.error("Error: Not update_methods_pay.")
             return
 
     # Set default method pay:
@@ -2888,7 +2892,7 @@ async def add_metod_pay_input_title(message: types.Message, state: FSMContext):
     }
     confirm = await update_methods_pay(pay_data)
     if not confirm:
-        logging.error("Error: Not update_methods_pay.")
+        logger_bot.error("Error: Not update_methods_pay.")
         return
 
     await message.reply(f"The default payment method in place use {pl_use} has been successfully installed - {int_value}", parse_mode="HTML")
@@ -2910,7 +2914,7 @@ async def backup(message: types.Message):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
     confirm = await backup_db() # Create Backup DB
@@ -2926,9 +2930,9 @@ async def backup(message: types.Message):
     sorted_files = sorted(files, key=lambda x: x.stat().st_mtime, reverse=True) # Сортируем список файлов по дате изменения (от новых к старым)
     for file_to_delete in sorted_files[3:]: # Оставляем последние 3 файла, удаляем остальные
         os.remove(file_to_delete)
-    logging.info("Remove all file DB, saved 3 latest files.")
+    logger_bot.info("Remove all file DB, saved 3 latest files.")
     last_downloaded_file = sorted_files[0] if sorted_files else None   # Последний скачанный файл будет первым в отсортированном списке (новейшим) (адрес)
-    logging.info("Download last DB file.")
+    logger_bot.info("Download last DB file.")
 
     await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(last_downloaded_file))
 
@@ -2952,7 +2956,7 @@ async def restore_db_admin(message: types.Message, state: FSMContext):
     id = user_id(message)
 
     if id != ADMIN_ID:
-        logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
     
     await bot.send_message(message.chat.id, "Attach and send the necessary copy of the database for recovery.", parse_mode="Markdown", reply_markup=ReplyKeyboardRemove()) 
@@ -3011,7 +3015,7 @@ async def try_answer_bot(message, answer, data):
     language = data.get("language")
 
     text = data.get("user_content")
-    logging.info(f"User: {id}, Say: {text}")
+    logger_bot.info(f"User: {id}, Say: {text}")
 
 
     # Messages to the administrator about a zero balance
@@ -3070,14 +3074,14 @@ async def try_answer_bot(message, answer, data):
         # Calculation voice:
         confirm = await calculation(data, "text_to_voice")
         if not confirm:
-            logging.error("Error: calculation.")
+            logger_bot.error("Error: calculation.")
 
         # Save file answer:
         if os.path.exists(voice_answer_file_path) and os.path.getsize(voice_answer_file_path) > 0:
             await bot.send_document(chat_id=message.from_user.id, document=types.input_file.FSInputFile(voice_answer_file_path))
         else:
             print(f"The file is empty or missing - {voice_answer_file_path}")
-            logging.error(f"The file is empty or missing - {voice_answer_file_path}")
+            logger_bot.error(f"The file is empty or missing - {voice_answer_file_path}")
 
         if DEL_AUDIO == True:
             await remove_file_os(voice_answer_file_path)
@@ -3175,7 +3179,7 @@ async def try_answer_bot(message, answer, data):
         confirm = await calculation(zip_data, "text")
         if not confirm:
             print("Error: calculation dialog_sum.")
-            logging.error("Error: calculation dialog_sum.")
+            logger_bot.error("Error: calculation dialog_sum.")
 
 
 
@@ -3190,7 +3194,7 @@ async def try_answer_bot(message, answer, data):
 
     if not await add_discussion(update_history):
         print("Error save history.")
-        logging.error("Error save history.")
+        logger_bot.error("Error save history.")
 
     data = {}
     return
@@ -3219,7 +3223,7 @@ async def mod_tex(data, message):
             assist_content.append({"assistant": chunk.get("assist_say")})
 
     elif not history:
-        logging.info("Info: History is empty.")
+        logger_bot.info("Info: History is empty.")
 
     # Add to Data - assist_content:
     if assist_content:
@@ -3258,7 +3262,7 @@ async def mod_tex(data, message):
 
     confirm = await calculation(data, "text")
     if not confirm:
-        logging.error("Error: calculation.")
+        logger_bot.error("Error: calculation.")
 
     # Attempts to give a response to the user:
     await try_answer_bot(message, response, data)
@@ -3281,7 +3285,7 @@ async def add_text_to_photo(message: Message, state: FSMContext):
 
     all_data["user_content"] = message.text
 
-    logging.info(f"User: {id} sent a photo and Say: {message.text}")
+    logger_bot.info(f"User: {id} sent a photo and Say: {message.text}")
 
     if all_data.get('ai') == "gemini":
         answer = await mod_gemini_chat(all_data)
@@ -3308,7 +3312,7 @@ async def add_text_to_photo(message: Message, state: FSMContext):
 
     confirm = await calculation(all_data, "text")
     if not confirm:
-        logging.error("Error: calculation.")
+        logger_bot.error("Error: calculation.")
 
     # Attempts to give a response to the user:
     await try_answer_bot(message, text, all_data)
@@ -3333,7 +3337,7 @@ async def mod_photo(data, message, state: FSMContext):
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, file_path)
     except:
-        logging.error("Error: Couldn't get a photo.")
+        logger_bot.error("Error: Couldn't get a photo.")
         await message.reply("Error: Couldn't get a photo.", parse_mode="Markdown")
         return
 
@@ -3343,7 +3347,7 @@ async def mod_photo(data, message, state: FSMContext):
     if data.get("user_content"):
 
         text = data.get("user_content")
-        logging.info(f"User: {id} sent a photo and Say: {text}")
+        logger_bot.info(f"User: {id} sent a photo and Say: {text}")
 
         if data.get("ai") == "gemini":
             answer = await mod_gemini_chat(data)
@@ -3369,7 +3373,7 @@ async def mod_photo(data, message, state: FSMContext):
 
         confirm = await calculation(data, "text")
         if not confirm:
-            logging.error("Error: calculation.")
+            logger_bot.error("Error: calculation.")
 
 
         # Attempts to give a response to the user:
@@ -3404,7 +3408,7 @@ async def mod_documents(data, message, state: FSMContext):
     # Get extension:
     match = re.search(r'\.([^.]+)$', name_file)
     if not match:
-        logging.error(f"File dont have extension - {name_file}")
+        logger_bot.error(f"File dont have extension - {name_file}")
     extension = match.group(1)  # Получаем расширение без точки
 
 
@@ -3417,7 +3421,7 @@ async def mod_documents(data, message, state: FSMContext):
             file = await bot.get_file(file_id)
             await bot.download_file(file.file_path, file_path)
         except:
-            logging.error("Error: Couldn't get a picture.")
+            logger_bot.error("Error: Couldn't get a picture.")
             await message.reply("Error: Couldn't get a picture.", parse_mode="Markdown")
             return
 
@@ -3428,7 +3432,7 @@ async def mod_documents(data, message, state: FSMContext):
         if data.get("user_content"):
 
             text = data.get("user_content")
-            logging.info(f"User: {id} sent a photo.document and Say: {text}")
+            logger_bot.info(f"User: {id} sent a photo.document and Say: {text}")
 
             if data.get("ai") == "gemini":
                 answer = await mod_gemini_chat(data)
@@ -3457,7 +3461,7 @@ async def mod_documents(data, message, state: FSMContext):
 
             confirm = await calculation(data, "text")
             if not confirm:
-                logging.error("Error: calculation.")
+                logger_bot.error("Error: calculation.")
 
             # Attempts to give a response to the user:
             await try_answer_bot(message, text, data)
@@ -3478,7 +3482,7 @@ async def mod_documents(data, message, state: FSMContext):
 
     else:
         await message.answer(f"The bot does not support this file yet, sorry - {name_file}", parse_mode="Markdown")
-        logging.error(f"The bot does not support this file yet, sorry - {name_file}")
+        logger_bot.error(f"The bot does not support this file yet, sorry - {name_file}")
         return
 
 # "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json", "doc"
@@ -3793,7 +3797,7 @@ async def mod_voice_to_text(data, message):
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, file_path)
     except:
-        logging.error("Error: Voice transmission error.")
+        logger_bot.error("Error: Voice transmission error.")
         await message.reply("Error: Voice transmission error.", parse_mode="Markdown")
         return
 
@@ -3811,7 +3815,7 @@ async def mod_voice_to_text(data, message):
         await remove_file_os(file_path)
 
     if not convert_answer:
-        logging.error("Error: Convet voice to text.")
+        logger_bot.error("Error: Convet voice to text.")
         await message.reply("Error: Convet voice to text.", parse_mode="Markdown")
         return
 
@@ -3824,7 +3828,7 @@ async def mod_voice_to_text(data, message):
     data["min"] = convert_answer.get("minutes")
 
     if not await calculation(data, "voice_to_text"):
-        logging.error("Error: calculation tokens voice to text.")
+        logger_bot.error("Error: calculation tokens voice to text.")
         return
 
     data["min"] = None
@@ -3866,7 +3870,7 @@ async def process_draw(message: types.Message, state: FSMContext):
     all_data["user_content"] = message.text
     language = all_data.get("language")
 
-    logging.info(f"User: {id} image generation and Say: {message.text}")
+    logger_bot.info(f"User: {id} image generation and Say: {message.text}")
 
     if message.text.lower() == "no" or message.text.lower() == "нет":
         if language == "ru":
@@ -3887,10 +3891,10 @@ async def process_draw(message: types.Message, state: FSMContext):
     #     answer = await mod_openai_dall_e(all_data) # Sorry)))
 
     if not answer:
-        logging.error("Error: Generation image.")
+        logger_bot.error("Error: Generation image.")
         return
 
-    logging.info(answer)
+    logger_bot.info(answer)
     # Response to the user:
     await bot.send_message(message.chat.id, answer.get("response"))
 
@@ -3907,7 +3911,7 @@ async def process_draw(message: types.Message, state: FSMContext):
     confirm = await calculation(all_data, "gen_img")
 
     if not confirm:
-        logging.error("Error: calculation tokens draw.")
+        logger_bot.error("Error: calculation tokens draw.")
         return
 
     await state.clear()
@@ -4149,7 +4153,7 @@ async def second_function(message: types.Message, state: FSMContext):
     }
 
     if typecontent not in input_content_type:
-        logging.error(f"Not support type file, sorry.")
+        logger_bot.error(f"Not support type file, sorry.")
         return
 
     arguments = {
@@ -4183,5 +4187,5 @@ if __name__ == "__main__":
     try:
         asyncio.run(main_bot())
     except Exception as e:
-        logging.error(f"Error: An error occurred: {e}.")
+        logger_bot.error(f"Error: An error occurred: {e}.")
         print(f"An error occurred: {e}.")

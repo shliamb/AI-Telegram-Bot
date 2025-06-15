@@ -1,10 +1,22 @@
+#### LOGGING ####
 import logging
 
-#### BASIC CONFIG ####
+def setup_logger(name, log_config):
+    logger = logging.getLogger(name)
+    logger.setLevel(log_config['level'])
+    
+    # Удаляем все существующие handlers
+    logger.handlers = []
+    
+    formatter = logging.Formatter(log_config['format'])
+    
+    file_handler = logging.FileHandler(log_config['filename'], mode=log_config['filemode'])
+    file_handler.setFormatter(formatter)
+    
+    logger.addHandler(file_handler)
+    return logger
 
-# System:
-NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
-HOST = "app_postgres"  # app_postgres or localhost
+
 LOG_CONFIG_DB = {
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s',
     'level': logging.INFO,
@@ -23,6 +35,15 @@ LOG_CONFIG_AI = {
     'filemode': 'a', 
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
 }
+
+
+
+
+#### BASIC CONFIG ####
+
+# System:
+NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
+HOST = "app_postgres"  # app_postgres or localhost
 URL = "http://167.99.210.245:8000"
 TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
