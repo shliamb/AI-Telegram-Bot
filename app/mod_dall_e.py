@@ -1,9 +1,12 @@
 from config import URL, NULL_TOKEN
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
+from config import LOG_CONFIG_AI, setup_logger
 import aiohttp
+logger_ai = setup_logger('ai', LOG_CONFIG_AI)
 
 
-async def mod_openai_dall_e(data):
+async def mod_openai_dall_e(data: dict) -> str:
+    '''Генерация картинок от OpenAI'''
 
     model = data.get("model_draw") # dall-e-3
     prompt = data.get("user_content")
@@ -32,15 +35,18 @@ async def mod_openai_dall_e(data):
         KEY_API_AI: VALUE_KEY_API_AI,
     }
 
+
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, data=data) as response:
             if response.status == 200:
                 try:
                     return await response.json()
                 except aiohttp.ContentTypeError:
+                    logger_ai.error("Error: Generate img of OpenAI dot Json response")
                     text_response = await response.text()
                     return {'response': text_response, "used_tokens": NULL_TOKEN}
             elif response.status == 400 or response.status == 500:
+                logger_ai.error(f"Error: Generate img of OpenAI code: {response.status}")
                 text_response = await response.text()
                 return {'response': text_response, "used_tokens": NULL_TOKEN}
 

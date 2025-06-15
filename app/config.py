@@ -71,7 +71,7 @@ AI_DEFAULT_MODEL_GROK = "grok-2-vision-latest"
 
 # Gen Audio models:
 AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
-AI_DEFAULT_MODEL_TEXT_TO_VOICE = "tts-1" # tts-1-hd           AI_DEFAULT_MODEL_GET_AUDIO
+AI_DEFAULT_MODEL_TEXT_TO_VOICE = "gpt-4o-mini-tts" # tts-1-hd gpt-4o-mini-tts           AI_DEFAULT_MODEL_GET_AUDIO
 VOICE = "nova" # alloy, echo, fable, onyx, nova, and shimmer
 VOICE_SPEED = 1.0 # 0.25 to 4.0
 
@@ -207,6 +207,7 @@ PRICE = {
     # Audio to 1M characters:
     'tts-1': 18, # / 1M characters
     'tts-1-hd': 36, # / 1M characters
+    'gpt-4o-mini-tts': 15.12, # / 1M characters
     'whisper-1': 0.0072, # minute (rounded to the nearest second)
 
     }

@@ -1,9 +1,9 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, AUDIO_FOLDER
+from config import URL, AUDIO_FOLDER, LOG_CONFIG_AI, setup_logger
 from general_functions import random_name_2X #, encode_file
 import aiohttp
 import aiofiles
-
+logger_ai = setup_logger('ai', LOG_CONFIG_AI)
 import base64
 
 
@@ -45,16 +45,17 @@ async def get_voice_openai(data):
                     try:
                         async with aiofiles.open(file_path, "wb") as audio_file:
                             await audio_file.write(audio_data)
-                            print(f"The audio file is saved as {file_path}")
+                            logger_ai.error(f"The audio file is saved as {file_path}")
                             return file_path
 
                     except aiohttp.ContentTypeError:
                         text_response = await response.text()
-                        print(text_response)
+                        logger_ai.error(f"Error: get_voice_openai respons is not json: {str(text_response)}")
 
             elif response.status == 400 or response.status == 500:
+                logger_ai.error(f"Error: get_voice_openai respons is code: {str(response.status)}")
                 text_response = await response.text()
-                print(text_response)
+
 
 
 # Only file

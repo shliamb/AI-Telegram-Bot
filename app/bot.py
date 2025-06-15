@@ -1,13 +1,7 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
 from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER, setup_logger #, DEFAULT_MODEL_ASSIST_OA
-
-# import logging
-# # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
-# logging.basicConfig(**LOG_CONFIG_BOT)
-
-
+# logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 logger_bot = setup_logger('bot', LOG_CONFIG_BOT)
-
 import re
 import random
 import os
@@ -59,8 +53,6 @@ from get_json_old_users import get_json_old_users_to_db
 
 bot = Bot(TELEGRAM_BOT_TOKEN, parse_mode="markdown") # Initialize Bot instance with a default parse mode which will be passed to all API calls
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
-
-logger_bot.info("INFO: bot.py is here")
 
 
 #########
@@ -348,7 +340,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>МОДЕЛЬ: {model_text_to_voice.upper()}:</b>\n\n"
         f"<b>Модель openai: {model_text_to_voice.upper()}</b>\n"
         f"        /tts_1 - 18$ / 1M символ\n"
-        f"        /tts_1_hd - 36$ / 1M символ\n\n"
+        f"        /tts_1_hd - 36$ / 1M символ\n"
+        f"        /4o_mini_tts - 15.12$ / 1M символ\n\n"
         f"<b>Стиль голоса:  {voice.upper()}</b>\n"
         f"        /nova - женский голос\n"
         f"        /alloy\n"
@@ -376,7 +369,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>MODEL NOW: {model_text_to_voice.upper()}:</b>\n\n"
         f"<b>Model from OpenAI: {model_text_to_voice.upper()}</b>\n"
         f"        /tts_1 - 18$ / 1M characters\n"
-        f"        /tts_1_hd - 36$ / 1M characters\n\n"
+        f"        /tts_1_hd - 36$ / 1M characters\n"
+        f"        /4o_mini_tts - 15.12$ / 1M characters\n\n"
         f"<b>Voice style: {voice.upper()}</b>\n"
         f"        /nova - a woman's voice\n"
         f"        /alloy\n"
@@ -1385,6 +1379,21 @@ async def tts_1_hd(message: types.Message):
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "voice_menu")
+
+
+
+@dp.message(Command('4o_mini_tts'))
+async def for_o_mini_tts(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai_text_to_voice": "openai",
+        "model_text_to_voice": "gpt-4o-mini-tts",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "voice_menu")
+
 
 @dp.message(Command('nova'))
 async def nova(message: types.Message):
@@ -3222,8 +3231,8 @@ async def mod_tex(data, message):
             assist_content.append({"user": chunk.get("user_say")}) # dates + 
             assist_content.append({"assistant": chunk.get("assist_say")})
 
-    elif not history:
-        logger_bot.info("Info: History is empty.")
+    # elif not history:
+    #     logger_bot.info("Info: History is empty.")
 
     # Add to Data - assist_content:
     if assist_content:

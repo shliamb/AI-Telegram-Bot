@@ -1,7 +1,6 @@
 from worker_db import add_statistics, read_user, update_user
-from config import PRICE, LOG_CONFIG_BOT, TIME_CORRECTION
-import logging
-logging.basicConfig(**LOG_CONFIG_BOT)
+from config import PRICE, LOG_CONFIG_BOT, TIME_CORRECTION, setup_logger
+logger_bot = setup_logger('bot', LOG_CONFIG_BOT)
 from datetime import datetime, timezone, timedelta
 import random
 import string
@@ -15,8 +14,6 @@ from mutagen import File
 from io import BytesIO
 
 
-
-logging.info("INFO: General_function.py is here")
 
 
 # Encode the image base64:
@@ -120,7 +117,7 @@ async def calculation(data: dict, input_data: str) -> bool:
 
         # Save statistic data to DB:
         if not await add_statistics(data_stat):
-            logging.error("Error: add_statistics")
+            logger_bot.error("Error: add_statistics")
 
         # Getting user data
         user_data = await read_user(data.get("user_id"))
@@ -129,12 +126,12 @@ async def calculation(data: dict, input_data: str) -> bool:
 
         # The balance was changed taking into account the expense
         if not await update_user(data_money):
-            logging.error("Error: update_user")
+            logger_bot.error("Error: update_user")
 
         return True
     
     except Exception as error:
-        logging.error("Error:", error)
+        logger_bot.error("Error:", error)
         return False
 
 # Counts the number of tokens from the text:
@@ -221,10 +218,10 @@ async def remove_file_os(file_path):
     
     if await loop.run_in_executor(None, os.path.exists, file_path):
         await loop.run_in_executor(None, os.remove, file_path)
-        logging.info(f"The {file_path} file was successfully deleted.")
+        logger_bot.info(f"The {file_path} file was successfully deleted.")
         return True
     else:
-        logging.error(f"The {file_path} file does not exist.")
+        logger_bot.error(f"The {file_path} file does not exist.")
         return False
 
 

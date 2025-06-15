@@ -1,8 +1,7 @@
 # Base:
 # import asyncio
-from config import LOG_CONFIG_BOT
-import logging
-logging.basicConfig(**LOG_CONFIG_BOT)
+from config import LOG_CONFIG_BOT, LOG_CONFIG_DB, setup_logger
+logger_db = setup_logger('db', LOG_CONFIG_DB)
 import json
 #import uuid
 from datetime import datetime
@@ -97,7 +96,7 @@ async def restore_loyal_users_to_db(file_path):
 
         except Exception as err:
             err_add_usr += 1
-            logging.error(f"Fail update user_id: {clear_data_user.get('user_id')}, reason: {err}")
+            logger_db.error(f"Fail update user_id: {clear_data_user.get('user_id')}, reason: {err}")
         
 
 
@@ -107,7 +106,7 @@ async def restore_loyal_users_to_db(file_path):
             if await add_methods_pay(metod):
                 qty_met_pay += 1
         except Exception as err:
-            logging.error(f"Fail update metod pay: {metod}, reason: {err}")
+            logger_db.error(f"Fail update metod pay: {metod}, reason: {err}")
             err_met_pay += 1
 
 

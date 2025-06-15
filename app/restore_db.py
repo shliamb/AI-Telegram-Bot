@@ -1,7 +1,6 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import LOG_CONFIG_DB, HOST
-import logging
-logging.basicConfig(**LOG_CONFIG_DB)
+from config import LOG_CONFIG_DB, HOST, setup_logger
+logger_db = setup_logger('db', LOG_CONFIG_DB)
 # from general_functions import day_utcnow, unformat_date
 import subprocess
 import os
@@ -48,26 +47,26 @@ async def restore_db(file_path):
         env = {**os.environ, 'PGPASSWORD': PASSWORD_DB}
         
         # 1. Завершаем подключения
-        print("Terminating existing connections...")
+        logger_db.info("Terminating existing connections...")
         result = subprocess.run(terminate_command, env=env, capture_output=True, text=True)
-        print(result.stdout)
+        logger_db.info(result.stdout)
         
         # 2. Очищаем БД
-        print("Clearing database...")
+        logger_db.info("Clearing database...")
         subprocess.run(clear_command, env=env, check=True)
         
         # 3. Восстанавливаем из бэкапа
-        print("Restoring database...")
+        logger_db.info("Restoring database...")
         subprocess.run(pg_restore_command, env=env, check=True)
         
-        print("Database restore completed successfully.")
+        logger_db.info("Database restore completed successfully.")
         return True
     
     except subprocess.CalledProcessError as e:
-        print(f"Command failed: {e}\nOutput: {e.stdout}\nError: {e.stderr}")
+        logger_db.error(f"Command failed: {e}\nOutput: {e.stdout}\nError: {e.stderr}")
         return False
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        logger_db.error(f"An error occurred: {str(e)}")
         return False
 
 

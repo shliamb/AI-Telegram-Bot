@@ -1,7 +1,8 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, AI_DEFAULT_MODEL_VOICE_TO_TEXT, NULL_TOKEN
+from config import URL, AI_DEFAULT_MODEL_VOICE_TO_TEXT, NULL_TOKEN, LOG_CONFIG_AI, setup_logger
 import aiohttp
 import aiofiles
+logger_ai = setup_logger('ai', LOG_CONFIG_AI)
 
 
 
@@ -45,9 +46,11 @@ async def get_text_openai(data):
                             try:
                                 return await response.json()
                             except aiohttp.ContentTypeError:
+                                logger_ai.error("Error: openai-voice-to-text respons is not json")
                                 text_response = await response.text()
                                 return {'response': text_response, "minutes": NULL_TOKEN}
                         elif response.status == 400 or response.status == 500:
+                            logger_ai.error(f"Error: openai-voice-to-text respons is code: {response.status}")
                             text_response = await response.text()
                             return {'response': text_response, "minutes": NULL_TOKEN}
 

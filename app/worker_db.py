@@ -1,7 +1,6 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, GIFT
-import logging
-logging.basicConfig(**LOG_CONFIG_DB)
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, GIFT, setup_logger
+logger_db = setup_logger('db', LOG_CONFIG_DB)
 import asyncpg
 #import asyncio
 
@@ -18,7 +17,7 @@ async def get_connection():
     return connection
 
 
-logging.info("INFO: worker_db.py is here")
+
 
 
 #### USERS TABLE: ####
@@ -31,11 +30,11 @@ async def add_user(user_data):
     user_id = user_data.get("user_id")
 
     if not user_id:
-        logging.error("Error add_user: Where is user_id?") 
+        logger_db.error("Error add_user: Where is user_id?") 
         return False
     
     if len(user_data) < 1: # if there is at least a user_id, let's go
-        logging.error("Error add_user: User_data is empty.")
+        logger_db.error("Error add_user: User_data is empty.")
         return False
 
     for key, value in user_data.items():
@@ -58,7 +57,7 @@ async def add_user(user_data):
         return True
     
     except Exception as e:
-        logging.error(f"Error add_user: {e}")
+        logger_db.error(f"Error add_user: {e}")
         return False
     
     finally:
@@ -94,7 +93,7 @@ async def read_user(user_id):
         return dict(*result)
     
     except Exception as e:
-        logging.error(f"Error read_user: {e}")
+        logger_db.error(f"Error read_user: {e}")
     finally:
         if connection:
             await connection.close()
@@ -115,11 +114,11 @@ async def update_user(user_data):
     user_id = user_data.get("user_id")
 
     if not user_id:
-        logging.error("Error update_user: Where is user_id?") 
+        logger_db.error("Error update_user: Where is user_id?") 
         return False
     
     if len(user_data) <= 1: # At a minimum, we need user_id + at least one element of the change.
-        logging.error("Error update_user: User_data is empty or contains a single entry.")
+        logger_db.error("Error update_user: User_data is empty or contains a single entry.")
         return False
 
     for key, value in user_data.items():
@@ -142,7 +141,7 @@ async def update_user(user_data):
         return True
     
     except Exception as e:
-        logging.error(f"Error update_user: {e}")
+        logger_db.error(f"Error update_user: {e}")
         return False
     finally:
         if connection:
@@ -179,11 +178,11 @@ async def add_statistics(statistics_data):
     user_id = statistics_data.get("user_id")
 
     if not user_id:
-        logging.error("Error add_statistics: Where is user_id?") 
+        logger_db.error("Error add_statistics: Where is user_id?") 
         return False
     
     if len(statistics_data) < 1: # if there is at least a user_id, let's go
-        logging.error("Error add_statistics: Statistics_data is empty.")
+        logger_db.error("Error add_statistics: Statistics_data is empty.")
         return False
 
     for key, value in statistics_data.items():
@@ -206,7 +205,7 @@ async def add_statistics(statistics_data):
         return True
     
     except Exception as e:
-        logging.error(f"Error add_statistics: {e}")
+        logger_db.error(f"Error add_statistics: {e}")
         return False
     
     finally:
@@ -246,7 +245,7 @@ async def read_statistics(user_id):
         return data
     
     except Exception as e:
-        logging.error(f"Error read_statistics: {e}")
+        logger_db.error(f"Error read_statistics: {e}")
     finally:
         if connection:
             await connection.close()
@@ -266,7 +265,7 @@ async def clear_statistics():
     # date_now = функция получения даты + какое то условие, что бы давался лимит 3 месяца допустим
 
     if not date_now:
-        logging.error("Error date: Today's date has not been received")
+        logger_db.error("Error date: Today's date has not been received")
         return False
 
     try:
@@ -280,7 +279,7 @@ async def clear_statistics():
         return True
     
     except Exception as e:
-        logging.error(f"Error clear_statistics {e}")
+        logger_db.error(f"Error clear_statistics {e}")
         return False
     
     finally:
@@ -304,7 +303,7 @@ async def fast_delete_statistics_tab():
         return True
     
     except Exception as e:
-        logging.error(f"Error fast_delete_statistics_tab {e}")
+        logger_db.error(f"Error fast_delete_statistics_tab {e}")
         return False
     
     finally:
@@ -327,11 +326,11 @@ async def add_discussion(discussion_data):
     user_id = discussion_data.get("user_id")
 
     if not user_id:
-        logging.error("Error add_discussion: Where is user_id?") 
+        logger_db.error("Error add_discussion: Where is user_id?") 
         return False
     
     if len(discussion_data) < 1: # if there is at least a user_id, let's go
-        logging.error("Error add_discussion: Discussion_data is empty.")
+        logger_db.error("Error add_discussion: Discussion_data is empty.")
         return False
 
     for key, value in discussion_data.items():
@@ -354,7 +353,7 @@ async def add_discussion(discussion_data):
         return True
     
     except Exception as e:
-        logging.error(f"Error add_discussion: {e}")
+        logger_db.error(f"Error add_discussion: {e}")
         return False
     
     finally:
@@ -398,7 +397,7 @@ async def read_discussion(user_id):
         return data
     
     except Exception as e:
-        logging.error(f"Error read_discussion: {e}")
+        logger_db.error(f"Error read_discussion: {e}")
         return False
 
     finally:
@@ -426,7 +425,7 @@ async def clear_discussion_by_id(user_id):
         return True
     
     except Exception as e:
-        logging.error(f"Error clear_discussion by id {e}")
+        logger_db.error(f"Error clear_discussion by id {e}")
         return False
     
     finally:
@@ -443,7 +442,7 @@ async def clear_discussion():
     # date_now = функция получения даты + ~ 2 дня, что бы дать время на использование..
 
     if not date_now:
-        logging.error("Error date: Today's date has not been received")
+        logger_db.error("Error date: Today's date has not been received")
         return False
 
     try:
@@ -457,7 +456,7 @@ async def clear_discussion():
         return True
     
     except Exception as e:
-        logging.error(f"Error clear_discussion {e}")
+        logger_db.error(f"Error clear_discussion {e}")
         return False
     
     finally:
@@ -482,7 +481,7 @@ async def read_all_methods_pay():
         )
 
         if not result:
-            logging.error("The methodt pay is empty, sorry.")
+            logger_db.error("The methodt pay is empty, sorry.")
             return False
 
         data = []
@@ -491,7 +490,7 @@ async def read_all_methods_pay():
         return data
     
     except Exception as e:
-        logging.error(f"Error read_all_methods_pay: {e}")
+        logger_db.error(f"Error read_all_methods_pay: {e}")
         return False
     finally:
         if connection:
@@ -510,11 +509,11 @@ async def read_one_methods_pay(title: str):
     connection = None
     try:
         if type(title) != str:
-            logging.error("Error: input data is not str (title method pay.)")
+            logger_db.error("Error: input data is not str (title method pay.)")
             return False
 
         if not title:
-            logging.error("Error: Title method pay is Empty or None.")
+            logger_db.error("Error: Title method pay is Empty or None.")
             return False
 
         connection = await get_connection()
@@ -531,7 +530,7 @@ async def read_one_methods_pay(title: str):
         return dict(*result)
 
     except Exception as e:
-        logging.error(f"Error read_one_methods_pay: {e}")
+        logger_db.error(f"Error read_one_methods_pay: {e}")
         return False
     finally:
         if connection:
@@ -543,7 +542,7 @@ async def read_one_methods_pay_by_id(id: int):
     connection = None
     try:
         if type(id) != int:
-            logging.error("Error: input data is not int (id method pay.)")
+            logger_db.error("Error: input data is not int (id method pay.)")
             return False
 
         connection = await get_connection()
@@ -560,7 +559,7 @@ async def read_one_methods_pay_by_id(id: int):
         return dict(*result)
     
     except Exception as e:
-        logging.error(f"Error read_one_methods_pay_by_id: {e}")
+        logger_db.error(f"Error read_one_methods_pay_by_id: {e}")
         return False
     finally:
         if connection:
@@ -585,7 +584,7 @@ async def read_one_methods_pay_by_use(place_of_use):
         return dict(*result)
     
     except Exception as e:
-        logging.error(f"Error read_one_methods_pay_by_use: {e}")
+        logger_db.error(f"Error read_one_methods_pay_by_use: {e}")
         return False
     finally:
         if connection:
@@ -604,11 +603,11 @@ async def deleted_one_methods_pay(id):
     connection = None
     try:
         if type(id) != int:
-            logging.error("Error: input data is not int (id method pay.)")
+            logger_db.error("Error: input data is not int (id method pay.)")
             return False
 
         if not id:
-            logging.error("Error: Title method pay is Empty or None.")
+            logger_db.error("Error: Title method pay is Empty or None.")
             return False
 
         connection = await get_connection()
@@ -622,7 +621,7 @@ async def deleted_one_methods_pay(id):
         return True
     
     except Exception as e:
-        logging.error(f"Error deleted_one_methods_pay: {e}")
+        logger_db.error(f"Error deleted_one_methods_pay: {e}")
         return False
     finally:
         if connection:
@@ -634,7 +633,7 @@ async def add_methods_pay(pay_data):
     keys_list, values_list, num_list, i, connection = [], [], [], 1, None
 
     if len(pay_data) <= 1: 
-        logging.error("Error: User_data is empty.")
+        logger_db.error("Error: User_data is empty.")
         return False
 
     for key, value in pay_data.items():
@@ -657,7 +656,7 @@ async def add_methods_pay(pay_data):
         return True
     
     except Exception as e:
-        logging.error(f"Error add_methods_pay: {e}")
+        logger_db.error(f"Error add_methods_pay: {e}")
         return False
     
     finally:
@@ -673,11 +672,11 @@ async def update_methods_pay(pay_data):
     id = pay_data.get("id")
 
     if not id:
-        logging.error("Error update_methods_pay: Where is id?") 
+        logger_db.error("Error update_methods_pay: Where is id?") 
         return False
     
     if len(pay_data) <= 1: # At a minimum, we need id + at least one element of the change.
-        logging.error("Error update_methods_pay: pay_data is empty or contains a single entry.")
+        logger_db.error("Error update_methods_pay: pay_data is empty or contains a single entry.")
         return False
 
     for key, value in pay_data.items():
@@ -701,7 +700,7 @@ async def update_methods_pay(pay_data):
     
     
     except Exception as e:
-        logging.error(f"Error update_methods_pay: {e}")
+        logger_db.error(f"Error update_methods_pay: {e}")
         return False
     
     finally:
@@ -804,7 +803,7 @@ async def read_all_payments():
         )
 
         if not result:
-            logging.error("Users not pay.")
+            logger_db.error("Users not pay.")
             return False
 
         data = []
@@ -817,7 +816,7 @@ async def read_all_payments():
         return data
     
     except Exception as e:
-        logging.error(f"Error read_all_payments: {e}")
+        logger_db.error(f"Error read_all_payments: {e}")
         return False
     finally:
         if connection:
@@ -834,11 +833,11 @@ async def add_payments(payments):
     keys_list, values_list, num_list, i, connection = [], [], [], 1, None
 
     if len(payments) <= 1: 
-        logging.error("Error: User_data is empty.")
+        logger_db.error("Error: User_data is empty.")
         return False
     
     if payments.get("user_id") is None: 
-        logging.error("Error: User_id is empty.")
+        logger_db.error("Error: User_id is empty.")
         return False
 
     for key, value in payments.items():
@@ -861,7 +860,7 @@ async def add_payments(payments):
         return True
     
     except Exception as e:
-        logging.error(f"Error add_payments: {e}")
+        logger_db.error(f"Error add_payments: {e}")
         return False
     
     finally:
@@ -882,7 +881,7 @@ async def deleted_all_payments():
         return True
     
     except Exception as e:
-        logging.error(f"Error deleted_all_payments: {e}")
+        logger_db.error(f"Error deleted_all_payments: {e}")
         return False
     finally:
         if connection:
@@ -939,7 +938,7 @@ async def read_all_users():
         return data
     
     except Exception as e:
-        logging.error(f"Error read_all_users: {e}")
+        logger_db.error(f"Error read_all_users: {e}")
     finally:
         if connection:
             await connection.close()
@@ -977,7 +976,7 @@ async def json_old_users():
         return data
     
     except Exception as e:
-        logging.error(f"Error json_old_users: {e}")
+        logger_db.error(f"Error json_old_users: {e}")
         return False
     finally:
         if connection:
@@ -1005,7 +1004,7 @@ async def drop_all_tables_and_reset_schema():
         await connection.execute("GRANT ALL ON SCHEMA public TO PUBLIC;")
         return True
     except Exception as e:
-        logging.error(f"Error in drop_all_tables_and_reset_schema: {e}")
+        logger_db.error(f"Error in drop_all_tables_and_reset_schema: {e}")
         return False
     finally:
         if connection:

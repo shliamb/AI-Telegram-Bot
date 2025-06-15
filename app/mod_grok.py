@@ -1,5 +1,6 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, NULL_TOKEN
+from config import URL, NULL_TOKEN, LOG_CONFIG_AI, setup_logger
+logger_ai = setup_logger('ai', LOG_CONFIG_AI)
 import aiohttp
 import aiofiles
 import json
@@ -43,9 +44,11 @@ async def mod_grok_chat(data):
                             try:
                                 return await response.json()
                             except aiohttp.ContentTypeError:
+                                logger_ai.error("Error: mod_grok_chat respons is not json")
                                 text_response = await response.text()
                                 return {'response': text_response, "used_tokens": NULL_TOKEN}
                         elif response.status == 400 or response.status == 500:
+                            logger_ai.error(f"Error: mod_grok_chat respons is code: {str(response.status)}")
                             text_response = await response.text()
                             return {'response': text_response, "used_tokens": NULL_TOKEN}
             else:
@@ -66,8 +69,10 @@ async def mod_grok_chat(data):
                             return await response.json()
                         except aiohttp.ContentTypeError:
                             text_response = await response.text()
+                            logger_ai.error("Error: mod_grok_chat respons is not json")
                             return {'response': text_response, "used_tokens": NULL_TOKEN}
                     elif response.status == 400 or response.status == 500:
+                        logger_ai.error(f"Error: mod_grok_chat respons is code: {str(response.status)}")
                         text_response = await response.text()
                         return {'response': text_response, "used_tokens": NULL_TOKEN}
 

@@ -1,7 +1,6 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import BACKUP_PATH, TIME_CORRECTION, LOG_CONFIG_DB, HOST
-import logging
-logging.basicConfig(**LOG_CONFIG_DB)
+from config import BACKUP_PATH, TIME_CORRECTION, LOG_CONFIG_DB, HOST, setup_logger
+logger_db = setup_logger('db', LOG_CONFIG_DB)
 from general_functions import day_utcnow, unformat_date
 import subprocess
 #import asyncio
@@ -19,12 +18,12 @@ async def backup_db():
 
     try:
         subprocess.run(pg_dump_command, shell=True)
-        logging.info("Backup Data Base is Completed.")
+        logger_db.info("Backup Data Base is Completed.")
         #print("Backup Data Base is Completed.")
         return True
 
     except subprocess.CalledProcessError as e:
-        logging.error(f"Error when creating a backup: {e}")
+        logger_db.error(f"Error when creating a backup: {e}")
         #print("Backup error")
         return False
 

@@ -1,7 +1,7 @@
 from get_keys import KEY_API_DEEPSEEK
-from config import NULL_TOKEN
+from config import NULL_TOKEN, LOG_CONFIG_AI, setup_logger
 from general_functions import encode_file
-# import logging
+logger_ai = setup_logger('ai', LOG_CONFIG_AI)
 from openai import AsyncOpenAI, RateLimitError, OpenAIError
 
 
@@ -65,10 +65,12 @@ async def mod_deepseek_chat(data):
         
 
     except RateLimitError as e:
+        logger_ai.error(f"Error: DeepSeek respons is: {str(e)}")
         return {"response": str(e), "used_tokens": NULL_TOKEN}
 
 
     except OpenAIError as e:
+        logger_ai.error(f"Error: DeepSeek respons is: {str(e)}")
         return {"response": str(e), "used_tokens": NULL_TOKEN}
 
 

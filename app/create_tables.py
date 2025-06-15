@@ -1,11 +1,11 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HOST, LOG_CONFIG_DB
+from config import HOST, LOG_CONFIG_DB, setup_logger
 import psycopg2
-import logging
-logging.basicConfig(**LOG_CONFIG_DB)
+logger_db = setup_logger('db', LOG_CONFIG_DB)
 
 
-logging.info("INFO: create_tables.py is here")
+
+
 
 # Create TABLES:
 def create_tables_in_db():
@@ -144,12 +144,12 @@ def create_tables_in_db():
 
         # Saving changes:
         connection.commit()
-        logging.info("Adding tables is done!")
+        logger_db.info("Adding tables is done!")
         #print("Adding tables is done!")
         return True
 
     except Exception as error:
-        logging.error(f"Error Create Tables in DB: {error}")
+        logger_db.error(f"Error Create Tables in DB: {error}")
         #print("Error Create Tables in DB:", error)
         return False
 
