@@ -189,8 +189,8 @@ PRICE = {
 
     # Antropic Claude to 1M tokens:  Context window - 200k, 
     # New:
-    'claude-opus-4-latest': 21.6, # claude-opus-4-20250514
-    'claude-sonnet-4-latest': 21.6, # claude-sonnet-4-20250514
+    'claude-opus-4-20250514': 21.6, # claude-opus-4-20250514
+    'claude-sonnet-4-20250514': 21.6, # claude-sonnet-4-20250514
 
     'claude-3-7-sonnet-latest': 21.6, # 200K context window Most intelligent model, with visible step‑by‑step reasoning claude-3-7-sonnet-20250219
     'claude-3-5-sonnet-latest': 21.6, # output 8192 tokens

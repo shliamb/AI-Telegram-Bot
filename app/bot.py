@@ -1156,7 +1156,7 @@ async def claude_4_opus(message: types.Message):
     data = {
         "user_id": id,
         "ai": "claude",
-        "model_language": "claude-opus-4-latest",
+        "model_language": "claude-opus-4-20250514",
     }
     confirm = await update_user(data)
     if confirm:
@@ -1168,7 +1168,7 @@ async def claude_4_sonnet(message: types.Message):
     data = {
         "user_id": id,
         "ai": "claude",
-        "model_language": "claude-sonnet-4-latest",
+        "model_language": "claude-sonnet-4-20250514",
     }
     confirm = await update_user(data)
     if confirm:
