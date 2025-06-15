@@ -45,7 +45,7 @@ async def get_voice_openai(data):
                     try:
                         async with aiofiles.open(file_path, "wb") as audio_file:
                             await audio_file.write(audio_data)
-                            logger_ai.error(f"The audio file is saved as {file_path}")
+                            #logger_ai.info(f"The audio file is saved as {file_path}")
                             return file_path
 
                     except aiohttp.ContentTypeError:

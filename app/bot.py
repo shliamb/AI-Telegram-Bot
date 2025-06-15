@@ -415,7 +415,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /gpt_4_1_mini - 2.4$\n"
         f"        /gpt_4_1_nano - 0.6$\n"
         f"        /gpt_4_5_preview - 270$\n"
-        f"        /o3 - 60$\n"
+        f"        /o3_pro - 120$\n"
+        f"        /o3 🔥 - 12$\n"
         f"        /o1_preview -  90$\n"
         f"        /o4_mini - 6.6$\n"
         f"        /o3_mini - 6.6$\n"
@@ -428,6 +429,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /gemini_2_0_flash_exp 🔥 - 0.9$\n"
         f"        /gemini_2_0_flash_lite_001 - 0.45$\n\n"
         f"<b>💡 Модели Anthropic 1м ток:</b>\n"
+        f"        /claude_4_opus 🔥 - 108$\n"
+        f"        /claude_4_sonnet 🔥 - 21.6$\n"
         f"        /claude_3_7_sonnet 🔥 - 21.6$\n"
         f"        /claude_3_5_sonnet - 21.6$\n"
         f"        /claude_3_5_haiku - 5.76$\n"
@@ -442,8 +445,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /grok_2_vision_latest - 14.4$\n"
         f"        /grok_2_latest - 14.4$\n\n"
         f"<b>💡 Модели DeepSeek 1м ток:</b>\n"
-        f"        /deepseek_reasoner R1 - 2.82$\n"
-        f"        /deepseek_chat - 1.45$\n\n\n"
+        f"        /deepseek_reasoner R1 - 3.288$\n"
+        f"        /deepseek_chat - 1.644$\n\n\n"
         f"<b>🎚 ДОПОЛНИТЕЛЬНО:</b>\n"
         f"        Параметры ген. изо. - /imgMenu\n"
         f"        Параметры голоса - /voiceMenu\n"
@@ -479,7 +482,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /gpt_4_1_mini - 2.4$\n"
         f"        /gpt_4_1_nano - 0.6$\n"
         f"        /gpt_4_5_preview - 270$\n"
-        f"        /o3 - 60$\n"
+        f"        /o3_pro - 120$\n"
+        f"        /o3 🔥 - 12$\n"
         f"        /o1_preview -  90$\n"
         f"        /o4_mini - 6.6$\n"
         f"        /o3_mini - 6.6$\n"
@@ -492,6 +496,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /gemini_2_0_flash_exp 🔥 - 0.9$\n"
         f"        /gemini_2_0_flash_lite_001 - 0.45$\n\n"
         f"<b>💡 Models Anthropic 1m tok:</b>\n"
+        f"        /claude_4_opus 🔥 - 108$\n"
+        f"        /claude_4_sonnet 🔥 - 21.6$\n"
         f"        /claude_3_7_sonnet 🔥 - 21.6$\n"
         f"        /claude_3_5_sonnet - 21.6$\n"
         f"        /claude_3_5_haiku - 5.76$\n"
@@ -506,8 +512,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /grok_2_vision_latest - 14.4$\n"
         f"        /grok_2_latest - 14.4$\n\n"
         f"<b>💡 Models DeepSeek 1m tok:</b>\n"
-        f"        /deepseek_reasoner R1 - 2.82$\n"
-        f"        /deepseek_chat - 1.45$\n\n\n"
+        f"        /deepseek_reasoner R1 - 3.288$\n"
+        f"        /deepseek_chat - 1.644$\n\n\n"
         f"<b>🎚 ADDITIONALLY:</b>\n"
         f"        Image gen. param. - /imgMenu\n"
         f"        Voice param. - /voiceMenu\n"
@@ -857,6 +863,23 @@ async def o3(message: types.Message):
         await main_menu(message, "main")
 
 
+
+
+
+@dp.message(Command('o3_pro'))
+async def o3_pro(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "o3-pro",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+
 @dp.message(Command('o4_mini'))
 async def o4_mini(message: types.Message):
     id = user_id(message)
@@ -1125,8 +1148,33 @@ async def deepseek_chat(message: types.Message):
 
 
 
-
 # Anthropic models:
+
+@dp.message(Command('claude_4_opus'))
+async def claude_4_opus(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-opus-4-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('claude_4_sonnet'))
+async def claude_4_sonnet(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-sonnet-4-latest",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
 @dp.message(Command('claude_3_5_sonnet'))
 async def claude_3_5_sonnet(message: types.Message):
     id = user_id(message)
