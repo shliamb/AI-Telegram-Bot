@@ -5,6 +5,8 @@ import logging
 logging.basicConfig(**LOG_CONFIG_DB)
 
 
+logging.info("INFO: create_tables.py is here")
+
 # Create TABLES:
 def create_tables_in_db():
 
@@ -143,12 +145,12 @@ def create_tables_in_db():
         # Saving changes:
         connection.commit()
         logging.info("Adding tables is done!")
-        print("Adding tables is done!")
+        #print("Adding tables is done!")
         return True
 
     except Exception as error:
         logging.error(f"Error Create Tables in DB: {error}")
-        print("Error Create Tables in DB:", error)
+        #print("Error Create Tables in DB:", error)
         return False
 
     finally:

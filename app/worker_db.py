@@ -3,7 +3,7 @@ from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, GIFT
 import logging
 logging.basicConfig(**LOG_CONFIG_DB)
 import asyncpg
-import asyncio
+#import asyncio
 
 
 
@@ -18,7 +18,7 @@ async def get_connection():
     return connection
 
 
-
+logging.info("INFO: worker_db.py is here")
 
 
 #### USERS TABLE: ####
@@ -62,7 +62,7 @@ async def add_user(user_data):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 # #Add user:
@@ -96,7 +96,7 @@ async def read_user(user_id):
     except Exception as e:
         logging.error(f"Error read_user: {e}")
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 # # # Read user:
@@ -145,7 +145,7 @@ async def update_user(user_data):
         logging.error(f"Error update_user: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -210,7 +210,7 @@ async def add_statistics(statistics_data):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 # # Add statistics:
@@ -248,7 +248,7 @@ async def read_statistics(user_id):
     except Exception as e:
         logging.error(f"Error read_statistics: {e}")
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 # # Read statistics by user_id:
@@ -260,6 +260,7 @@ async def read_statistics(user_id):
 
 # Clear statistics:
 async def clear_statistics():
+    connection = None
 
     date_now = None
     # date_now = функция получения даты + какое то условие, что бы давался лимит 3 месяца допустим
@@ -283,7 +284,7 @@ async def clear_statistics():
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -291,7 +292,7 @@ async def clear_statistics():
 # Fast delete Tab Statistic:
 async def fast_delete_statistics_tab():
 
-    connection = False
+    connection = None
 
     try:
         connection = await get_connection()
@@ -307,7 +308,7 @@ async def fast_delete_statistics_tab():
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -357,7 +358,7 @@ async def add_discussion(discussion_data):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -401,7 +402,7 @@ async def read_discussion(user_id):
         return False
 
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 # # Read discussion by user_id:
@@ -412,6 +413,7 @@ async def read_discussion(user_id):
 
 # Clear discussion by id:
 async def clear_discussion_by_id(user_id):
+    connection = None
 
     try:
         connection = await get_connection()
@@ -428,13 +430,14 @@ async def clear_discussion_by_id(user_id):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
 
 # Clear discussion:
 async def clear_discussion():
+    connection = None
 
     date_now = None
     # date_now = функция получения даты + ~ 2 дня, что бы дать время на использование..
@@ -458,7 +461,7 @@ async def clear_discussion():
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -491,7 +494,7 @@ async def read_all_methods_pay():
         logging.error(f"Error read_all_methods_pay: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 # data = asyncio.run(read_all_methods_pay())
@@ -531,7 +534,7 @@ async def read_one_methods_pay(title: str):
         logging.error(f"Error read_one_methods_pay: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -560,7 +563,7 @@ async def read_one_methods_pay_by_id(id: int):
         logging.error(f"Error read_one_methods_pay_by_id: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -585,7 +588,7 @@ async def read_one_methods_pay_by_use(place_of_use):
         logging.error(f"Error read_one_methods_pay_by_use: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -622,7 +625,7 @@ async def deleted_one_methods_pay(id):
         logging.error(f"Error deleted_one_methods_pay: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -658,7 +661,7 @@ async def add_methods_pay(pay_data):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -702,7 +705,7 @@ async def update_methods_pay(pay_data):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -817,7 +820,7 @@ async def read_all_payments():
         logging.error(f"Error read_all_payments: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -862,7 +865,7 @@ async def add_payments(payments):
         return False
     
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -882,7 +885,7 @@ async def deleted_all_payments():
         logging.error(f"Error deleted_all_payments: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -938,7 +941,7 @@ async def read_all_users():
     except Exception as e:
         logging.error(f"Error read_all_users: {e}")
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -977,7 +980,7 @@ async def json_old_users():
         logging.error(f"Error json_old_users: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 
@@ -1005,7 +1008,7 @@ async def drop_all_tables_and_reset_schema():
         logging.error(f"Error in drop_all_tables_and_reset_schema: {e}")
         return False
     finally:
-        if connection is not None:
+        if connection:
             await connection.close()
 
 

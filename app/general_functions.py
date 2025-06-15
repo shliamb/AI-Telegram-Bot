@@ -16,7 +16,7 @@ from io import BytesIO
 
 
 
-
+logging.info("INFO: General_function.py is here")
 
 
 # Encode the image base64:
@@ -38,7 +38,7 @@ def random_name_2X() -> str:
     return name
 
 # Combined escaping of special characters:
-def escape_special_chars(text):
+def escape_special_chars(text: str) -> str:
     if not text:
        print("Error: There is no content in the model's response.")
        return
@@ -57,17 +57,17 @@ async def day_utcnow(time_zone=None):
     a = a + timedelta(hours=time_zone)
     day_str = a.strftime("%Y-%m-%d %H:%M:%S")
     day = datetime.strptime(day_str, '%Y-%m-%d %H:%M:%S')
-    logging.info("info: Getting the day and time from the server")
+    #logging.info("info: Getting the day and time from the server")
     return day or None
 
 # UNFORMAT TIME:
-async def unformat_date(date):
+async def unformat_date(date) -> dict:
     day = str(date.strftime("%Y-%m-%d"))
     time = str(date.strftime("%H.%M"))
     return {"day": day, "time": time}
 
 # in BOOL out STR TEXT UPPER:
-def bool_to_str(bools, lang):
+def bool_to_str(bools: bool, lang: str) -> str:
     if bools == True:
         if lang == "ru":
             text = "Включено"
@@ -81,7 +81,7 @@ def bool_to_str(bools, lang):
     return text.upper()
 
 # Calculation of the cost of used tokens:
-async def calculation(data, input_data):
+async def calculation(data: dict, input_data: str) -> bool:
     one_price, use_model, data_stat = None, None, {}
     
     try:
@@ -119,9 +119,8 @@ async def calculation(data, input_data):
         data_stat["price"] = total_price
 
         # Save statistic data to DB:
-        confirm = await add_statistics(data_stat)
-        if not confirm:
-            print("Error: add_statistics")
+        if not await add_statistics(data_stat):
+            logging.error("Error: add_statistics")
 
         # Getting user data
         user_data = await read_user(data.get("user_id"))
@@ -129,17 +128,17 @@ async def calculation(data, input_data):
         data_money = {"money": new_money, "user_id": data.get("user_id"), "last_visit": await day_utcnow()}
 
         # The balance was changed taking into account the expense
-        confirm = await update_user(data_money)
-        if not confirm:
-            print("Error: update_user")
+        if not await update_user(data_money):
+            logging.error("Error: update_user")
+
         return True
     
     except Exception as error:
-        print("Error:", error)
+        logging.error("Error:", error)
         return False
 
 # Counts the number of tokens from the text:
-def tiktroken(user_content):
+def tiktroken(user_content) -> int:
     # Statistic *** Ебанный костыль, пока что не знаю как подругому сделать ****   Available encodings: ['gpt2', 'r50k_base', 'p50k_base', 'p50k_edit', 'cl100k_base', 'o200k_base']
     enc = tiktoken.get_encoding("gpt2")
     tokens = enc.encode(user_content)
@@ -147,7 +146,7 @@ def tiktroken(user_content):
     return used_tokens
 
 # Set right model OpenAI Dall-e:
-def set_model_dalle(data):
+def set_model_dalle(data: dict) -> str:
     quality = data.get("quality")
     size = data.get("size")
     model = data.get("model_draw")
@@ -186,7 +185,7 @@ def set_model_dalle(data):
         return model
 
 # Get activ use pay method:
-def get_use_met_all(n):
+def get_use_met_all(n) -> str:
     if n.get("use_sbp_transfer") is True:
         use = "use_sbp_transfer"
     elif n.get("use_mastercard") is True:

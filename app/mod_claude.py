@@ -1,10 +1,12 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, NULL_TOKEN
+from config import URL, NULL_TOKEN, LOG_CONFIG_AI
+import logging
+logging.basicConfig(**LOG_CONFIG_AI)
 import aiohttp
 import aiofiles
 import json
 
-
+logging.info("INFO: mod_claude.py is here")
 
 
 async def mod_claude_chat(data):
@@ -43,9 +45,11 @@ async def mod_claude_chat(data):
                         try:
                             return await response.json()
                         except aiohttp.ContentTypeError:
+                            logging.error("Error: claude respons is not json")
                             text_response = await response.text()
                             return {'response': text_response, "used_tokens": NULL_TOKEN}
                     elif response.status == 400 or response.status == 500:
+                        logging.error(f"Error: claude respons is code: {response.status}")
                         text_response = await response.text()
                         return {'response': text_response, "used_tokens": NULL_TOKEN}
                 
@@ -67,9 +71,11 @@ async def mod_claude_chat(data):
                     try:
                         return await response.json()
                     except aiohttp.ContentTypeError:
+                        logging.error("Error: claude respons is not json")
                         text_response = await response.text()
                         return {'response': text_response, "used_tokens": NULL_TOKEN}
                 elif response.status == 400 or response.status == 500:
+                    logging.error(f"Error: claude respons is code: {response.status}")
                     text_response = await response.text()
                     return {'response': text_response, "used_tokens": NULL_TOKEN}
 

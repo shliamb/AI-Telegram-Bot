@@ -1,8 +1,8 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS #, DEFAULT_MODEL_ASSIST_OA
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER #, DEFAULT_MODEL_ASSIST_OA
 
 import logging
-logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
+# logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 logging.basicConfig(**LOG_CONFIG_BOT)
 import re
 import random
@@ -56,7 +56,7 @@ from get_json_old_users import get_json_old_users_to_db
 bot = Bot(TELEGRAM_BOT_TOKEN, parse_mode="markdown") # Initialize Bot instance with a default parse mode which will be passed to all API calls
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
 
-
+logging.info("INFO: bot.py is here")
 
 
 #########
@@ -2515,30 +2515,43 @@ async def confirm_send_news(message: types.Message, state: FSMContext):
 
 
 
-# ADMIN: Get Info a Payments:
-@dp.message(Command('logs'))
+
+
+# Admin submenu download log
+@dp.message(Command("logs"))
 async def get_logs_bot(message: types.Message):
+    await typing(message)
     id = user_id(message)
 
     if id != ADMIN_ID:
         logging.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
-    if os.path.exists("./log/bot.log") and os.path.getsize("./log/bot.log") > 0:
-        await bot.send_document(message.chat.id, document=types.input_file.FSInputFile("./log/bot.log"))
-    else:
-        await bot.send_message(message.chat.id, "The bot.log file is empty or missing.")
+    data_folder = Path(LOGS_FOLDER)
+    empts = True
+    for entry in data_folder.iterdir():
+        if entry.is_file() and entry.stat().st_size > 0:  # Проверяем, что файл не пустой
+            file_path = str(entry.absolute())  # Получаем абсолютный путь
+            try:
+                await bot.send_document(
+                    chat_id=message.from_user.id,
+                    document=types.input_file.FSInputFile(file_path)
+                )
+                empts = False
+                await asyncio.sleep(0.5)
+            except Exception as e:
+                logging.error(f"Error sending file log: {file_path}: {e}")
+    if empts:
+        await bot.send_message(message.chat.id, "There are no logging files or they are empty")
 
-    # if os.path.exists("./log/api.log") and os.path.getsize("./log/api.log") > 0:
-    #     await bot.send_document(message.chat.id, document=types.input_file.FSInputFile("./log/api.log"))
-    # else:
-    #     await bot.send_message(message.chat.id, "The api.log file is empty or missing.")
 
 
 
-# Admin clear logs /clearlog
+
+# Admin clear logs /dLogs
 @dp.message(Command("dLogs"))
 async def admin_clear_logs(message: types.Message):
+    await typing(message)
     id = user_id(message)
 
     if id != ADMIN_ID:
@@ -2546,22 +2559,17 @@ async def admin_clear_logs(message: types.Message):
         return
 
 
-    if os.path.exists("./log/bot.log") and os.path.getsize("./log/bot.log") > 0:
-
-        with open("./log/bot.log", 'w'):
-            pass
-        await bot.send_message(message.chat.id, "The bot.log file has been cleared successfully.")
-    else:
-        await bot.send_message(message.chat.id, "The bot.log file is empty or missing.")
-
-    # if os.path.exists("./log/api.log") and os.path.getsize("./log/api.log") > 0:
-
-    #     with open("./log/api.log", 'w'):
-    #         pass
-    #     await bot.send_message(message.chat.id, "The api.log file has been cleared successfully.")
-    # else:
-    #     await bot.send_message(message.chat.id, "The api.log file is empty or missing.")
-
+    data_folder = Path(LOGS_FOLDER)
+    for entry in data_folder.iterdir():
+        if entry.is_file() and entry.stat().st_size > 0:  # Проверяем, что файл не пустой
+            file_path = str(entry.absolute())  # Получаем абсолютный путь
+            try:
+                with open(file_path, 'w'):
+                    pass
+                await bot.send_message(message.chat.id, f"The '{file_path}' file has been clearing.")
+                await asyncio.sleep(0.5)
+            except Exception as e:
+                logging.error(f"Error clearing file log: {file_path}: {e}")
 
 
 
@@ -4175,5 +4183,5 @@ if __name__ == "__main__":
     try:
         asyncio.run(main_bot())
     except Exception as e:
-        logging.error(f"An error occurred: {e}.")
+        logging.error(f"Error: An error occurred: {e}.")
         print(f"An error occurred: {e}.")

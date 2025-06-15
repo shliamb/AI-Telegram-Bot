@@ -8,11 +8,18 @@ HOST = "app_postgres"  # app_postgres or localhost
 LOG_CONFIG_DB = {
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s',
     'level': logging.INFO,
-    'filename': './log/db.log'
+    'filename': './log/db.log',
+    'filemode': 'a'
 }
 LOG_CONFIG_BOT = {
     'level': logging.INFO, 
     'filename': './log/bot.log', 
+    'filemode': 'a', 
+    'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
+}
+LOG_CONFIG_AI = {
+    'level': logging.INFO, 
+    'filename': './log/ai.log', 
     'filemode': 'a', 
     'format': '%(levelname)s - %(asctime)s - %(name)s - %(message)s'
 }
@@ -68,6 +75,7 @@ UPLOADS_FOLDER = "./uploads/"
 AUDIO_FOLDER = "./audio/"
 VOICE_FOLDER = "./voice/"
 PATH_JSON_USERS = "./json/"
+LOGS_FOLDER = "./log/"
 
 # Delete files:
 DEL_DOWNLOADS = True
