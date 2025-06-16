@@ -1,13 +1,14 @@
 # System:
 from worker_db import json_old_users
-from config import PATH_JSON_USERS, LOG_CONFIG_DB, setup_logger
+from config import PATH_JSON_USERS
 # Base:
 #import asyncio
 import os
 import json
 import uuid
 from datetime import datetime
-logger_db = setup_logger('db', LOG_CONFIG_DB)
+from setup_config_logger import setup_logger
+logger_db = setup_logger('db', '/log/db.log')
 
 
 

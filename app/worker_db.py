@@ -1,6 +1,7 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, LOG_CONFIG_DB, GIFT, setup_logger
-logger_db = setup_logger('db', LOG_CONFIG_DB)
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, GIFT
+from setup_config_logger import setup_logger
+logger_db = setup_logger('db', '/log/db.log')
 import asyncpg
 #import asyncio
 
@@ -17,7 +18,7 @@ async def get_connection():
     return connection
 
 
-logger_db.info("INFO: Hi i am here, db!")
+
 
 
 #### USERS TABLE: ####

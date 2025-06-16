@@ -1,6 +1,7 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import BACKUP_PATH, TIME_CORRECTION, LOG_CONFIG_DB, HOST, setup_logger
-logger_db = setup_logger('db', LOG_CONFIG_DB)
+from config import BACKUP_PATH, TIME_CORRECTION, HOST
+from setup_config_logger import setup_logger
+logger_db = setup_logger('db', '/log/db.log')
 from general_functions import day_utcnow, unformat_date
 import subprocess
 #import asyncio

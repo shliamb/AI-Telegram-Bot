@@ -1,7 +1,8 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, LOG_CONFIG_BOT, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER, setup_logger #, DEFAULT_MODEL_ASSIST_OA
+from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER #, DEFAULT_MODEL_ASSIST_OA
 # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
-logger_bot = setup_logger('bot', LOG_CONFIG_BOT)
+from setup_config_logger import setup_logger
+logger_bot = setup_logger('bot', '/log/bot.log')
 import re
 import random
 import os
@@ -27,9 +28,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 # from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 # Service
-# from worker_db import get_user_by_id, get_user_by_username, update_user, adding_user, get_all_data_user_by_username, get_last_statistics
-# from general_functions import day_utcnow, unformat_date
-
 from mod_claude import mod_claude_chat
 from mod_gemini import mod_gemini_chat
 from mod_openai import mod_openai_chat
@@ -56,8 +54,6 @@ dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher
 
 
 
-
-logger_bot.info("INFO: Hi i am here, bot!")
 
 
 

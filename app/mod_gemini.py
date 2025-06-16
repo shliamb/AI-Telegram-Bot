@@ -1,9 +1,10 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, NULL_TOKEN, LOG_CONFIG_AI, setup_logger
+from config import URL, NULL_TOKEN
 import aiohttp
 import aiofiles
 import json
-logger_ai = setup_logger('ai', LOG_CONFIG_AI)
+from setup_config_logger import setup_logger
+logger_ai = setup_logger('ai', '/log/ai.log')
 
 
 

@@ -1,7 +1,8 @@
 from get_keys import KEY_API_DEEPSEEK
-from config import NULL_TOKEN, LOG_CONFIG_AI, setup_logger
+from config import NULL_TOKEN
 from general_functions import encode_file
-logger_ai = setup_logger('ai', LOG_CONFIG_AI)
+from setup_config_logger import setup_logger
+logger_ai = setup_logger('ai', '/log/ai.log')
 from openai import AsyncOpenAI, RateLimitError, OpenAIError
 
 

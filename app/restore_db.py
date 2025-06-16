@@ -1,6 +1,7 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import LOG_CONFIG_DB, HOST, setup_logger
-logger_db = setup_logger('db', LOG_CONFIG_DB)
+from config import HOST
+from setup_config_logger import setup_logger
+logger_db = setup_logger('db', '/log/db.log')
 # from general_functions import day_utcnow, unformat_date
 import subprocess
 import os

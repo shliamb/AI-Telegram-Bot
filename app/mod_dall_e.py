@@ -1,8 +1,8 @@
 from config import URL, NULL_TOKEN
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import LOG_CONFIG_AI, setup_logger
 import aiohttp
-logger_ai = setup_logger('ai', LOG_CONFIG_AI)
+from setup_config_logger import setup_logger
+logger_ai = setup_logger('ai', '/log/ai.log')
 
 
 async def mod_openai_dall_e(data: dict) -> str:

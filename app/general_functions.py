@@ -1,6 +1,7 @@
 from worker_db import add_statistics, read_user, update_user
-from config import PRICE, LOG_CONFIG_BOT, TIME_CORRECTION, setup_logger
-logger_bot = setup_logger('bot', LOG_CONFIG_BOT)
+from config import PRICE, TIME_CORRECTION
+from setup_config_logger import setup_logger
+logger_bot = setup_logger('bot', '/log/bot.log')
 from datetime import datetime, timezone, timedelta
 import random
 import string

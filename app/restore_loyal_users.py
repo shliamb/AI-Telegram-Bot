@@ -1,7 +1,7 @@
 # Base:
 # import asyncio
-from config import LOG_CONFIG_BOT, LOG_CONFIG_DB, setup_logger
-logger_db = setup_logger('db', LOG_CONFIG_DB)
+from setup_config_logger import setup_logger
+logger_db = setup_logger('db', '/log/db.log')
 import json
 #import uuid
 from datetime import datetime

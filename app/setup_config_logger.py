@@ -1,0 +1,272 @@
+import logging
+#import os
+from pathlib import Path
+from typing import Optional, Dict
+from logging.handlers import RotatingFileHandler
+import threading
+
+# Глобальная блокировка для thread-safety
+_logger_lock = threading.Lock()
+_configured_loggers: Dict[str, logging.Logger] = {}
+_uvicorn_disabled = False
+
+def setup_logger(
+    name: str, 
+    log_file: str, 
+    level: int = logging.INFO,
+    format_string: str = '%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+    max_bytes: int = 10 * 1024 * 1024,  # 10MB
+    backup_count: int = 5,
+    encoding: str = 'utf-8',
+    disable_uvicorn: bool = True
+) -> logging.Logger:
+    """
+    Настройка логгера с ротацией файлов и защитой от дублирования.
+    Thread-safe реализация.
+    
+    Args:
+        name: Имя логгера
+        log_file: Путь к файлу лога  
+        level: Уровень логирования
+        format_string: Формат сообщений
+        max_bytes: Максимальный размер файла лога
+        backup_count: Количество backup файлов
+        encoding: Кодировка файла
+        disable_uvicorn: Отключить uvicorn логи
+        
+    Returns:
+        Настроенный логгер
+        
+    Raises:
+        OSError: Если не удается создать директорию или файл
+    """
+    with _logger_lock:
+        # Проверяем cache
+        cache_key = f"{name}:{log_file}"
+        if cache_key in _configured_loggers:
+            return _configured_loggers[cache_key]
+        
+        logger = logging.getLogger(name)
+        
+        # Сбрасываем существующие хендлеры
+        logger.handlers.clear()
+        logger.setLevel(level)
+        logger.propagate = False
+        
+        # Отключаем uvicorn один раз глобально
+        global _uvicorn_disabled
+        if disable_uvicorn and not _uvicorn_disabled:
+            _disable_uvicorn_logs()
+            _uvicorn_disabled = True
+        
+        try:
+            # Создаем директорию
+            log_path = Path(log_file)
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Проверяем права на запись
+            if not _check_write_permissions(log_path.parent):
+                raise OSError(f"Нет прав на запись в директорию: {log_path.parent}")
+            
+            # Создаем хендлер с ротацией
+            file_handler = RotatingFileHandler(
+                filename=str(log_path),
+                maxBytes=max_bytes,
+                backupCount=backup_count,
+                encoding=encoding,
+                delay=True  # Создаем файл только при первой записи
+            )
+            
+            # Настраиваем форматтер
+            formatter = logging.Formatter(
+                fmt=format_string,
+                datefmt='%Y-%m-%d %H:%M:%S'
+            )
+            file_handler.setFormatter(formatter)
+            
+            # Добавляем хендлер
+            logger.addHandler(file_handler)
+            
+            # Сохраняем в cache
+            _configured_loggers[cache_key] = logger
+            
+            # Логируем успешную инициализацию
+            logger.info(f"Logger '{name}' initialized. Log file: {log_file}")
+            
+            return logger
+            
+        except Exception as e:
+            # В случае ошибки создаем консольный логгер
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(logging.Formatter(format_string))
+            logger.addHandler(console_handler)
+            logger.error(f"Failed to setup file logging for '{name}': {e}")
+            return logger
+
+def _disable_uvicorn_logs():
+    """Отключает стандартные uvicorn логи"""
+    uvicorn_loggers = ["uvicorn", "uvicorn.access", "uvicorn.error"]
+    for logger_name in uvicorn_loggers:
+        uvicorn_logger = logging.getLogger(logger_name)
+        uvicorn_logger.handlers.clear()
+        uvicorn_logger.propagate = False
+
+def _check_write_permissions(directory: Path) -> bool:
+    """Проверяет права на запись в директорию"""
+    try:
+        test_file = directory / ".write_test"
+        test_file.touch()
+        test_file.unlink()
+        return True
+    except (OSError, PermissionError):
+        return False
+
+def get_logger(name: str) -> Optional[logging.Logger]:
+    """Получить уже настроенный логгер по имени"""
+    with _logger_lock:
+        for key, logger in _configured_loggers.items():
+            if key.startswith(f"{name}:"):
+                return logger
+    return None
+
+def list_configured_loggers() -> Dict[str, str]:
+    """Возвращает список всех настроенных логгеров"""
+    with _logger_lock:
+        return {
+            logger_name.split(':')[0]: logger_name.split(':')[1] 
+            for logger_name in _configured_loggers.keys()
+        }
+
+def cleanup_loggers():
+    """Очищает все настроенные логгеры"""
+    with _logger_lock:
+        for logger in _configured_loggers.values():
+            for handler in logger.handlers:
+                handler.close()
+            logger.handlers.clear()
+        _configured_loggers.clear()
+        global _uvicorn_disabled
+        _uvicorn_disabled = False
+
+# Контекстный менеджер для временного логгера
+class TemporaryLogger:
+    def __init__(self, name: str, log_file: str, **kwargs):
+        self.name = name
+        self.log_file = log_file
+        self.kwargs = kwargs
+        self.logger = None
+    
+    def __enter__(self):
+        self.logger = setup_logger(self.name, self.log_file, **self.kwargs)
+        return self.logger
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.logger:
+            for handler in self.logger.handlers:
+                handler.close()
+            self.logger.handlers.clear()
+
+
+
+
+
+
+
+'''
+
+Основные улучшения:
+
+1. **Thread-safety** - добавил блокировки
+2. **Кэширование** - избегаем пересоздания логгеров
+3. **Проверка прав** - проверяем возможность записи
+4. **Обработка ошибок** - fallback на консольный вывод
+5. **Управление ресурсами** - правильное закрытие хендлеров  
+6. **Дополнительные утилиты** - получение логгеров, очистка
+7. **Контекстный менеджер** - для временных логгеров
+8. **Лучшее форматирование** - добавил datefmt
+
+'''
+
+
+# # Использование:
+
+# # Основное использование
+# logger = setup_logger('api', '/log/api.log')
+# logger.info("Test message")
+
+# # Временный логгер
+# with TemporaryLogger('temp', '/log/temp.log') as temp_logger:
+#     temp_logger.info("Temporary log")
+
+# # Получить существующий логгер
+# existing = get_logger('api')
+
+# # Список всех логгеров
+# loggers = list_configured_loggers()
+
+
+
+
+
+#### LOGGING ####
+# - `./log/api.log` - логи из FastAPI
+# - `./log/uvicorn.log` - логи uvicorn (запросы HTTP)
+
+
+
+# import logging
+# import os
+# from pathlib import Path
+# from typing import Optional
+
+# def setup_logger(
+#     name: str, 
+#     log_file: str, 
+#     level: int = logging.INFO,
+#     format_string: str = '%(asctime)s %(name)s %(levelname)s: %(message)s',
+#     max_bytes: int = 10 * 1024 * 1024,  # 10MB
+#     backup_count: int = 5
+# ) -> logging.Logger:
+#     """
+#     Настройка логгера с ротацией файлов и защитой от дублирования.
+    
+#     Args:
+#         name: Имя логгера
+#         log_file: Путь к файлу лога
+#         level: Уровень логирования
+#         format_string: Формат сообщений
+#         max_bytes: Максимальный размер файла лога
+#         backup_count: Количество backup файлов
+#     """
+#     logger = logging.getLogger(name)
+    
+#     # Если логгер уже настроен - возвращаем его
+#     if logger.handlers:
+#         return logger
+    
+#     logger.setLevel(level)
+#     logger.propagate = False
+    
+#     # Отключаем uvicorn логи только при первом вызове
+#     if not hasattr(setup_logger, '_uvicorn_disabled'):
+#         logging.getLogger("uvicorn.access").handlers = []
+#         logging.getLogger("uvicorn").handlers = []
+#         setup_logger._uvicorn_disabled = True
+    
+#     # Создаем директорию
+#     Path(log_file).parent.mkdir(parents=True, exist_ok=True)
+    
+#     # Файловый хендлер с ротацией
+#     from logging.handlers import RotatingFileHandler
+#     file_handler = RotatingFileHandler(
+#         log_file, 
+#         maxBytes=max_bytes, 
+#         backupCount=backup_count,
+#         encoding='utf-8'
+#     )
+    
+#     formatter = logging.Formatter(format_string)
+#     file_handler.setFormatter(formatter)
+#     logger.addHandler(file_handler)
+    
+#     return logger
