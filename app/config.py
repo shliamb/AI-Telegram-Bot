@@ -4,17 +4,17 @@ import logging
 def setup_logger(name, log_config):
     logger = logging.getLogger(name)
     logger.setLevel(log_config['level'])
-    
-    # Удаляем все существующие handlers
     logger.handlers = []
+    logger.propagate = False  # Важно!
     
     formatter = logging.Formatter(log_config['format'])
-    
     file_handler = logging.FileHandler(log_config['filename'], mode=log_config['filemode'])
     file_handler.setFormatter(formatter)
-    
     logger.addHandler(file_handler)
+    
     return logger
+
+
 
 
 LOG_CONFIG_DB = {
