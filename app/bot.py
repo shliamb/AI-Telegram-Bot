@@ -55,6 +55,12 @@ bot = Bot(TELEGRAM_BOT_TOKEN, parse_mode="markdown") # Initialize Bot instance w
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
 
 
+
+
+logger_bot.info("INFO: Hi i am here, bot!")
+
+
+
 #########
 # Get User_ID
 def user_id(action) -> int:

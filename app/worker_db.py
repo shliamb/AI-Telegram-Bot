@@ -17,7 +17,7 @@ async def get_connection():
     return connection
 
 
-
+logger_db.info("INFO: Hi i am here, db!")
 
 
 #### USERS TABLE: ####

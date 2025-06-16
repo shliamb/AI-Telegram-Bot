@@ -7,6 +7,9 @@ logger_ai = setup_logger('ai', LOG_CONFIG_AI)
 
 
 
+
+logger_ai.info("INFO: Hi i am here, ai!")
+
 async def mod_openai_chat(data):
 
     # Get data:
