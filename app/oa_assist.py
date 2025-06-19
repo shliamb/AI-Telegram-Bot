@@ -1,7 +1,7 @@
 # Base:
 # import aiohttp
 # from setup_config_logger import setup_logger
-# logger_ai = setup_logger('ai', '/log/ai.log')
+# logger_ai = setup_logger('ai', f'{PATH_LOGS}ai.log')
 # import json
 # from typing import Dict, Optional, Any, List
 # import asyncio

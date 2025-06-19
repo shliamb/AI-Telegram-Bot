@@ -1,8 +1,9 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOADS_FOLDER, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_PATH, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, LOGS_FOLDER #, DEFAULT_MODEL_ASSIST_OA
+from config import DOWNLOAD, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_DB, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, PATH_LOGS
+ #, DEFAULT_MODEL_ASSIST_OA
 # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 from setup_config_logger import setup_logger
-logger_bot = setup_logger('bot', '/log/bot.log')
+logger_bot = setup_logger('bot', f'{PATH_LOGS}bot.log')
 import re
 import random
 import os
@@ -2590,7 +2591,7 @@ async def get_logs_bot(message: types.Message):
         logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
         return
 
-    data_folder = Path(LOGS_FOLDER)
+    data_folder = Path(PATH_LOGS)
     empts = True
     for entry in data_folder.iterdir():
         if entry.is_file() and entry.stat().st_size > 0:  # Проверяем, что файл не пустой
@@ -2622,7 +2623,7 @@ async def admin_clear_logs(message: types.Message):
         return
 
 
-    data_folder = Path(LOGS_FOLDER)
+    data_folder = Path(PATH_LOGS)
     for entry in data_folder.iterdir():
         if entry.is_file() and entry.stat().st_size > 0:  # Проверяем, что файл не пустой
             file_path = str(entry.absolute())  # Получаем абсолютный путь
@@ -2984,7 +2985,7 @@ async def backup(message: types.Message):
         await message.reply("Error: Database backup error.", parse_mode="HTML")
 
     await asyncio.sleep(0.5)
-    data_folder = Path(BACKUP_PATH)
+    data_folder = Path(BACKUP_DB)
     files = [entry for entry in data_folder.iterdir() if entry.is_file()] # Получаем список всех файлов в директории
     sorted_files = sorted(files, key=lambda x: x.stat().st_mtime, reverse=True) # Сортируем список файлов по дате изменения (от новых к старым)
     for file_to_delete in sorted_files[3:]: # Оставляем последние 3 файла, удаляем остальные
@@ -3038,7 +3039,7 @@ async def load_a_base(message: Message, state: FSMContext):
 
     # Name file
     formtime = random_name_2X()
-    file_path = f"{BACKUP_PATH}Uploaded-db-{formtime}.sql"
+    file_path = f"{BACKUP_DB}Uploaded-db-{formtime}.sql"
     await bot.download(message.document, file_path)
     await bot.session.close()
     await dp.storage.close()
@@ -3391,7 +3392,7 @@ async def mod_photo(data, message, state: FSMContext):
     file_id = photo.file_id
     little = random_name_2X()
     photo_file_name = f"photo-{little}-{message.photo[-1].file_id}.jpg"
-    file_path = f'{DOWNLOADS_FOLDER}{photo_file_name}'
+    file_path = f'{DOWNLOAD}{photo_file_name}'
     try:
         file = await bot.get_file(file_id)
         await bot.download_file(file.file_path, file_path)
@@ -3474,7 +3475,7 @@ async def mod_documents(data, message, state: FSMContext):
     #### IMAGE ####
     if extension.lower() == "jpg" or extension.lower() == "png":
 
-        file_path = f'{DOWNLOADS_FOLDER}{name_file}'
+        file_path = f'{DOWNLOAD}{name_file}'
 
         try:
             file = await bot.get_file(file_id)

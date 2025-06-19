@@ -1,7 +1,7 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, GIFT
+from config import HISTORY_LINE_LIMIT, LIMIT_STAT, HOST, GIFT, PATH_LOGS
 from setup_config_logger import setup_logger
-logger_db = setup_logger('db', '/log/db.log')
+logger_db = setup_logger('db', f'{PATH_LOGS}db.log')
 import asyncpg
 #import asyncio
 

@@ -1,23 +1,33 @@
-#### BASIC CONFIG ####
+#### BASIC CONFIG (set it up manually): ####
+HOST = "localhost" # app_postgres localhost
+DOCKER = False # True or False
+TIME_CORRECTION = + 3
+URL = "http://167.99.210.245:8000"
+########
+
+# Folders:
+PATH_LOGS = "/log/" if DOCKER else "./log/"
+PATH_CAPTCHA_1 = "/img_captcha_1/" if DOCKER else "./img_captcha_1/"
+DOWNLOAD = "/downloads/" if DOCKER else "./downloads/"
+BACKUP_DB = "/backup_db/" if DOCKER else "./backup_db/"
+PATH_JSON_USERS = "/json/" if DOCKER else "./json/"
+UPLOADS_FOLDER = "/uploads/" if DOCKER else "./uploads/"
+AUDIO_FOLDER = "/audio/" if DOCKER else "./audio/"
+VOICE_FOLDER = "/voice/" if DOCKER else "./voice/"
 
 # System:
 NAME_BOT = "Main AI: [ ChatGPT, Gemini, Claude, DeepSeek ]"
-HOST = "app_postgres"  # app_postgres or localhost
-URL = "http://167.99.210.245:8000"
-TIME_CORRECTION = +3 # Moscow
 MIN_PAY = 1 # $ Minimum pay
 RUBTOUSD = 100 # The internal exchange rate
 LIMIT_STAT = 500 # CSV file last 500
 GIFT = 0.1 # $ The amount on the account at the beginning
-VOICE_THE_ANSWER = True # False or True
+VOICE_THE_ANSWER = False # False or True
 HISTORY_LINE_LIMIT = 15 # The number of rows in the history table that will be used   ----- 10 25 30 50 !!! Сделать в настройках изменяемые..
 MAX_SIMBOLS = 500 # Maximum number of characters of text to compress  
 DIALOG = True # History dialog
 DIALOG_SUM = False # AI compress history dialog
 LANGUAGE = "en"
 NOTIFICATIONS = True
-DIALOG_SUM = False
-BACKUP_PATH = "./backup_db/"
 MAX_LEN = 4000 #4096
 
 # Language models:
@@ -49,13 +59,6 @@ IMG_STYLE = "vivid" # vivid ore natural
 # Gen Video models:
 AI_GEN_VIDEO = None
 
-# Folders:
-DOWNLOADS_FOLDER = "./downloads/"
-UPLOADS_FOLDER = "./uploads/"
-AUDIO_FOLDER = "./audio/"
-VOICE_FOLDER = "./voice/"
-PATH_JSON_USERS = "./json/"
-LOGS_FOLDER = "./log/"
 
 # Delete files:
 DEL_DOWNLOADS = True

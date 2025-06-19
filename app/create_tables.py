@@ -1,8 +1,8 @@
 from get_keys import USER_DB, PASSWORD_DB, DB_NAME
-from config import HOST
+from config import HOST, PATH_LOGS
 import psycopg2
 from setup_config_logger import setup_logger
-logger_db = setup_logger('db', '/log/db.log')
+logger_db = setup_logger('db', f'{PATH_LOGS}db.log')
 
 
 

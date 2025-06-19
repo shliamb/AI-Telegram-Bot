@@ -1,10 +1,10 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, AUDIO_FOLDER
+from config import URL, AUDIO_FOLDER, PATH_LOGS
 from general_functions import random_name_2X #, encode_file
 import aiohttp
 import aiofiles
 from setup_config_logger import setup_logger
-logger_ai = setup_logger('ai', '/log/ai.log')
+logger_ai = setup_logger('ai', f'{PATH_LOGS}ai.log')
 import base64
 
 

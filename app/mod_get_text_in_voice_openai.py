@@ -1,9 +1,9 @@
 from get_keys import ACCESS_ID, KEY_API_AI, VALUE_KEY_API_AI
-from config import URL, AI_DEFAULT_MODEL_VOICE_TO_TEXT, NULL_TOKEN
+from config import URL, AI_DEFAULT_MODEL_VOICE_TO_TEXT, NULL_TOKEN, PATH_LOGS
 import aiohttp
 import aiofiles
 from setup_config_logger import setup_logger
-logger_ai = setup_logger('ai', '/log/ai.log')
+logger_ai = setup_logger('ai', f'{PATH_LOGS}ai.log')
 
 
 
