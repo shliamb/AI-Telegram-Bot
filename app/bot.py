@@ -428,9 +428,10 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /gpt_4o_mini - 1.8$\n\n"
         f"<b>💡 Модели Google 1м ток:</b>\n"
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash 🔥 - 0.9$\n"
-        f"        /gemini_2_0_flash_exp 🔥 - 0.9$\n"
-        f"        /gemini_2_0_flash_lite_001 - 0.45$\n\n"
+        f"        /gemini_2_5_flash 🔥 - 3.36$\n"
+        f"        /gemini_2_5_flash_lite - 0.6$\n"
+        f"        /gemini_2_0_flash 🔥 - 0.6$\n"
+        f"        /gemini_2_0_flash_lite - 0.45$\n\n"
         f"<b>💡 Модели Anthropic 1м ток:</b>\n"
         f"        /claude_4_opus 🔥 - 108$\n"
         f"        /claude_4_sonnet 🔥 - 21.6$\n"
@@ -495,9 +496,10 @@ async def main_menu(message: types.Message, submenu="main"):
         f"        /gpt_4o_mini - 1.8$\n\n"
         f"<b>💡 Models Google 1m tok:</b>\n"
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash 🔥 - 0.9$\n"
-        f"        /gemini_2_0_flash_exp 🔥 - 0.9$\n"
-        f"        /gemini_2_0_flash_lite_001 - 0.45$\n\n"
+        f"        /gemini_2_5_flash 🔥 - 3.36$\n"
+        f"        /gemini_2_5_flash_lite - 0.6$\n"
+        f"        /gemini_2_0_flash 🔥 - 0.6$\n"
+        f"        /gemini_2_0_flash_lite - 0.45$\n\n"
         f"<b>💡 Models Anthropic 1m tok:</b>\n"
         f"        /claude_4_opus 🔥 - 108$\n"
         f"        /claude_4_sonnet 🔥 - 21.6$\n"
@@ -948,13 +950,13 @@ async def gemini_1_5_flash_8b(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
-@dp.message(Command('gemini_2_0_flash_exp'))
+@dp.message(Command('gemini_2_0_flash'))
 async def gemini_2_0_flash_exp(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
         "ai": "gemini",
-        "model_language": "gemini-2.0-flash-exp",
+        "model_language": "gemini-2.0-flash",
     }
     confirm = await update_user(data)
     if confirm:
@@ -967,7 +969,7 @@ async def gemini_2_5_pro_preview_03_25(message: types.Message):
     data = {
         "user_id": id,
         "ai": "gemini",
-        "model_language": "gemini-2.5-pro-preview-05-06",
+        "model_language": "gemini-2.5-pro" #gemini-2.5-pro-preview-05-06",
     }
     confirm = await update_user(data)
     if confirm:
@@ -980,20 +982,33 @@ async def gemini_2_5_flash(message: types.Message):
     data = {
         "user_id": id,
         "ai": "gemini",
-        "model_language": "gemini-2.5-flash-preview-04-17",
+        "model_language": "gemini-2.5-flash",
     }
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "main")
 
 
-@dp.message(Command('gemini_2_0_flash_lite_001'))
+@dp.message(Command('gemini_2_5_flash_lite'))
+async def gemini_2_5_flash_lite(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-2.5-flash-lite-preview-06-17",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gemini_2_0_flash_lite'))
 async def gemini_2_0_flash_lite_001(message: types.Message):
     id = user_id(message)
     data = {
         "user_id": id,
         "ai": "gemini",
-        "model_language": "gemini-2.0-flash-lite-001",
+        "model_language": "gemini-2.0-flash-lite",
     }
     confirm = await update_user(data)
     if confirm:

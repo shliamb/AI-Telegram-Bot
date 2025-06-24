@@ -73,8 +73,8 @@ def setup_logger(
                 filename=str(log_path),
                 maxBytes=max_bytes,
                 backupCount=backup_count,
-                encoding=encoding,
-                delay=True  # Создаем файл только при первой записи
+                encoding='utf-8-sig',  # Добавляет BOM для лучшего распознавания кирилицф на айфоне, посмотрим
+                delay=True
             )
             
             # Настраиваем форматтер

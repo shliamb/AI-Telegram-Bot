@@ -1,6 +1,6 @@
 #### BASIC CONFIG (set it up manually): ####
-HOST = "localhost" # app_postgres localhost
-DOCKER = False # True or False
+HOST = "app_postgres" # app_postgres localhost
+DOCKER = True # True or False
 TIME_CORRECTION = + 3
 URL = "http://167.99.210.245:8000"
 ########
@@ -126,10 +126,13 @@ PRICE = {
     'gpt-4-turbo-2024-04-09': 48,
 
     # Google Gemini to 1M tokens:
-    'gemini-2.5-pro-preview-05-06': 13.5, # Maximum input tokens 1,048,576
-    'gemini-2.5-flash-preview-04-17': 0.9, # $3.50  - Text output (thinking- response and reasoning)
-    'gemini-2.0-flash-exp': 0.9, # 15,
-    'gemini-2.0-flash-lite-001': 0.45,
+    'gemini-2.5-pro': 13.5, # Maximum input tokens 1,048,576
+    'gemini-2.5-flash': 3.36, # $3.50  - Text output (thinking- response and reasoning) 3.36
+    'gemini-2.5-flash-lite-preview-06-17': 0.6,
+    'gemini-2.0-flash': 0.6, # 15,
+    'gemini-2.0-flash-lite': 0.45,
+
+
     'gemini-1.5-pro-latest': 3.75, # 15, 
     'gemini-1.5-flash-latest': 0.225, # 0.8,
     'gemini-1.5-flash-8b': 0.5,
