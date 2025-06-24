@@ -10,7 +10,7 @@ import os
 import asyncio
 #import json
 #import requests
-from io import StringIO #, BytesIO
+from io import StringIO, BytesIO
 #import uuid
 from pathlib import Path # Работа с файловыми путями 
 # from datetime import datetime, timezone, timedelta
@@ -2597,32 +2597,72 @@ async def confirm_send_news(message: types.Message, state: FSMContext):
 
 
 # Admin submenu download log
+# @dp.message(Command("logs"))
+# async def get_logs_bot(message: types.Message):
+#     await typing(message)
+#     id = user_id(message)
+
+#     if id != ADMIN_ID:
+#         logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+#         return
+
+#     data_folder = Path(PATH_LOGS)
+#     empts = True
+#     for entry in data_folder.iterdir():
+#         if entry.is_file() and entry.stat().st_size > 0:  # Проверяем, что файл не пустой
+#             file_path = str(entry.absolute())  # Получаем абсолютный путь
+#             try:
+#                 await bot.send_document(
+#                     chat_id=message.from_user.id,
+#                     document=types.input_file.FSInputFile(file_path)
+#                 )
+#                 empts = False
+#                 await asyncio.sleep(0.5)
+#             except Exception as e:
+#                 logger_bot.error(f"Error sending file log: {file_path}: {e}")
+#     if empts:
+#         await bot.send_message(message.chat.id, "There are no logging files or they are empty")
+
+
 @dp.message(Command("logs"))
 async def get_logs_bot(message: types.Message):
     await typing(message)
-    id = user_id(message)
-
-    if id != ADMIN_ID:
-        logger_bot.error(f"This {id} shit made an attempt to enter to Admin Panel.")
+    if user_id(message) != ADMIN_ID:
+        logger_bot.error(f"{user_id(message)} tried to enter Admin Panel")
         return
 
-    data_folder = Path(PATH_LOGS)
-    empts = True
-    for entry in data_folder.iterdir():
-        if entry.is_file() and entry.stat().st_size > 0:  # Проверяем, что файл не пустой
-            file_path = str(entry.absolute())  # Получаем абсолютный путь
+    log_dir = Path(PATH_LOGS)
+    sent_any = False
+
+    async def send_as_utf8(path: Path):
+        # читаем файл
+        raw = path.read_bytes()
+        try:
+            text = raw.decode('utf-8')
+        except UnicodeDecodeError:
+            text = raw.decode('cp1251', errors='replace')
+
+        # кладём в буфер
+        buf = BytesIO(text.encode('utf-8'))
+        buf.name = path.stem + '_utf8.txt'   # чтоб iOS показал превью
+
+        await bot.send_document(
+            chat_id=message.from_user.id,
+            document=types.input_file.BufferedInputFile(buf.getvalue(), filename=buf.name)
+        )
+
+    for entry in log_dir.iterdir():
+        if entry.is_file() and entry.stat().st_size:
             try:
-                await bot.send_document(
-                    chat_id=message.from_user.id,
-                    document=types.input_file.FSInputFile(file_path)
-                )
-                empts = False
+                await send_as_utf8(entry)
+                sent_any = True
                 await asyncio.sleep(0.5)
             except Exception as e:
-                logger_bot.error(f"Error sending file log: {file_path}: {e}")
-    if empts:
-        await bot.send_message(message.chat.id, "There are no logging files or they are empty")
+                logger_bot.error(f"cant send {entry}: {e}")
 
+    if not sent_any:
+        await bot.send_message(message.chat.id,
+                               "There are no logging files or they are empty")
 
 
 
@@ -3207,7 +3247,7 @@ async def try_answer_bot(message, answer, data):
             "file_path": None,
             "name_file": None,
             "assist_content": None,
-            "model_language": "gemini-2.0-flash-exp" # "gpt-4.1-nano" # "gemini-2.5-flash-preview-04-17" # gemini-2.0-flash-exp  gemini-1.5-flash-latest    gemini-2.0-flash-lite-001
+            "model_language": "gemini-2.0-flash-lite" # "gpt-4.1-nano" # "gemini-2.5-flash-preview-04-17" # gemini-2.0-flash-exp  gemini-1.5-flash-latest    gemini-2.0-flash-lite-001
         }
         
         # await asyncio.sleep(1)
