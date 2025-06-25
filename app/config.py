@@ -32,11 +32,11 @@ MAX_LEN = 4000 #4096
 
 # Language models:
 AI_DEFAULT = "gemini" # gemini, openai, anthropic, deepseek, grok
-AI_DEFAULT_MODEL_GEMINI = "gemini-2.0-flash-exp"
+AI_DEFAULT_MODEL_GEMINI = "gemini-2.5-flash-lite-preview-06-17"
 AI_DEFAULT_MODEL_OPENAI = "gpt-4o-mini"
-AI_DEFAULT_MODEL_CLAUDE = "claude-3-haiku-20240307"
+AI_DEFAULT_MODEL_CLAUDE = "claude-3-5-haiku-latest"
 AI_DEFAULT_MODEL_DEEPSEEK = "deepseek-chat"
-AI_DEFAULT_MODEL_GROK = "grok-2-vision-latest"
+AI_DEFAULT_MODEL_GROK = "grok-3-mini-latest"
 
 # Gen Audio models:
 AI_TEXT_TO_VOICE = "openai" # in - Text, Out - Voice 
