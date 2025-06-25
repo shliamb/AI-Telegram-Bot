@@ -1,14 +1,41 @@
 import logging
+from config import TIME_CORRECTION
 #import os
 from pathlib import Path
 from typing import Optional, Dict
 from logging.handlers import RotatingFileHandler
 import threading
+import datetime
+
+
+
+
 
 # Глобальная блокировка для thread-safety
 _logger_lock = threading.Lock()
 _configured_loggers: Dict[str, logging.Logger] = {}
 _uvicorn_disabled = False
+
+
+
+
+class TimezoneFormatter(logging.Formatter):
+    """Форматтер с поддержкой временных зон"""
+    
+    def __init__(self, *args, timezone_offset_hours: int = 0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timezone_offset = datetime.timedelta(hours=timezone_offset_hours)
+    
+    def formatTime(self, record, datefmt=None):
+        # Получаем UTC время из record.created
+        dt = datetime.datetime.fromtimestamp(record.created, tz=datetime.timezone.utc)
+        # Применяем смещение
+        dt_local = dt + self.timezone_offset
+        # Форматируем
+        if datefmt:
+            return dt_local.strftime(datefmt)
+        else:
+            return dt_local.strftime('%Y-%m-%d %H:%M:%S')
 
 def setup_logger(
     name: str, 
@@ -18,31 +45,19 @@ def setup_logger(
     max_bytes: int = 10 * 1024 * 1024,  # 10MB
     backup_count: int = 5,
     encoding: str = 'utf-8',
-    disable_uvicorn: bool = True
+    disable_uvicorn: bool = True,
+    timezone_offset_hours: int = TIME_CORRECTION  # Смещение в часах (например, +3 для MSK)
 ) -> logging.Logger:
     """
-    Настройка логгера с ротацией файлов и защитой от дублирования.
-    Thread-safe реализация.
+    Настройка логгера с ротацией файлов и поддержкой временных зон.
     
     Args:
-        name: Имя логгера
-        log_file: Путь к файлу лога  
-        level: Уровень логирования
-        format_string: Формат сообщений
-        max_bytes: Максимальный размер файла лога
-        backup_count: Количество backup файлов
-        encoding: Кодировка файла
-        disable_uvicorn: Отключить uvicorn логи
-        
-    Returns:
-        Настроенный логгер
-        
-    Raises:
-        OSError: Если не удается создать директорию или файл
+        timezone_offset_hours: Смещение времени в часах относительно UTC
+                              (например, 3 для MSK, -5 для EST)
     """
     with _logger_lock:
         # Проверяем cache
-        cache_key = f"{name}:{log_file}"
+        cache_key = f"{name}:{log_file}:{timezone_offset_hours}"
         if cache_key in _configured_loggers:
             return _configured_loggers[cache_key]
         
@@ -73,14 +88,15 @@ def setup_logger(
                 filename=str(log_path),
                 maxBytes=max_bytes,
                 backupCount=backup_count,
-                encoding='utf-8',  # Добавляет BOM для лучшего распознавания кирилицф на айфоне, посмотрим
+                encoding=encoding,
                 delay=True
             )
             
-            # Настраиваем форматтер
-            formatter = logging.Formatter(
+            # Настраиваем форматтер с временной зоной
+            formatter = TimezoneFormatter(
                 fmt=format_string,
-                datefmt='%Y-%m-%d %H:%M:%S'
+                datefmt='%Y-%m-%d %H:%M:%S',
+                timezone_offset_hours=timezone_offset_hours
             )
             file_handler.setFormatter(formatter)
             
@@ -91,17 +107,23 @@ def setup_logger(
             _configured_loggers[cache_key] = logger
             
             # Логируем успешную инициализацию
-            logger.info(f"Logger '{name}' initialized. Log file: {log_file}")
+            logger.info(f"Logger '{name}' initialized with UTC{timezone_offset_hours:+d} timezone. Log file: {log_file}")
             
             return logger
             
         except Exception as e:
             # В случае ошибки создаем консольный логгер
             console_handler = logging.StreamHandler()
-            console_handler.setFormatter(logging.Formatter(format_string))
+            console_formatter = TimezoneFormatter(
+                format_string, 
+                timezone_offset_hours=timezone_offset_hours
+            )
+            console_handler.setFormatter(console_formatter)
             logger.addHandler(console_handler)
             logger.error(f"Failed to setup file logging for '{name}': {e}")
             return logger
+
+
 
 def _disable_uvicorn_logs():
     """Отключает стандартные uvicorn логи"""

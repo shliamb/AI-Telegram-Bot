@@ -1,7 +1,7 @@
 #### BASIC CONFIG (set it up manually): ####
 HOST = "app_postgres" # app_postgres localhost
 DOCKER = True # True or False
-TIME_CORRECTION = + 6
+TIME_CORRECTION = + 3
 URL = "http://167.99.210.245:8000"
 ########
 
