@@ -66,7 +66,7 @@ async def get_json_old_users_to_db():
         return filepath
 
     except Exception as e:
-        setup_logger.error(f"Error save file to JSON: {e}")
+        logger_db.error(f"Error save file to JSON: {e}")
         return False
     
 # asyncio.run(get_json_old_users_to_db())
