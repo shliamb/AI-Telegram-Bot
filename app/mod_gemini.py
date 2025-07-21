@@ -85,25 +85,23 @@ async def _handle_response(response: aiohttp.ClientResponse) -> Dict[str, Any]:
     if response.status == 200:
         try:
             answer: dict = await response.json()  # {"response": "{gemini answer all}", "expenses": 0.00033075, "used_tokens": 294}
-            print("\nlist_answer:", answer)
+            # print("\nanswer:", answer)
             list_answer = answer.get("response")
             expenses = answer.get("expenses")
             used_tokens = answer.get("used_tokens")
 
-
-            print("\nlist_answer:", list_answer, "type:", type(list_answer))
             main_response = ""
 
             for part in list_answer:
 
                 if 'text' in part:
                     text_response = part['text']
-                    # Добавить размышления если есть - thoughtSignature
+                    # Добавить размышления если есть - thoughtSignature !!! Это не размышления
 
-                if 'thoughtSignature' in part:
-                    # function = part['functionCall']['name']
-                    print("\npart:", part, "\n")
-                    pass
+                # if 'thoughtSignature' in part:
+                #     # function = part['functionCall']['name']
+                #     print("\npart:", part, "\n")
+                #     pass
 
                 main_response += str(text_response)
 
