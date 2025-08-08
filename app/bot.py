@@ -414,7 +414,10 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>МОДЕЛЬ: {model_language.upper()}</b>\n"
         f"(Наценка на токены 20% от их ориг. стоимости)\n\n"
         f"<b>💡 Модели OpenAI 1м ток:</b>\n"
-        f"        /gpt_4_1 🔥 - 12$\n"
+        f"        /gpt_5 🔥 - 13.5$\n"
+        f"        /gpt-5-mini 🔥 - 2.7$\n"
+        f"        /gpt-5-nano 🔥 - 0.54$\n"
+        f"        /gpt_4_1 - 12$\n"
         f"        /gpt_4_1_mini - 2.4$\n"
         f"        /gpt_4_1_nano - 0.6$\n"
         f"        /gpt_4_5_preview - 270$\n"
@@ -482,6 +485,9 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>MODEL: {model_language.upper()}</b>\n"
         f"(The token markup is 20% of their original cost)\n\n"
         f"<b>💡 Models OpenAI 1m tok:</b>\n"
+        f"        /gpt_5 🔥 - 13.5$\n"
+        f"        /gpt_5_mini 🔥 - 2.7$\n"
+        f"        /gpt_5_nano 🔥 - 0.54$\n"
         f"        /gpt_4_1 🔥 - 12$\n"
         f"        /gpt_4_1_mini - 2.4$\n"
         f"        /gpt_4_1_nano - 0.6$\n"
@@ -679,6 +685,49 @@ async def audio_off(message: types.Message):
 
 
 # OpenAI models:
+@dp.message(Command('gpt_5'))
+async def gpt_5(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('gpt_5_mini'))
+async def gpt_5_mini(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5-mini",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('gpt_5_nano'))
+async def gpt_5_nano(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5-nano",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+
+
+
+
+
+
 @dp.message(Command('gpt_4o_mini'))
 async def gpt_4o_mini(message: types.Message):
     id = user_id(message)
