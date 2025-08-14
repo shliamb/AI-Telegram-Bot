@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOAD, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_DB, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, PATH_LOGS
+from config import DOWNLOAD, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_DB, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, PATH_LOGS, MAX_SIZE_DOC
  #, DEFAULT_MODEL_ASSIST_OA
 # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 from setup_config_logger import setup_logger
@@ -8,7 +8,7 @@ import re
 import random
 import os
 import asyncio
-#import json
+import json
 #import requests
 from io import StringIO, BytesIO
 #import uuid
@@ -17,6 +17,9 @@ from pathlib import Path # Работа с файловыми путями
 # import time
 # import sys
 import csv
+import docx
+import PyPDF2
+import io
 # import datetime
 # Aiogram
 from aiogram import Bot, Dispatcher, types, F#, Router
@@ -414,46 +417,28 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>МОДЕЛЬ: {model_language.upper()}</b>\n"
         f"(Наценка на токены 20% от их ориг. стоимости)\n\n"
         f"<b>💡 Модели OpenAI 1м ток:</b>\n"
-        f"        /gpt_5 🔥 - 13.5$\n"
-        f"        /gpt_5_mini 🔥 - 2.7$\n"
-        f"        /gpt_5_nano 🔥 - 0.54$\n"
-        f"        /gpt_4_1 - 12$\n"
-        f"        /gpt_4_1_mini - 2.4$\n"
-        f"        /gpt_4_1_nano - 0.6$\n"
-        f"        /gpt_4_5_preview - 270$\n"
+        f"        /gpt_5 🎉 - 13.5$\n"
+        f"        /gpt_5_mini - 2.7$\n"
+        f"        /gpt_5_nano - 0.54$\n"
+        f"        /o1_pro - 900$\n"
         f"        /o3_pro - 120$\n"
-        f"        /o3 🔥 - 12$\n"
-        f"        /o1_preview -  90$\n"
-        f"        /o4_mini - 6.6$\n"
-        f"        /o3_mini - 6.6$\n"
-        f"        /o1_mini - 6.6$\n"
-        f"        /chatgpt_4o_latest 🔥 - 24$\n"
-        f"        /gpt_4o_mini - 1.8$\n\n"
+        f"        /o3 - 12$\n"
+        f"        /chatgpt_4o 🔥 - 24$\n\n"
         f"<b>💡 Модели Google 1м ток:</b>\n"
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash 🔥 - 3.36$\n"
-        f"        /gemini_2_5_flash_lite - 0.6$\n"
-        f"        /gemini_2_0_flash 🔥 - 0.6$\n"
-        f"        /gemini_2_0_flash_lite - 0.45$\n\n"
+        f"        /gemini_2_5_flash - 3.36$\n"
+        f"        /gemini_2_5_flash_lite - 0.6$\n\n"
         f"<b>💡 Модели Anthropic 1м ток:</b>\n"
-        f"        /claude_4_opus 🔥 - 108$\n"
-        f"        /claude_4_sonnet 🔥 - 21.6$\n"
-        f"        /claude_3_7_sonnet 🔥 - 21.6$\n"
-        f"        /claude_3_5_sonnet - 21.6$\n"
-        f"        /claude_3_5_haiku - 5.76$\n"
-        f"        /claude_3_opus - 108$\n"
-        f"        /claude_3_sonnet - 21.6$\n"
-        f"        /claude_3_haiku - 1.8$\n\n"
+        f"        /claude_4_1_opus 🎉 - 108$\n"
+        f"        /claude_4_opus - 108$\n"
+        f"        /claude_4_sonnet 🔥 - 21.6$\n\n"
         f"<b>💡 Модели Grok 1м ток:</b>\n"
-        f"        /grok_3_latest 🔥 - 21.6$\n"
-        f"        /grok_3_fast_latest - 36$\n"
-        f"        /grok_3_mini_latest 🔥 - 0.96$\n"
-        f"        /grok_3_mini_fast_latest - 5.52$\n"
-        f"        /grok_2_vision_latest - 14.4$\n"
-        f"        /grok_2_latest - 14.4$\n\n"
+        f"        /grok_4 🎉 - 21.6$\n"
+        f"        /grok_3 - 21.6$\n"
+        f"        /grok_3_mini - 0.96$\n\n"
         f"<b>💡 Модели DeepSeek 1м ток:</b>\n"
         f"        /deepseek_reasoner R1 - 3.288$\n"
-        f"        /deepseek_chat - 1.644$\n\n\n"
+        f"        /deepseek_chat 🔥 - 1.644$\n\n\n"
         f"<b>🎚 ДОПОЛНИТЕЛЬНО:</b>\n"
         f"        Параметры ген. изо. - /imgMenu\n"
         f"        Параметры голоса - /voiceMenu\n"
@@ -485,46 +470,28 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>MODEL: {model_language.upper()}</b>\n"
         f"(The token markup is 20% of their original cost)\n\n"
         f"<b>💡 Models OpenAI 1m tok:</b>\n"
-        f"        /gpt_5 🔥 - 13.5$\n"
-        f"        /gpt_5_mini 🔥 - 2.7$\n"
-        f"        /gpt_5_nano 🔥 - 0.54$\n"
-        f"        /gpt_4_1 🔥 - 12$\n"
-        f"        /gpt_4_1_mini - 2.4$\n"
-        f"        /gpt_4_1_nano - 0.6$\n"
-        f"        /gpt_4_5_preview - 270$\n"
+        f"        /gpt_5 🎉 - 13.5$\n"
+        f"        /gpt_5_mini - 2.7$\n"
+        f"        /gpt_5_nano - 0.54$\n"
+        f"        /o1_pro - 900$\n"
         f"        /o3_pro - 120$\n"
-        f"        /o3 🔥 - 12$\n"
-        f"        /o1_preview -  90$\n"
-        f"        /o4_mini - 6.6$\n"
-        f"        /o3_mini - 6.6$\n"
-        f"        /o1_mini - 6.6$\n"
-        f"        /chatgpt_4o_latest 🔥 - 24$\n"
-        f"        /gpt_4o_mini - 1.8$\n\n"
+        f"        /o3 - 12$\n"
+        f"        /chatgpt_4o 🔥 - 24$\n\n"
         f"<b>💡 Models Google 1m tok:</b>\n"
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash 🔥 - 3.36$\n"
-        f"        /gemini_2_5_flash_lite - 0.6$\n"
-        f"        /gemini_2_0_flash 🔥 - 0.6$\n"
-        f"        /gemini_2_0_flash_lite - 0.45$\n\n"
+        f"        /gemini_2_5_flash - 3.36$\n"
+        f"        /gemini_2_5_flash_lite - 0.6$\n\n"
         f"<b>💡 Models Anthropic 1m tok:</b>\n"
-        f"        /claude_4_opus 🔥 - 108$\n"
-        f"        /claude_4_sonnet 🔥 - 21.6$\n"
-        f"        /claude_3_7_sonnet 🔥 - 21.6$\n"
-        f"        /claude_3_5_sonnet - 21.6$\n"
-        f"        /claude_3_5_haiku - 5.76$\n"
-        f"        /claude_3_opus - 108$\n"
-        f"        /claude_3_sonnet - 21.6$\n"
-        f"        /claude_3_haiku - 1.8$\n\n"
+        f"        /claude_4_1_opus 🎉 - 108$\n"
+        f"        /claude_4_opus - 108$\n"
+        f"        /claude_4_sonnet 🔥 - 21.6$\n\n"
         f"<b>💡 Models Grok 1m tok:</b>\n"
-        f"        /grok_3_latest 🔥 - 21.6$\n"
-        f"        /grok_3_fast_latest - 36$\n"
-        f"        /grok_3_mini_latest 🔥 - 0.96$\n"
-        f"        /grok_3_mini_fast_latest - 5.52$\n"
-        f"        /grok_2_vision_latest - 14.4$\n"
-        f"        /grok_2_latest - 14.4$\n\n"
+        f"        /grok_4 🎉 - 21.6$\n"
+        f"        /grok_3 - 21.6$\n"
+        f"        /grok_3_mini - 0.96$\n\n"
         f"<b>💡 Models DeepSeek 1m tok:</b>\n"
         f"        /deepseek_reasoner R1 - 3.288$\n"
-        f"        /deepseek_chat - 1.644$\n\n\n"
+        f"        /deepseek_chat 🔥 - 1.644$\n\n\n"
         f"<b>🎚 ADDITIONALLY:</b>\n"
         f"        Image gen. param. - /imgMenu\n"
         f"        Voice param. - /voiceMenu\n"
@@ -788,7 +755,7 @@ async def gpt_4_turbo(message: types.Message):
     if confirm:
         await main_menu(message, "main")
 
-@dp.message(Command('chatgpt_4o_latest'))
+@dp.message(Command('chatgpt_4o'))
 async def chatgpt_4o_latest(message: types.Message):
     id = user_id(message)
     data = {
@@ -1073,6 +1040,19 @@ async def gemini_2_0_flash_lite_001(message: types.Message):
 
 
 # Grok models:
+
+@dp.message(Command('grok_4'))
+async def grok_4(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-4-0709",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
 @dp.message(Command('grok_vision_beta'))
 async def grok_vision_beta(message: types.Message):
     id = user_id(message)
@@ -1137,7 +1117,7 @@ async def grok_3_mini_fast_latest(message: types.Message):
         await main_menu(message, "main")
 
 
-@dp.message(Command('grok_3_mini_latest'))
+@dp.message(Command('grok_3_mini'))
 async def grok_3_mini_latest(message: types.Message):
     id = user_id(message)
     data = {
@@ -1163,7 +1143,7 @@ async def grok_3_fast_latest(message: types.Message):
         await main_menu(message, "main")
 
 
-@dp.message(Command('grok_3_latest'))
+@dp.message(Command('grok_3'))
 async def grok_3_latest(message: types.Message):
     id = user_id(message)
     data = {
@@ -1216,6 +1196,18 @@ async def deepseek_chat(message: types.Message):
 
 
 # Anthropic models:
+
+@dp.message(Command('claude_4_1_opus'))
+async def claude_4_1_opus(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-opus-4-1-20250805",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
 
 @dp.message(Command('claude_4_opus'))
 async def claude_4_opus(message: types.Message):
@@ -4117,9 +4109,72 @@ async def check_request_drawing(question):
 
 
 
+
+# WHEN USER SEND FILE:
+# Пользователь передает файл вместо текста docx, md, txt, json
+async def get_data_doc_file(message: types.Message, language: str):
+    text_content = ""
+    if message.text:
+        text_content = message.text
+    elif message.document:
+        file_size = MAX_SIZE_DOC * 1024 * 1024
+        if message.document.file_size > file_size:
+            error_text = f"⚠ Файл слишком большой (макс. {file_size} МБ)" if language == "ru" else f"⚠ The file is too large (max . {file_size} MB)"
+            await message.answer(error_text, parse_mode="HTML")
+            return False
+        file_id = message.document.file_id
+        file = await bot.get_file(file_id)
+        file_path = file.file_path # В ОЗУ
+        # Скачиваем файл
+        downloaded_file = await bot.download_file(file_path)
+        file_bytes = downloaded_file.read()
+        # Обработка .txt и .md
+        if message.document.mime_type == "text/plain" or message.document.file_name.endswith(('.txt', '.md')):
+            text_content = file_bytes.decode('utf-8')
+        # Обработка .docx
+        elif message.document.file_name.endswith('.docx'):
+            doc = docx.Document(io.BytesIO(file_bytes))
+            text_content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+        elif message.document.file_name.endswith('.pdf'):
+            try:
+                pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+                text_content = "\n".join([page.extract_text() for page in pdf_reader.pages])
+            except Exception as e:
+                error_text = f"❌ Ошибка чтения PDF: {e}" if language == "ru" else f"❌ PDF reading error: {e}"
+                await message.answer(error_text, parse_mode="HTML")
+                return False
+        elif message.document.file_name.endswith('.json'):
+            try:
+                json_data = json.loads(file_bytes.decode('utf-8'))  # Парсим JSON
+                text_content = str(json_data)  # Преобразуем в строку для примера гавное ебаное, переделаю потом нормально...
+                # Или работаем напрямую с json_data (dict/list)
+            except json.JSONDecodeError as e:
+                error_text = f"❌ Ошибка парсинга JSON: {e}" if language == "ru" else f"❌ JSON parsing error: {e}"
+                await message.answer(error_text, parse_mode="HTML")
+                return False
+        else:
+            error_text = "⚠ Поддерживаются только файлы .txt, .md, .docx, pdf, json" if language == "ru" else "⚠ Only files are supported .txt, .md, .docx, pdf, json"
+            await message.answer(error_text, parse_mode="HTML")
+            return False
+
+    return text_content
+
+
+
+
+
+
+
+
 #### MAIN HENDLER INCOMING
 @dp.message(F.content_type.in_({'text', 'document', 'photo', 'audio', 'voice', })) # 'location' 'contact' 'video_note'  'video'  'sticker'
 async def second_function(message: types.Message, state: FSMContext):
+
+    if message.from_user.is_bot:
+        await message.answer("🚔 Sorry, the bot only works with humans.")
+        return
+
+
 
     #### DEFAULT VALUES:
 
@@ -4269,6 +4324,13 @@ async def second_function(message: types.Message, state: FSMContext):
     if typecontent == "text":
         if await forget_history(question, message):
             return
+
+    # Проверка входного на документ
+    question = await get_data_doc_file(message, language)
+    if not question:
+        return
+
+
         
     # # Checking ADMIN AI:
     # if typecontent == "text" and id == ADMIN_ID:
