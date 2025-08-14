@@ -4170,7 +4170,10 @@ async def get_data_doc_file(message: types.Message, language: str):
             await message.answer(error_text, parse_mode="HTML")
             return False
 
-    return f"{caption}:\n{text_content}" if caption else text_content
+    answer = f"{caption}:\n{text_content}" if caption else text_content
+    print(answer)
+
+    return answer
 
 
 
@@ -4401,7 +4404,7 @@ async def second_function(message: types.Message, state: FSMContext):
         match = re.search(r'\.([^.]+)$', message.document.file_name) # Получаю расширение из имени документа
         extension = match.group(1)
 
-        print(f"extension: {extension}, EXTENS_DOC_SUPPORT: {EXTENS_DOC_SUPPORT}")
+        # print(f"extension: {extension}, EXTENS_DOC_SUPPORT: {EXTENS_DOC_SUPPORT}")
 
         if extension.lower() in EXTENS_DOC_SUPPORT:
             typecontent = "text"
