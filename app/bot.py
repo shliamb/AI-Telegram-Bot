@@ -3507,6 +3507,8 @@ async def mod_photo(data, message, state: FSMContext):
     data["file_path"] = file_path
     data["name_file"] = photo_file_name
 
+    print(f"user_content: {data.get('user_content')}")
+
     if data.get("user_content"):
 
         text = data.get("user_content")
@@ -3546,7 +3548,7 @@ async def mod_photo(data, message, state: FSMContext):
         await state.clear()
     
 
-    elif data.get("user_content") is None:
+    elif not data.get("user_content"):
         await state.update_data(all_data=data)
         if language == "ru":
             await message.reply(f"Вопрос по прикрепленному изображению:", parse_mode="Markdown")
@@ -3634,7 +3636,7 @@ async def mod_documents(data, message, state: FSMContext):
             await try_answer_bot(message, text, data)
             await state.clear()
 
-        elif data.get("user_content") is None:
+        elif not data.get("user_content"):
             await state.update_data(all_data=data)
             if language == "ru":
                 await message.reply(f"Вопрос по прикрепленному изображению:", parse_mode="Markdown")
@@ -4413,7 +4415,6 @@ async def second_function(message: types.Message, state: FSMContext):
             await input_content_type[typecontent](**arguments)
             return
         elif extension.lower() in ["jpg", "png"]:
-            print("\n\n\n11")
             arguments["state"] = state  # state: FSMContext
             await input_content_type[typecontent](**arguments)
             return
@@ -4422,7 +4423,6 @@ async def second_function(message: types.Message, state: FSMContext):
             await message.answer(error_text, parse_mode="HTML")
             return
     elif typecontent == "draw" or typecontent == "photo":
-        print("\n\n\n22")
         arguments["state"] = state #state: FSMContext
         await input_content_type[typecontent](**arguments)
         return
