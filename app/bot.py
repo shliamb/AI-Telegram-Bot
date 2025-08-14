@@ -4125,7 +4125,7 @@ async def check_request_drawing(question):
 # Пользователь передает файл вместо текста docx, md, txt, json
 async def get_data_doc_file(message: types.Message, language: str):
     text_content = ""
-    caption = None
+    caption = ""
     if message.text:
         text_content = message.text
     elif message.document:
@@ -4134,7 +4134,8 @@ async def get_data_doc_file(message: types.Message, language: str):
             error_text = f"⚠ Файл слишком большой (макс. {file_size} МБ)" if language == "ru" else f"⚠ The file is too large (max . {file_size} MB)"
             await message.answer(error_text, parse_mode="HTML")
             return False
-        caption = message.caption
+        if message.caption:
+            caption = message.caption
         file_id = message.document.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path # В ОЗУ
@@ -4170,10 +4171,10 @@ async def get_data_doc_file(message: types.Message, language: str):
             await message.answer(error_text, parse_mode="HTML")
             return False
 
-    answer = f"{str(caption)}:\n\n{str(text_content)}" if caption else str(text_content)
-    print(answer)
+    if caption and text_content:
+        text_content = f":\n\n{text_content}"
 
-    return answer
+    return f"{caption}{text_content}" if caption else text_content
 
 
 
@@ -4217,8 +4218,8 @@ async def second_function(message: types.Message, state: FSMContext):
     }
 
     # SYS
-    file_path, received_object, photo_file_name, name_file, caption, system_content, model_voice_to_text, voice, language = (None,) * 9
-    caption, typecontent = message.caption, message.content_type
+    file_path, received_object, photo_file_name, name_file, system_content, model_voice_to_text, voice, language = (None,) * 8
+    typecontent = message.content_type
     ai, ai_draw, ai_voice_to_text, ai_text_to_voice, voice_answer, dialog, img_size, n_number, dialog_sum, voice, voice_speed, img_quality, img_style = AI_DEFAULT, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, VOICE_THE_ANSWER, DIALOG, IMG_SIZE, N_NUMBER, DIALOG_SUM, VOICE, VOICE_SPEED, IMG_QUALITY, IMG_STYLE
 
 
@@ -4377,7 +4378,7 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Additionally:
     data["system_content"] = system_content
-    data["user_content"] = caption or question
+    data["user_content"] = question
     data["language"] = language
 
     # Choosing a direction:
@@ -4404,7 +4405,7 @@ async def second_function(message: types.Message, state: FSMContext):
         match = re.search(r'\.([^.]+)$', message.document.file_name) # Получаю расширение из имени документа
         extension = match.group(1)
 
-        # print(f"extension: {extension}, EXTENS_DOC_SUPPORT: {EXTENS_DOC_SUPPORT}")
+        print(f"extension: {extension}, EXTENS_DOC_SUPPORT: {EXTENS_DOC_SUPPORT}")
 
         if extension.lower() in EXTENS_DOC_SUPPORT:
             typecontent = "text"
