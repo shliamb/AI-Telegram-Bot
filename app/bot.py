@@ -4125,6 +4125,7 @@ async def check_request_drawing(question):
 # Пользователь передает файл вместо текста docx, md, txt, json
 async def get_data_doc_file(message: types.Message, language: str):
     text_content = ""
+    caption = None
     if message.text:
         text_content = message.text
     elif message.document:
@@ -4133,6 +4134,7 @@ async def get_data_doc_file(message: types.Message, language: str):
             error_text = f"⚠ Файл слишком большой (макс. {file_size} МБ)" if language == "ru" else f"⚠ The file is too large (max . {file_size} MB)"
             await message.answer(error_text, parse_mode="HTML")
             return False
+        caption = message.caption
         file_id = message.document.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path # В ОЗУ
@@ -4168,7 +4170,7 @@ async def get_data_doc_file(message: types.Message, language: str):
             await message.answer(error_text, parse_mode="HTML")
             return False
 
-    return text_content
+    return f"{caption}:\n{text_content}" if caption else text_content
 
 
 
