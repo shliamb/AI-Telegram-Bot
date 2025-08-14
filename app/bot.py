@@ -19,6 +19,8 @@ from pathlib import Path # Работа с файловыми путями
 import csv
 import docx
 import PyPDF2
+from openpyxl import load_workbook  # для Excel (.xlsx)
+import pandas as pd  # для Excel и CSV
 import io
 # import datetime
 # Aiogram
@@ -4123,7 +4125,7 @@ async def check_request_drawing(question):
 
 
 # WHEN USER SEND FILE:
-# Пользователь передает файл вместо текста docx, md, txt, json
+# Пользователь передает файл вместо текста docx, xlsx, md, txt, json, csv
 async def get_data_doc_file(message: types.Message, language: str):
     text_content = ""
     caption = ""
@@ -4145,13 +4147,17 @@ async def get_data_doc_file(message: types.Message, language: str):
         # Скачиваем файл
         downloaded_file = await bot.download_file(file_path)
         file_bytes = downloaded_file.read()
-        # Обработка .txt и .md
+
+        # MD TXT
         if message.document.mime_type == "text/plain" or message.document.file_name.endswith(('.txt', '.md')):
             text_content = file_bytes.decode('utf-8')
-        # Обработка .docx
+
+        # DOCX:
         elif message.document.file_name.endswith('.docx'):
             doc = docx.Document(io.BytesIO(file_bytes))
             text_content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+
+        # PDF:
         elif message.document.file_name.endswith('.pdf'):
             try:
                 pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
@@ -4160,6 +4166,7 @@ async def get_data_doc_file(message: types.Message, language: str):
                 error_text = f"❌ Ошибка чтения PDF: {e}" if language == "ru" else f"❌ PDF reading error: {e}"
                 await message.answer(error_text, parse_mode="HTML")
                 return "end"
+        # JSON:
         elif message.document.file_name.endswith('.json'):
             try:
                 json_data = json.loads(file_bytes.decode('utf-8'))  # Парсим JSON
@@ -4169,10 +4176,25 @@ async def get_data_doc_file(message: types.Message, language: str):
                 error_text = f"❌ Ошибка парсинга JSON: {e}" if language == "ru" else f"❌ JSON parsing error: {e}"
                 await message.answer(error_text, parse_mode="HTML")
                 return "end"
-        # else:
-        #     error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)}" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)}"
-        #     await message.answer(error_text, parse_mode="HTML")
-        #     return False
+
+        # XLSX:
+        elif message.document.file_name.endswith('.xlsx'):
+            try:
+                # Используем pandas для чтения Excel (можно и openpyxl)
+                df = pd.read_excel(io.BytesIO(file_bytes))
+                text_content = df.to_string(index=False)  # без индексов для краткости
+            except Exception as e:
+                await message.answer(f"❌ Ошибка чтения Excel: {e}")
+                return "end"
+
+        # CSV:
+        elif message.document.file_name.endswith('.csv'):
+            try:
+                df = pd.read_csv(io.BytesIO(file_bytes))
+                text_content = df.to_string(index=False)
+            except Exception as e:
+                await message.answer(f"❌ Ошибка чтения CSV: {e}")
+                return "end"
 
     if caption and text_content:
         text_content = f":\n\n{text_content}"
