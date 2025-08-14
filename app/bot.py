@@ -4398,6 +4398,7 @@ async def second_function(message: types.Message, state: FSMContext):
     if typecontent == "document":
         extension = re.search(r'\.([^.]+)$', message.document.file_name) # Получаю расширение из имени документа
         if extension in EXTENS_DOC_SUPPORT:
+            typecontent = "text"
             await input_content_type[typecontent](**arguments)
             return
         else:
