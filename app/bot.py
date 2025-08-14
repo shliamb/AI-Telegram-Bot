@@ -4129,13 +4129,13 @@ async def get_data_doc_file(message: types.Message, language: str):
     if message.text:
         text_content = message.text
     elif message.document:
+        if message.caption:
+            caption = message.caption
         file_size = MAX_SIZE_DOC * 1024 * 1024
         if message.document.file_size > file_size:
             error_text = f"⚠ Файл слишком большой (макс. {file_size} МБ)" if language == "ru" else f"⚠ The file is too large (max . {file_size} MB)"
             await message.answer(error_text, parse_mode="HTML")
             return False
-        if message.caption:
-            caption = message.caption
         file_id = message.document.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path # В ОЗУ
@@ -4237,6 +4237,7 @@ async def second_function(message: types.Message, state: FSMContext):
     # Проверка входного на документ
     question = await get_data_doc_file(message, language)
     if not question:
+        print("Error 443323 suka")
         return
 
 
@@ -4400,27 +4401,32 @@ async def second_function(message: types.Message, state: FSMContext):
         'message': message,
     }
 
-    # Получаем расширение если документ:
+
+    print(f"typecontent: {typecontent}")
+
     if typecontent == "document":
         match = re.search(r'\.([^.]+)$', message.document.file_name) # Получаю расширение из имени документа
         extension = match.group(1)
-
-        print(f"extension: {extension}, EXTENS_DOC_SUPPORT: {EXTENS_DOC_SUPPORT}")
-
         if extension.lower() in EXTENS_DOC_SUPPORT:
             typecontent = "text"
             await input_content_type[typecontent](**arguments)
             return
+        if extension.lower() in ["jpg", "png"]:
+            arguments["state"] = state  # state: FSMContext
+            await input_content_type[typecontent](**arguments)
+            return
         else:
-            error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)}" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)}"
+            error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)} + jpg + png" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)} + jpg + png"
             await message.answer(error_text, parse_mode="HTML")
             return
-
-    if typecontent == "draw" or typecontent == "photo" or typecontent == "document":
+    elif typecontent == "draw" or typecontent == "photo":
         arguments["state"] = state #state: FSMContext
+        await input_content_type[typecontent](**arguments)
+        return
+    else:
+        await input_content_type[typecontent](**arguments)
 
 
-    await input_content_type[typecontent](**arguments)
 ####
 
 

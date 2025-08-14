@@ -30,7 +30,8 @@ LANGUAGE = "en"
 NOTIFICATIONS = True
 MAX_LEN = 4000 #4096
 MAX_SIZE_DOC = 3 # Возможный максимум передоваемого файла в mb
-EXTENS_DOC_SUPPORT = ["docx", "pdf", "md", "txt", "json"]
+EXTENS_DOC_SUPPORT = ["docx", "pdf", "md", "txt", "json"] # ["jpg", "png"]
+
 
 # Language models:
 AI_DEFAULT = "gemini" # gemini, openai, anthropic, deepseek, grok
