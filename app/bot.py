@@ -3507,7 +3507,6 @@ async def mod_photo(data, message, state: FSMContext):
     data["file_path"] = file_path
     data["name_file"] = photo_file_name
 
-    print(f"user_content: {data.get('user_content')}")
 
     if data.get("user_content"):
 
@@ -4405,7 +4404,6 @@ async def second_function(message: types.Message, state: FSMContext):
     }
 
 
-    print(f"typecontent: {typecontent}")
 
     if typecontent == "document":
         match = re.search(r'\.([^.]+)$', message.document.file_name) # Получаю расширение из имени документа
