@@ -4170,7 +4170,7 @@ async def get_data_doc_file(message: types.Message, language: str):
             await message.answer(error_text, parse_mode="HTML")
             return False
 
-    answer = f"{caption}:\n{text_content}" if caption else text_content
+    answer = f"{str(caption)}:\n\n{str(text_content)}" if caption else str(text_content)
     print(answer)
 
     return answer
