@@ -31,6 +31,7 @@ async def mod_openai_chat(data):
     #     for n in assist_content:
     #         print(n)
 
+    print(user_content)
 
     async with aiohttp.ClientSession() as session:
             if file_path:
