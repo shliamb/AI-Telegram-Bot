@@ -4135,7 +4135,7 @@ async def get_data_doc_file(message: types.Message, language: str):
         if message.document.file_size > file_size:
             error_text = f"⚠ Файл слишком большой (макс. {file_size} МБ)" if language == "ru" else f"⚠ The file is too large (max . {file_size} MB)"
             await message.answer(error_text, parse_mode="HTML")
-            return False
+            return "end"
         file_id = message.document.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path # В ОЗУ
@@ -4156,7 +4156,7 @@ async def get_data_doc_file(message: types.Message, language: str):
             except Exception as e:
                 error_text = f"❌ Ошибка чтения PDF: {e}" if language == "ru" else f"❌ PDF reading error: {e}"
                 await message.answer(error_text, parse_mode="HTML")
-                return False
+                return "end"
         elif message.document.file_name.endswith('.json'):
             try:
                 json_data = json.loads(file_bytes.decode('utf-8'))  # Парсим JSON
@@ -4165,11 +4165,11 @@ async def get_data_doc_file(message: types.Message, language: str):
             except json.JSONDecodeError as e:
                 error_text = f"❌ Ошибка парсинга JSON: {e}" if language == "ru" else f"❌ JSON parsing error: {e}"
                 await message.answer(error_text, parse_mode="HTML")
-                return False
-        else:
-            error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)}" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)}"
-            await message.answer(error_text, parse_mode="HTML")
-            return False
+                return "end"
+        # else:
+        #     error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)}" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)}"
+        #     await message.answer(error_text, parse_mode="HTML")
+        #     return False
 
     if caption and text_content:
         text_content = f":\n\n{text_content}"
@@ -4236,8 +4236,7 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Проверка входного на документ
     question = await get_data_doc_file(message, language)
-    if not question:
-        print("Error 443323 suka")
+    if question == "end":
         return
 
 
