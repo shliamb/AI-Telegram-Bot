@@ -4205,9 +4205,10 @@ async def second_function(message: types.Message, state: FSMContext):
     }
 
     # SYS
-    file_path, question, received_object, photo_file_name, name_file, caption, system_content, model_voice_to_text, voice, language = (None,) * 10
-    caption, question, typecontent = message.caption, message.text, message.content_type
+    file_path, received_object, photo_file_name, name_file, caption, system_content, model_voice_to_text, voice, language = (None,) * 9
+    caption, typecontent = message.caption, message.content_type
     ai, ai_draw, ai_voice_to_text, ai_text_to_voice, voice_answer, dialog, img_size, n_number, dialog_sum, voice, voice_speed, img_quality, img_style = AI_DEFAULT, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, VOICE_THE_ANSWER, DIALOG, IMG_SIZE, N_NUMBER, DIALOG_SUM, VOICE, VOICE_SPEED, IMG_QUALITY, IMG_STYLE
+
 
     await typing(message)
     id = user_id(message)
@@ -4217,7 +4218,13 @@ async def second_function(message: types.Message, state: FSMContext):
     if not data_from_db:
         await forced_start(message)
         return
-    #language = data_from_db.get("language")
+
+    language = data_from_db.get("language", "en")
+
+    # Проверка входного на документ
+    question = await get_data_doc_file(message, language)
+    if not question:
+        return
 
 
     # Get AI:
@@ -4296,10 +4303,6 @@ async def second_function(message: types.Message, state: FSMContext):
     if data_from_db.get("dialog") is not None:
         dialog = data_from_db.get("dialog")
 
-    # Get language:
-    if data_from_db.get("language"):
-        language = data_from_db.get("language")
-
     # Get dialog_sum:
     if data_from_db.get("dialog_sum") is not None:
         dialog_sum = data_from_db.get("dialog_sum")
@@ -4329,13 +4332,6 @@ async def second_function(message: types.Message, state: FSMContext):
         if await forget_history(question, message):
             return
 
-    # Проверка входного на документ
-    question = await get_data_doc_file(message, language)
-    if not question:
-        return
-
-
-        
     # # Checking ADMIN AI:
     # if typecontent == "text" and id == ADMIN_ID:
     #     if await admin_ai(question, message):
