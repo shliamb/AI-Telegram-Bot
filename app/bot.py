@@ -169,6 +169,10 @@ async def select_ru_in_start(callback_query: types.CallbackQuery, state: FSMCont
 async def command_start_handler(message: Message, state: FSMContext):
     await typing(message)
 
+    if message.from_user.is_bot:
+        await message.answer("🚔 Sorry, the bot only works with humans.")
+        return
+
     # MENU
     bot_commands = [
         BotCommand(command="/reset", description="CLEAR MEMORY"), # clear memory
