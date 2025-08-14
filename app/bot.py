@@ -1,5 +1,5 @@
 from get_keys import TELEGRAM_BOT_TOKEN, ADMIN_ID
-from config import DOWNLOAD, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_DB, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, PATH_LOGS, MAX_SIZE_DOC
+from config import DOWNLOAD, AI_DEFAULT, AI_DEFAULT_MODEL_GEMINI, AI_DEFAULT_MODEL_OPENAI, VOICE_THE_ANSWER, VOICE_FOLDER, GIFT, DEFAULT_DALL_E, AI_DRAW, AI_VOICE_TO_TEXT, AI_TEXT_TO_VOICE, DIALOG, DIALOG_SUM, IMG_SIZE, N_NUMBER, VOICE, VOICE_SPEED, IMG_SIZE, N_NUMBER, IMG_QUALITY, IMG_STYLE, AI_DEFAULT_MODEL_TEXT_TO_VOICE, AI_DEFAULT_MODEL_VOICE_TO_TEXT, LANGUAGE, NOTIFICATIONS, USE_SBP_TRANSFER, USE_MASTERCARD, USE_VISA, USE_MIRCARD, USE_CRIPTO, USE_SMS, USE_STARS, USE_TELEGRAM, USE_DIGITAL, RUBTOUSD, DEL_VOICE, DEL_DOWNLOADS, DEL_AUDIO, BACKUP_DB, NAME_BOT, NULL_TOKEN, MAX_SIMBOLS, AI_DEFAULT_MODEL_CLAUDE, AI_DEFAULT_MODEL_DEEPSEEK, AI_DEFAULT_MODEL_GROK, MAX_LEN, MIN_PAY, PATH_JSON_USERS, PATH_LOGS, MAX_SIZE_DOC, EXTENS_DOC_SUPPORT
  #, DEFAULT_MODEL_ASSIST_OA
 # logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
 from setup_config_logger import setup_logger
@@ -3451,12 +3451,14 @@ async def add_text_to_photo(message: Message, state: FSMContext):
         answer = await mod_gemini_chat(all_data)
     elif all_data.get('ai') == "openai":
         answer = await mod_openai_chat(all_data)
-    elif all_data.get("ai") == "claude":
-        answer = await mod_claude_chat(all_data)
-    elif all_data.get("ai") == "deepseek":
-        answer = await mod_deepseek_chat(all_data)
-    elif all_data.get("ai") == "grok":
-        answer = await mod_grok_chat(all_data)
+    else:
+        answer = await mod_gemini_chat(all_data)
+    # elif all_data.get("ai") == "claude":
+    #     answer = await mod_claude_chat(all_data)
+    # elif all_data.get("ai") == "deepseek":
+    #     answer = await mod_deepseek_chat(all_data)
+    # elif all_data.get("ai") == "grok":
+    #     answer = await mod_grok_chat(all_data)
 
     if not answer:
         return
@@ -3484,6 +3486,7 @@ async def add_text_to_photo(message: Message, state: FSMContext):
 async def mod_photo(data, message, state: FSMContext):
 
     await typing(message)
+    answer = {}
     id = user_id(message)
     language = data.get("language")
 
@@ -3513,12 +3516,14 @@ async def mod_photo(data, message, state: FSMContext):
             answer = await mod_gemini_chat(data)
         elif data.get("ai") == "openai":
             answer = await mod_openai_chat(data)
-        elif data.get("ai") == "claude":
-            answer = await mod_claude_chat(data)
-        elif data.get("ai") == "deepseek":
-            answer = await mod_deepseek_chat(data)
-        elif data.get("ai") == "grok":
-            answer = await mod_grok_chat(data)
+        else:
+            answer = await mod_gemini_chat(data)
+        # elif data.get("ai") == "claude":
+        #     answer = await mod_claude_chat(data)
+        # elif data.get("ai") == "deepseek":
+        #     answer = await mod_deepseek_chat(data)
+        # elif data.get("ai") == "grok":
+        #     answer = await mod_grok_chat(data)
 
         if not answer:
             return
@@ -3594,16 +3599,18 @@ async def mod_documents(data, message, state: FSMContext):
             text = data.get("user_content")
             logger_bot.info(f"User: {id} sent a photo.document and Say: {text}")
 
-            if data.get("ai") == "gemini":
-                answer = await mod_gemini_chat(data)
-            elif data.get("ai") == "openai":
+            if data.get("ai") == "openai":
                 answer = await mod_openai_chat(data)
-            elif data.get("ai") == "claude":
-                answer = await mod_claude_chat(data)
-            elif data.get("ai") == "deepseek":
-                answer = await mod_deepseek_chat(data)
-            elif data.get("ai") == "grok":
-                answer = await mod_grok_chat(data)
+            elif data.get("ai") == "gemini":
+                answer = await mod_gemini_chat(data)
+            else:
+                answer = await mod_gemini_chat(data)
+            # elif data.get("ai") == "claude":
+            #     answer = await mod_claude_chat(data)
+            # elif data.get("ai") == "deepseek":
+            #     answer = await mod_deepseek_chat(data)
+            # elif data.get("ai") == "grok":
+            #     answer = await mod_grok_chat(data)
 
             if not answer:
                 return
@@ -3635,15 +3642,15 @@ async def mod_documents(data, message, state: FSMContext):
                 await message.reply(f"Question about the attached image:", parse_mode="Markdown")
             await state.set_state(Form_text_img.no_caption)
 
-    #### DOC ####
-    elif extension.lower() == "doc":
-        await message.reply("Серьезно...?", parse_mode="markdown")
-        return
-
-    else:
-        await message.answer(f"The bot does not support this file yet, sorry - {name_file}", parse_mode="Markdown")
-        logger_bot.error(f"The bot does not support this file yet, sorry - {name_file}")
-        return
+    # #### DOC ####
+    # elif extension.lower() == "doc":
+    #     await message.reply("Серьезно...?", parse_mode="markdown")
+    #     return
+    #
+    # else:
+    #     await message.answer(f"The bot does not support this file yet, sorry - {name_file}", parse_mode="Markdown")
+    #     logger_bot.error(f"The bot does not support this file yet, sorry - {name_file}")
+    #     return
 
 # "docx", "odt", "rtf", "txt", "xls", "xlsx", "ods", "ppt", "pptx", "odp", "pdf", "html", "htm", "csv", "md", "xml", "json", "doc"
 
@@ -4157,7 +4164,7 @@ async def get_data_doc_file(message: types.Message, language: str):
                 await message.answer(error_text, parse_mode="HTML")
                 return False
         else:
-            error_text = "⚠ Поддерживаются только файлы .txt, .md, .docx, pdf, json" if language == "ru" else "⚠ Only files are supported .txt, .md, .docx, pdf, json"
+            error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)}" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)}"
             await message.answer(error_text, parse_mode="HTML")
             return False
 
@@ -4387,8 +4394,20 @@ async def second_function(message: types.Message, state: FSMContext):
         'message': message,
     }
 
+    # Получаем расширение если документ:
+    if typecontent == "document":
+        extension = re.search(r'\.([^.]+)$', message.document.file_name) # Получаю расширение из имени документа
+        if extension in EXTENS_DOC_SUPPORT:
+            await input_content_type[typecontent](**arguments)
+            return
+        else:
+            error_text = f"⚠ Поддерживаются только файлы: {str(EXTENS_DOC_SUPPORT)}" if language == "ru" else f"⚠ Only files are supported: {str(EXTENS_DOC_SUPPORT)}"
+            await message.answer(error_text, parse_mode="HTML")
+            return
+
     if typecontent == "draw" or typecontent == "photo" or typecontent == "document":
         arguments["state"] = state #state: FSMContext
+
 
     await input_content_type[typecontent](**arguments)
 ####
