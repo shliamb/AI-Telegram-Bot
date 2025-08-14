@@ -4126,11 +4126,13 @@ async def check_request_drawing(question):
 async def get_data_doc_file(message: types.Message, language: str):
     text_content = ""
     caption = ""
+
+    if message.caption:
+        caption = message.caption
+
     if message.text:
         text_content = message.text
     elif message.document:
-        if message.caption:
-            caption = message.caption
         file_size = MAX_SIZE_DOC * 1024 * 1024
         if message.document.file_size > file_size:
             error_text = f"⚠ Файл слишком большой (макс. {file_size} МБ)" if language == "ru" else f"⚠ The file is too large (max . {file_size} MB)"
@@ -4410,7 +4412,8 @@ async def second_function(message: types.Message, state: FSMContext):
             typecontent = "text"
             await input_content_type[typecontent](**arguments)
             return
-        if extension.lower() in ["jpg", "png"]:
+        elif extension.lower() in ["jpg", "png"]:
+            print("\n\n\n11")
             arguments["state"] = state  # state: FSMContext
             await input_content_type[typecontent](**arguments)
             return
@@ -4419,11 +4422,13 @@ async def second_function(message: types.Message, state: FSMContext):
             await message.answer(error_text, parse_mode="HTML")
             return
     elif typecontent == "draw" or typecontent == "photo":
+        print("\n\n\n22")
         arguments["state"] = state #state: FSMContext
         await input_content_type[typecontent](**arguments)
         return
     else:
         await input_content_type[typecontent](**arguments)
+        return
 
 
 ####
