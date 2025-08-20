@@ -29,7 +29,7 @@ DIALOG_SUM = False # AI compress history dialog
 LANGUAGE = "en"
 NOTIFICATIONS = True
 MAX_LEN = 4000 #4096
-MAX_SIZE_DOC = 3 # Возможный максимум передоваемого файла в mb
+MAX_SIZE_DOC = 10 # Возможный максимум передоваемого файла в mb
 EXTENS_DOC_SUPPORT = ["docx", "pdf", "md", "txt", "json", "xlsx", "csv"] # ["jpg", "png"]
 
 
