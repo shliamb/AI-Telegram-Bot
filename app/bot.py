@@ -3163,7 +3163,23 @@ async def load_a_base(message: Message, state: FSMContext):
 
 
 
-
+# Сохранение текста в файл и передача
+async def save_text_to_file(message: types.Message, in_text: str, message_to_user: str) -> bool:
+    text = f" {in_text} "
+    file_bytes = text.encode("utf-8")
+    buffered_file = types.input_file.BufferedInputFile(
+        file=file_bytes,
+        filename="output.txt"
+    )
+    try:
+        await message.answer_document(
+            document=buffered_file,
+            caption=f"📄 {message_to_user}"
+        )
+        return True
+    except Exception as e:
+        logger_bot.error(f"Error sending document: {e}")
+        return False
 
 
 
@@ -3210,16 +3226,24 @@ async def try_answer_bot(message, answer, data):
     for part in text_parts:
         # TRY TRANSFER ANSWER TO TELERAM:
         try:
-            await message.reply(part, parse_mode="markdown")
+            await save_text_to_file(message, part, "TEST")
+            #await message.reply(part, parse_mode="markdown")
         except:
             try:
                 await message.reply(part, parse_mode="HTML")
             except:
-                escape_text = escape_special_chars(part)
-                await message.reply(escape_text)
+                try:
+                    escape_text = escape_special_chars(part)
+                    await message.reply(escape_text)
+                except:
+                    # Если совсем не понравится API Telegram
+                    err_text = "К сожалению, текст содержит не допустимый формат для вывода в Телеграмм" if language == "ru" else "Unfortunately, the text does not contain a valid format for Telegram output"
+                    logger_bot.error(f"Error: {err_text}")
+                    await save_text_to_file(message, part, err_text)
 
 
-    # VOICE ANSWER: 
+
+    # VOICE ANSWER:
     if data.get("voice_answer") and len(answer) < 4096:
 
         # Convert Text to Audio:
