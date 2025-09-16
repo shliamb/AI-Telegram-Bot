@@ -3163,8 +3163,17 @@ async def load_a_base(message: Message, state: FSMContext):
 
 
 
+
+
+
+
+############ AI ###############
+###############################
+
+
+
 # Сохранение текста в файл и передача
-async def save_text_to_file(message: types.Message, in_text: str, message_to_user: str) -> bool:
+async def _save_text_to_file(message: types.Message, in_text: str, message_to_user: str) -> bool:
     text = f" {in_text} "
     file_bytes = text.encode("utf-8")
     buffered_file = types.input_file.BufferedInputFile(
@@ -3183,8 +3192,23 @@ async def save_text_to_file(message: types.Message, in_text: str, message_to_use
 
 
 
-############ AI ###############
-###############################
+
+async def _try_send_message(message, text: str, language: str) -> None:
+    """Пытается отправить сообщение с разными форматами."""
+
+    try:
+        await message.reply(text, parse_mode="markdown")
+    except:
+        try:
+            await message.reply(text, parse_mode="HTML")  # escape_special_chars(part)
+        except:
+            # Если совсем не понравится API Telegram то в файл
+            err_text = "Ответ содержит сложное форматирование, потому он прикреплен файлом" if language == "ru" else "This response uses rich formatting, so it has been sent as a file"
+            logger_bot.error(f"Error: {err_text}")
+            await _save_text_to_file(message, text, err_text)
+
+
+
 
 # Attempts to give a response to the user:
 async def try_answer_bot(message, answer, data):
@@ -3222,23 +3246,19 @@ async def try_answer_bot(message, answer, data):
     # Разбиваем текст на части
     text_parts = [answer[i:i + MAX_LEN] for i in range(0, len(answer), MAX_LEN)] # Якобы API Telegram принимает в одном сообщении только 4096 символов, потому делим и частями, на всякий чуть меньше
 
-    # Отправляем сообщения по частям
-    for part in text_parts:
-        # TRY TRANSFER ANSWER TO TELERAM:
-        try:
-            await message.reply(part, parse_mode="markdown")
-        except:
-            try:
-                await message.reply(part, parse_mode="HTML")
-            except:
-                try:
-                    escape_text = escape_special_chars(part)
-                    await message.reply(escape_text)
-                except:
-                    # Если совсем не понравится API Telegram
-                    err_text = "К сожалению, текст содержит не допустимый формат для вывода в Телеграмм" if language == "ru" else "Unfortunately, the text does not contain a valid format for Telegram output"
-                    logger_bot.error(f"Error: {err_text}")
-                    await save_text_to_file(message, part, err_text)
+    if len(text_parts) == 1:
+        text = text_parts[0] if text_parts else ""
+        await _try_send_message(message, text, language)
+    else:
+        i = 0
+        # Отправляем сообщения по частям
+        for part in text_parts:
+            i += 1
+            numb_part = f"{i} часть:\n\n" if language == "ru" else f"Part {i}:\n\n"
+            part_message = numb_part + part
+            await _try_send_message(message, part_message, language)
+
+
 
 
 
@@ -3344,14 +3364,17 @@ async def try_answer_bot(message, answer, data):
                 await message.answer(f"📦 <b>Ответ сжат в историю на {reduction_percent}%:</b>", parse_mode="HTML")
             else:
                 await message.answer(f"📦 <b>The answer is compressed into a {reduction_percent} story:</b>", parse_mode="Markdown")
-            try:
-                await message.answer(answer, parse_mode="Markdown")
-            except:
-                try:
-                    await message.answer(answer, parse_mode="HTML")
-                except:
-                    escape_text = escape_special_chars(answer)
-                    await message.answer(answer)
+
+            await _try_send_message(message, answer, language)
+
+            # try:
+            #     await message.answer(answer, parse_mode="Markdown")
+            # except:
+            #     try:
+            #         await message.answer(answer, parse_mode="HTML")
+            #     except:
+            #         escape_text = escape_special_chars(answer)
+            #         await message.answer(answer)
 
 
 
