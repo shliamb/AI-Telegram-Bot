@@ -3178,7 +3178,7 @@ async def _save_text_to_file(message: types.Message, in_text: str, message_to_us
     file_bytes = text.encode("utf-8")
     buffered_file = types.input_file.BufferedInputFile(
         file=file_bytes,
-        filename="output.txt"
+        filename=f"output-{random_name_2X()}.txt"
     )
     try:
         await message.answer_document(
