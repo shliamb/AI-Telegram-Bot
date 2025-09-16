@@ -3226,8 +3226,7 @@ async def try_answer_bot(message, answer, data):
     for part in text_parts:
         # TRY TRANSFER ANSWER TO TELERAM:
         try:
-            await save_text_to_file(message, part, "TEST")
-            #await message.reply(part, parse_mode="markdown")
+            await message.reply(part, parse_mode="markdown")
         except:
             try:
                 await message.reply(part, parse_mode="HTML")
