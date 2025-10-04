@@ -437,7 +437,8 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>💡 Модели Anthropic 1м ток:</b>\n"
         f"        /claude_4_1_opus 🎉 - 108$\n"
         f"        /claude_4_opus - 108$\n"
-        f"        /claude_4_sonnet 🔥 - 21.6$\n\n"
+        f"        /claude_4_5_sonnet 🔥 - 21.6$\n"
+        f"        /claude_4_sonnet - 21.6$\n\n"
         f"<b>💡 Модели Grok 1м ток:</b>\n"
         f"        /grok_4 🎉 - 21.6$\n"
         f"        /grok_3 - 21.6$\n"
@@ -490,6 +491,7 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>💡 Models Anthropic 1m tok:</b>\n"
         f"        /claude_4_1_opus 🎉 - 108$\n"
         f"        /claude_4_opus - 108$\n"
+        f"        /claude_4_5_sonnet 🔥 - 21.6$\n"
         f"        /claude_4_sonnet 🔥 - 21.6$\n\n"
         f"<b>💡 Models Grok 1m tok:</b>\n"
         f"        /grok_4 🎉 - 21.6$\n"
@@ -1234,6 +1236,19 @@ async def claude_4_sonnet(message: types.Message):
         "user_id": id,
         "ai": "claude",
         "model_language": "claude-sonnet-4-20250514",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('claude_4_5_sonnet'))
+async def claude_4_5_sonnet(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-sonnet-4-5-20250929",
     }
     confirm = await update_user(data)
     if confirm:
