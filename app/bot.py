@@ -4466,8 +4466,17 @@ async def second_function(message: types.Message, state: FSMContext):
 
     # Checking the text for a DRAWING request:
     if typecontent == "text":
+        user_paid = data_from_db.get("paid")
         drawing_request = await check_request_drawing(question)
         typecontent = drawing_request or typecontent
+        if typecontent == "draw" and user_paid == 0:
+            await message.reply("😳 Доступно после пополнения счета" if language == "ru" else "😳 Available after adding funds to your account")
+            logger_bot.error("Error: 😳 Доступно после пополнения счета")
+            return
+
+
+
+
 
     # Checking the text for a CLEAR HISTORY:
     if typecontent == "text":
