@@ -101,6 +101,10 @@ USE_DIGITAL = False
 NULL_TOKEN = 0
 PRICE = {
     # OpenAI to 1M tokes:
+
+    'gpt-5-pro': 162,  # gpt-5-pro-2025-10-06
+    'gpt-5.1': 13.5,  # gpt-5.1-2025-11-13
+
     'gpt-5': 13.5,
     'gpt-5-chat-latest': 13.5,
     'gpt-5-mini': 2.7,
@@ -133,6 +137,8 @@ PRICE = {
     'gpt-4-turbo-2024-04-09': 48,
 
     # Google Gemini to 1M tokens:
+    'gemini-3-pro': 16.8,  # gemini-3-pro-preview
+
     'gemini-2.5-pro': 13.5, # Maximum input tokens 1,048,576
     'gemini-2.5-flash': 3.36, # $3.50  - Text output (thinking- response and reasoning) 3.36
     'gemini-2.5-flash-lite-preview-06-17': 0.6,

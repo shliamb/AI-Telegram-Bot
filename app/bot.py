@@ -423,14 +423,17 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>МОДЕЛЬ: {model_language.upper()}</b>\n"
         f"(Наценка на токены 20% от их ориг. стоимости)\n\n"
         f"<b>💡 Модели OpenAI 1м ток:</b>\n"
-        f"        /gpt_5 🎉 - 13.5$\n"
+        f"        /gpt_5_pro - 162$\n"  # gpt-5-pro-2025-10-06
+        f"        /gpt_5_1 🎉 - 13.5$\n"  # gpt-5.1-2025-11-13
+        #f"        /gpt_5 - 13.5$\n"
         f"        /gpt_5_mini - 2.7$\n"
         f"        /gpt_5_nano - 0.54$\n"
-        f"        /o1_pro - 900$\n"
-        f"        /o3_pro - 120$\n"
+        #f"        /o1_pro - 900$\n"
+        #f"        /o3_pro - 120$\n"
         f"        /o3 - 12$\n"
         f"        /chatgpt_4o 🔥 - 24$\n\n"
         f"<b>💡 Модели Google 1м ток:</b>\n"
+        f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
         f"        /gemini_2_5_flash - 3.36$\n"
         f"        /gemini_2_5_flash_lite - 0.6$\n\n"
@@ -477,14 +480,17 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>MODEL: {model_language.upper()}</b>\n"
         f"(The token markup is 20% of their original cost)\n\n"
         f"<b>💡 Models OpenAI 1m tok:</b>\n"
-        f"        /gpt_5 🎉 - 13.5$\n"
+        f"        /gpt_5_pro - 162$\n"  # gpt-5-pro-2025-10-06
+        f"        /gpt_5_1 🎉 - 13.5$\n"  # gpt-5.1-2025-11-13
+        #f"        /gpt_5 🎉 - 13.5$\n"
         f"        /gpt_5_mini - 2.7$\n"
         f"        /gpt_5_nano - 0.54$\n"
-        f"        /o1_pro - 900$\n"
-        f"        /o3_pro - 120$\n"
+        # f"        /o1_pro - 900$\n"
+        # f"        /o3_pro - 120$\n"
         f"        /o3 - 12$\n"
         f"        /chatgpt_4o 🔥 - 24$\n\n"
         f"<b>💡 Models Google 1m tok:</b>\n"
+        f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
         f"        /gemini_2_5_flash - 3.36$\n"
         f"        /gemini_2_5_flash_lite - 0.6$\n\n"
@@ -667,6 +673,30 @@ async def gpt_5(message: types.Message):
         "user_id": id,
         "ai": "openai",
         "model_language": "gpt-5",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('gpt_5_1'))
+async def gpt_5_1(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5.1-2025-11-13",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+@dp.message(Command('gpt_5_pro'))
+async def gpt_5_pro(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5-pro-2025-10-06",
     }
     confirm = await update_user(data)
     if confirm:
@@ -994,6 +1024,19 @@ async def gemini_2_5_pro_preview_03_25(message: types.Message):
         "user_id": id,
         "ai": "gemini",
         "model_language": "gemini-2.5-pro" #gemini-2.5-pro-preview-05-06",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gemini_3_pro'))
+async def gemini_3_pro(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-3-pro-preview"
     }
     confirm = await update_user(data)
     if confirm:
