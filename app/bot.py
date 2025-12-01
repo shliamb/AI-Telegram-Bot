@@ -435,7 +435,7 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>💡 Модели Google 1м ток:</b>\n"
         f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash - 3.36$\n"
+        f"        /gemini_2_5_flash - 3.36$\n\n"
         #f"        /gemini_2_5_flash_lite - 0.6$\n\n"
         f"<b>💡 Модели Anthropic 1м ток:</b>\n"
         f"        /claude_4_1_opus 🎉 - 108$\n"
@@ -492,7 +492,7 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>💡 Models Google 1m tok:</b>\n"
         f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
         f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash - 3.36$\n"
+        f"        /gemini_2_5_flash - 3.36$\n\n"
         #f"        /gemini_2_5_flash_lite - 0.6$\n\n"
         f"<b>💡 Models Anthropic 1m tok:</b>\n"
         f"        /claude_4_1_opus 🎉 - 108$\n"
