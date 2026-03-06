@@ -423,29 +423,35 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>МОДЕЛЬ: {model_language.upper()}</b>\n"
         f"(Наценка на токены 20% от их ориг. стоимости)\n\n"
         f"<b>💡 Модели OpenAI 1м ток:</b>\n"
-        f"        /gpt_5_pro - 162$\n"  # gpt-5-pro-2025-10-06
-        f"        /gpt_5_1 🎉 - 13.5$\n"  # gpt-5.1-2025-11-13
-        #f"        /gpt_5 - 13.5$\n"
-        f"        /gpt_5_mini - 2.7$\n"
-        f"        /gpt_5_nano - 0.54$\n"
+        f"        /gpt_5_4_pro 🎉 - 252$\n" # gpt-5.4-pro
+        f"        /gpt_5_4 🎉 - 21$\n" # gpt-5.4
+        f"        /gpt_5 - 13.5$\n" # gpt-5-chat-latest
+        f"        /gpt_5_mini - 2.7$\n" # gpt-5-mini
+        f"        /gpt_5_nano - 0.54$\n\n" # gpt-5-nano
         #f"        /o1_pro - 900$\n"
         #f"        /o3_pro - 120$\n"
-        f"        /o3 - 12$\n"
-        f"        /chatgpt_4o 🔥 - 24$\n\n"
+        #f"        /o3 - 12$\n\n"
+        #f"        /chatgpt_4o 🔥 - 24$\n\n"
         f"<b>💡 Модели Google 1м ток:</b>\n"
-        f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
-        f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash - 3.36$\n\n"
+        f"        /gemini_3_1_pro 🎉 - 16.8$\n" # gemini-3.1-pro-preview
+        f"        /gemini_3_1_flash_lite 🎉 - 2.1$\n\n" # gemini-3.1-flash-lite-preview
+        #f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
+        #f"        /gemini_2_5_pro 🔥 - 13.5$\n"
+        #f"        /gemini_2_5_flash - 3.36$\n\n"
         #f"        /gemini_2_5_flash_lite - 0.6$\n\n"
         f"<b>💡 Модели Anthropic 1м ток:</b>\n"
-        f"        /claude_4_1_opus 🎉 - 108$\n"
-        f"        /claude_4_opus - 108$\n"
-        f"        /claude_4_5_sonnet 🔥 - 21.6$\n"
-        f"        /claude_4_sonnet - 21.6$\n\n"
+        f"        /claude_4_6_opus 🎉 - 36$\n"
+        f"        /claude_4_1_opus - 108$\n"
+        #f"        /claude_4_opus - 108$\n"
+        f"        /claude_4_6_sonnet 🎉 - 21.6$\n"
+        f"        /claude_4_5_sonnet - 21.6$\n\n"
+        #f"        /claude_4_sonnet - 21.6$\n\n"
         f"<b>💡 Модели Grok 1м ток:</b>\n"
-        f"        /grok_4 🎉 - 21.6$\n"
-        f"        /grok_3 - 21.6$\n"
-        f"        /grok_3_mini - 0.96$\n\n"
+        f"        /grok_4_1_reason 🎉 - 0.84$\n"
+        f"        /grok_4_1_no_reason 🎉 - 0.84$\n"
+        f"        /grok_4 - 21.6$\n\n"
+        #f"        /grok_3 - 21.6$\n"
+        #f"        /grok_3_mini - 0.96$\n\n"
         f"<b>💡 Модели DeepSeek 1м ток:</b>\n"
         f"        /deepseek_reasoner R1 - 3.288$\n"
         f"        /deepseek_chat 🔥 - 1.644$\n\n\n"
@@ -480,29 +486,35 @@ async def main_menu(message: types.Message, submenu="main"):
         f"<b>MODEL: {model_language.upper()}</b>\n"
         f"(The token markup is 20% of their original cost)\n\n"
         f"<b>💡 Models OpenAI 1m tok:</b>\n"
-        f"        /gpt_5_pro - 162$\n"  # gpt-5-pro-2025-10-06
-        f"        /gpt_5_1 🎉 - 13.5$\n"  # gpt-5.1-2025-11-13
-        #f"        /gpt_5 🎉 - 13.5$\n"
-        f"        /gpt_5_mini - 2.7$\n"
-        f"        /gpt_5_nano - 0.54$\n"
-        # f"        /o1_pro - 900$\n"
-        # f"        /o3_pro - 120$\n"
-        f"        /o3 - 12$\n"
-        f"        /chatgpt_4o 🔥 - 24$\n\n"
+        f"        /gpt_5_4_pro 🎉 - 252$\n" # gpt-5.4-pro
+        f"        /gpt_5_4 🎉 - 21$\n" # gpt-5.4
+        f"        /gpt_5 - 13.5$\n" # gpt-5-chat-latest
+        f"        /gpt_5_mini - 2.7$\n" # gpt-5-mini
+        f"        /gpt_5_nano - 0.54$\n\n" # gpt-5-nano
+        #f"        /o1_pro - 900$\n"
+        #f"        /o3_pro - 120$\n"
+        #f"        /o3 - 12$\n\n"
+        #f"        /chatgpt_4o 🔥 - 24$\n\n"
         f"<b>💡 Models Google 1m tok:</b>\n"
-        f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
-        f"        /gemini_2_5_pro 🔥 - 13.5$\n"
-        f"        /gemini_2_5_flash - 3.36$\n\n"
+        f"        /gemini_3_1_pro 🎉 - 16.8$\n" # gemini-3.1-pro-preview
+        f"        /gemini_3_1_flash_lite 🎉 - 2.1$\n\n" # gemini-3.1-flash-lite-preview
+        #f"        /gemini_3_pro 🎉 - 16.8$\n"  # gemini-3-pro-preview
+        #f"        /gemini_2_5_pro 🔥 - 13.5$\n"
+        #f"        /gemini_2_5_flash - 3.36$\n\n"
         #f"        /gemini_2_5_flash_lite - 0.6$\n\n"
         f"<b>💡 Models Anthropic 1m tok:</b>\n"
-        f"        /claude_4_1_opus 🎉 - 108$\n"
-        f"        /claude_4_opus - 108$\n"
-        f"        /claude_4_5_sonnet 🔥 - 21.6$\n"
-        f"        /claude_4_sonnet 🔥 - 21.6$\n\n"
+        f"        /claude_4_6_opus 🎉 - 36$\n"
+        f"        /claude_4_1_opus - 108$\n"
+        #f"        /claude_4_opus - 108$\n"
+        f"        /claude_4_6_sonnet 🎉 - 21.6$\n"
+        f"        /claude_4_5_sonnet - 21.6$\n\n"
+        #f"        /claude_4_sonnet - 21.6$\n\n"
         f"<b>💡 Models Grok 1m tok:</b>\n"
-        f"        /grok_4 🎉 - 21.6$\n"
-        f"        /grok_3 - 21.6$\n"
-        f"        /grok_3_mini - 0.96$\n\n"
+        f"        /grok_4_1_reason 🎉 - 0.84$\n"
+        f"        /grok_4_1_no_reason 🎉 - 0.84$\n"
+        f"        /grok_4 - 21.6$\n\n"
+        #f"        /grok_3 - 21.6$\n"
+        #f"        /grok_3_mini - 0.96$\n\n"
         f"<b>💡 Models DeepSeek 1m tok:</b>\n"
         f"        /deepseek_reasoner R1 - 3.288$\n"
         f"        /deepseek_chat 🔥 - 1.644$\n\n\n"
@@ -689,6 +701,33 @@ async def gpt_5_1(message: types.Message):
     confirm = await update_user(data)
     if confirm:
         await main_menu(message, "main")
+
+
+@dp.message(Command('gpt_5_4_pro'))
+async def gpt_5_4_pro(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5.4-pro",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gpt_5_4'))
+async def gpt_5_4(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "openai",
+        "model_language": "gpt-5.4",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
 
 @dp.message(Command('gpt_5_pro'))
 async def gpt_5_pro(message: types.Message):
@@ -1030,6 +1069,32 @@ async def gemini_2_5_pro_preview_03_25(message: types.Message):
         await main_menu(message, "main")
 
 
+@dp.message(Command('gemini_3_1_flash_lite'))
+async def gemini_3_1_flash_lite(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-3.1-flash-lite-preview"
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('gemini_3_1_pro'))
+async def gemini_3_1_pro(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "gemini",
+        "model_language": "gemini-3.1-pro-preview"
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
 @dp.message(Command('gemini_3_pro'))
 async def gemini_3_pro(message: types.Message):
     id = user_id(message)
@@ -1091,6 +1156,34 @@ async def gemini_2_0_flash_lite_001(message: types.Message):
 
 
 # Grok models:
+
+
+@dp.message(Command('grok_4_1_reason'))
+async def grok_4_1_reason(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-4-1-fast-reasoning",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('grok_4_1_no_reason'))
+async def grok_4_1_no_reason(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "grok",
+        "model_language": "grok-4-1-fast-non-reasoning",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
 
 @dp.message(Command('grok_4'))
 async def grok_4(message: types.Message):
@@ -1248,6 +1341,19 @@ async def deepseek_chat(message: types.Message):
 
 # Anthropic models:
 
+@dp.message(Command('claude_4_6_opus '))
+async def claude_4_6_opus (message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-opus-4-6",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
 @dp.message(Command('claude_4_1_opus'))
 async def claude_4_1_opus(message: types.Message):
     id = user_id(message)
@@ -1292,6 +1398,19 @@ async def claude_4_5_sonnet(message: types.Message):
         "user_id": id,
         "ai": "claude",
         "model_language": "claude-sonnet-4-5-20250929",
+    }
+    confirm = await update_user(data)
+    if confirm:
+        await main_menu(message, "main")
+
+
+@dp.message(Command('claude_4_6_sonnet'))
+async def claude_4_6_sonnet(message: types.Message):
+    id = user_id(message)
+    data = {
+        "user_id": id,
+        "ai": "claude",
+        "model_language": "claude-sonnet-4-6",
     }
     confirm = await update_user(data)
     if confirm:

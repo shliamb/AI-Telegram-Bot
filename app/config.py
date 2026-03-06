@@ -102,13 +102,16 @@ NULL_TOKEN = 0
 PRICE = {
     # OpenAI to 1M tokes:
 
-    'gpt-5-pro-2025-10-06': 162,  # gpt-5-pro-2025-10-06
-    'gpt-5.1-2025-11-13': 13.5,  # gpt-5.1-2025-11-13
-
-    'gpt-5': 13.5,
+    'gpt-5.4-pro': 252,
+    'gpt-5.4': 21,
     'gpt-5-chat-latest': 13.5,
     'gpt-5-mini': 2.7,
     'gpt-5-nano': 0.54,
+
+    # Hidden:
+    'gpt-5': 13.5,
+    'gpt-5-pro-2025-10-06': 162,  # gpt-5-pro-2025-10-06
+    'gpt-5.1-2025-11-13': 13.5,  # gpt-5.1-2025-11-13
 
     'gpt-4.5-preview': 270,  # gpt-4.5-preview-2025-02-27
     'gpt-4.1': 12, # 1 million Contex gpt-4.1-2025-04-14
@@ -120,7 +123,6 @@ PRICE = {
     'chatgpt-4o-latest': 24,
     'gpt-4o-mini': 1.8,  # no vision
 
-    # Hidden:
     'gpt-4.1-mini': 2.4, # gpt-4.1-mini-2025-04-14
     'gpt-4.1-nano': 0.6, # gpt-4.1-nano-2025-04-14
     'o1-preview': 90,
@@ -137,12 +139,14 @@ PRICE = {
     'gpt-4-turbo-2024-04-09': 48,
 
     # Google Gemini to 1M tokens:
-    'gemini-3-pro-preview': 16.8,  # gemini-3-pro-preview
+    'gemini-3.1-pro-preview': 16.8,
+    'gemini-3.1-flash-lite-preview': 2.1,
 
+    # Hidden:
     'gemini-2.5-pro': 13.5, # Maximum input tokens 1,048,576
     'gemini-2.5-flash': 3.36, # $3.50  - Text output (thinking- response and reasoning) 3.36
     'gemini-2.5-flash-lite-preview-06-17': 0.6,
-    # Hidden:
+    'gemini-3-pro-preview': 16.8,  # gemini-3-pro-preview
     'gemini-2.0-flash': 0.6, # 15,
     'gemini-2.0-flash-lite': 0.45,
     'gemini-1.5-pro-latest': 3.75, # 15, 
@@ -150,7 +154,10 @@ PRICE = {
     'gemini-1.5-flash-8b': 0.5,
 
     # Ilon Mask Grok to 1M tokens:
+    'grok-4-1-fast-reasoning': 0.84,
+    'grok-4-1-fast-non-reasoning': 0.84,
     'grok-4-0709': 21.6, # 256 000
+    # Hidden:
     'grok-3-latest': 21.6, # Contex 131072,
     'grok-3-mini-latest': 0.96, # Contex 131072,
 
@@ -168,12 +175,14 @@ PRICE = {
 
     # Antropic Claude to 1M tokens:  Context window - 200k, 
     # New:
+    'claude-opus-4-6': 36,
     'claude-opus-4-1-20250805': 108,
-    'claude-opus-4-20250514': 108, # claude-opus-4-20250514
+    'claude-sonnet-4-6': 21.6,
     'claude-sonnet-4-5-20250929': 21.6,
-    'claude-sonnet-4-20250514': 21.6, # claude-sonnet-4-20250514
 
     # Hidden:
+    'claude-opus-4-20250514': 108,
+    'claude-sonnet-4-20250514': 21.6,
     'claude-3-7-sonnet-latest': 21.6, # 200K context window Most intelligent model, with visible step‑by‑step reasoning claude-3-7-sonnet-20250219
     'claude-3-5-sonnet-latest': 21.6, # output 8192 tokens
     'claude-3-5-haiku-latest': 5.76, # no vision and output 8192 tokens
