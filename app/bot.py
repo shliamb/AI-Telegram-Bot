@@ -1341,7 +1341,7 @@ async def deepseek_chat(message: types.Message):
 
 # Anthropic models:
 
-@dp.message(Command('claude_4_6_opus '))
+@dp.message(Command('claude_4_6_opus'))
 async def claude_4_6_opus (message: types.Message):
     id = user_id(message)
     data = {
