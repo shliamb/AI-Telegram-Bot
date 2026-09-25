@@ -25,8 +25,8 @@ metods_pay = [
         'use_telegram': None, 
         'use_digital': None, 
         'title_method_pay': 'OZON  CARD NUMBER', 
-        'method_pay_ru': 'Переведите на карту банка OZON по номеру карты  2204 2402 7076 3321 из приложения своего банка. На имя Александр В. сумму вводимую ранее.', 
-        'method_pay_en': "Transfer to the OZON Bank card by card number 2204 2402 7076 3321 from your bank's application. In the name of Alexander V. the amount entered earlier."
+        'method_pay_ru': '....',
+        'method_pay_en': "..."
     },  
     {
         'date': datetime(2024, 10, 14, 0, 9, 11), 
@@ -41,8 +41,8 @@ metods_pay = [
         'use_telegram': None, 
         'use_digital': None, 
         'title_method_pay': 'Jusan', 
-        'method_pay_ru': 'Переведите на карту банка JUSAN по номеру карты  5395 4599 0505 1850 из приложения своего банка. На имя Александр В. сумму вводимую ранее.', 
-        'method_pay_en': "Transfer to a JUSAN Bank card using the card number 5395 4599 0505 1850 from your bank's application. In the name of Alexander V. the amount entered earlier."
+        'method_pay_ru': '...',
+        'method_pay_en': "...."
 }
 ]
 

@@ -3394,8 +3394,6 @@ async def try_answer_bot(message, answer, data):
     language = data.get("language")
 
     text = data.get("user_content")
-    logger_bot.info(f"User: {id}, Say: {text}")
-
 
     # Messages to the administrator about a zero balance
     # If OpenAI is no money for account.
